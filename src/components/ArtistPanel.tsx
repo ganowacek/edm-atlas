@@ -64,6 +64,40 @@ export default function ArtistPanel({ artist, genre, onClose, onJumpToGenre }: P
           </a>
         </div>
 
+        {artist.tracks.length > 0 && (
+          <div>
+            <p className="text-[10px] uppercase tracking-widest mb-2" style={{ color: 'var(--text-3)' }}>Recommended tracks</p>
+            <div className="space-y-2">
+              {artist.tracks.map((track) => (
+                <div key={track.id} className="rounded-lg border p-3"
+                  style={{ background: 'var(--surface-2)', borderColor: 'var(--border)' }}>
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="min-w-0">
+                      <p className="text-sm font-semibold truncate" style={{ color: 'var(--text-1)' }}>{track.title}</p>
+                      <p className="text-xs mt-1 leading-relaxed" style={{ color: 'var(--text-2)' }}>{track.reason}</p>
+                    </div>
+                    <Music size={14} className="mt-0.5 flex-shrink-0" style={{ color: color.text }} />
+                  </div>
+                  <div className="flex flex-wrap gap-2 mt-3">
+                    <a href={track.appleMusicUrl} target="_blank" rel="noopener noreferrer"
+                      className="flex items-center gap-1.5 text-xs font-medium px-2.5 py-1.5 rounded transition-colors"
+                      style={{ background: 'rgba(209,115,173,0.14)', color: '#e394c4' }}>
+                      <ExternalLink size={12} />Apple Music
+                    </a>
+                    {track.spotifyUrl && (
+                      <a href={track.spotifyUrl} target="_blank" rel="noopener noreferrer"
+                        className="flex items-center gap-1.5 text-xs font-medium px-2.5 py-1.5 rounded transition-colors"
+                        style={{ background: 'rgba(64,184,154,0.14)', color: '#5fcab0' }}>
+                        <ExternalLink size={12} />Spotify
+                      </a>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
         <div>
           <p className="text-[10px] uppercase tracking-widest mb-2" style={{ color: 'var(--text-3)' }}>Artist history</p>
           <div className="space-y-2">

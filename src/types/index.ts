@@ -5,6 +5,21 @@ export interface Artist {
   appleMusicUrl: string;
 }
 
+export interface ArtistTrackSuggestion {
+  title: string;
+  appleMusicUrl: string;
+  spotifyUrl?: string;
+  reason: string;
+}
+
+export interface TrackNode extends ArtistTrackSuggestion {
+  id: string;
+  artistName: string;
+  genreId: string;
+  genreName: string;
+  family: string;
+}
+
 export interface ArtistNode {
   id: string;
   name: string;
@@ -12,6 +27,7 @@ export interface ArtistNode {
   history: string[];
   spotifyUrl: string;
   appleMusicUrl: string;
+  tracks: TrackNode[];
   genreId: string;
   genreName: string;
   family: string;

@@ -236,7 +236,7 @@ export const GENRE_ENRICHMENT: Record<string, GenreEnrichment> = {
     history: ['UK garage localized US garage and house into a London sound shaped by pirate radio, MC culture, 2-step swing, and bass pressure.'],
     soundProfile: ['Shuffling drums', 'Chopped vocals', 'Sub bass', '2-step syncopation'],
     labels: ['Locked On', 'Public Demand', 'Ice Cream', 'XL'],
-    moreArtists: ['MJ Cole', 'Artful Dodger', 'Wookie', 'Tuff Jam', 'Zed Bias', 'El-B', 'Sunship', 'Sticky'],
+    moreArtists: ['MJ Cole', 'Artful Dodger', 'Wookie', 'Tuff Jam', 'Zed Bias', 'El-B', 'Sunship', 'Sticky', 'Fred again..', 'Joy Anonymous', 'Overmono', 'Bicep', 'salute', 'Sammy Virji', 'Barry Can’t Swim', 'TSHA'],
   },
   grime: {
     history: ['Grime emerged from UK garage, jungle, dancehall, and hip-hop as a raw MC-led East London sound built for radio clashes and cheap software production.'],

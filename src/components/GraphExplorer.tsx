@@ -3,12 +3,13 @@ import {
 } from 'react';
 import * as d3 from 'd3';
 import { GitBranch, Minus, Plus, RotateCcw } from 'lucide-react';
-import type { ArtistNode, Genre } from '../types';
+import type { ArtistNode, Genre, TrackNode } from '../types';
 import { getFamilyColor } from '../data/colors';
+import { ARTIST_TRACKS } from '../data/artistTracks';
 
 const HUB_ID = '__edm__';
 
-type Kind = 'hub' | 'family' | 'sub' | 'artist';
+type Kind = 'hub' | 'family' | 'sub' | 'artist' | 'track';
 
 interface GNode extends d3.SimulationNodeDatum {
   id: string;
@@ -17,7 +18,9 @@ interface GNode extends d3.SimulationNodeDatum {
   family: string;
   genre: Genre | null;
   artist: ArtistNode | null;
+  track: TrackNode | null;
   parentGenreId?: string;
+  parentArtistId?: string;
   childCount: number;
 }
 
@@ -38,10 +41,34 @@ interface Props {
   onSelectArtist: (artist: ArtistNode) => void;
 }
 
-const R: Record<Kind, number> = { hub: 26, family: 15, sub: 8.5, artist: 6.5 };
-const COLLIDE: Record<Kind, number> = { hub: 38, family: 36, sub: 30, artist: 22 };
+const R: Record<Kind, number> = { hub: 26, family: 15, sub: 8.5, artist: 6.5, track: 4.6 };
+const COLLIDE: Record<Kind, number> = { hub: 38, family: 36, sub: 30, artist: 22, track: 17 };
 const LABEL_ZOOM = 1.25;
 const ARTIST_LABEL_ZOOM = 1.7;
+const TRACK_LABEL_ZOOM = 2.15;
+
+function linkFamilyColor(link: GLink) {
+  const target = link.target as GNode;
+  const source = link.source as GNode;
+  const family = target.family !== 'hub' ? target.family : source.family;
+  return getFamilyColor(family).primary;
+}
+
+function linkOpacity(link: GLink) {
+  const target = link.target as GNode;
+  if (target.kind === 'track') return 0.68;
+  if (target.kind === 'artist') return 0.6;
+  if (target.kind === 'sub') return 0.55;
+  return 0.32;
+}
+
+function linkWidth(link: GLink) {
+  const target = link.target as GNode;
+  if (target.kind === 'track') return 0.9;
+  if (target.kind === 'artist') return 1.1;
+  if (target.kind === 'sub') return 1.35;
+  return 1;
+}
 
 function truncate(s: string, n = 18) {
   return s.length > n ? s.slice(0, n - 1) + '…' : s;
@@ -58,11 +85,23 @@ function musicSearchUrl(service: 'spotify' | 'apple', name: string) {
 }
 
 function clampPadding(d: GNode) {
-  const labelWidth = d.kind === 'hub' ? 0 : Math.min(92, d.name.length * (d.kind === 'artist' ? 2.7 : d.kind === 'sub' ? 3.2 : 3.8));
+  const labelWidth = d.kind === 'hub' ? 0 : Math.min(92, d.name.length * (d.kind === 'track' ? 2.4 : d.kind === 'artist' ? 2.7 : d.kind === 'sub' ? 3.2 : 3.8));
   return {
     x: Math.max(R[d.kind] + 8, labelWidth),
     y: d.kind === 'hub' ? R[d.kind] + 8 : R[d.kind] + 24,
   };
+}
+
+function trackNodesForArtist(artistName: string, genre: Genre): TrackNode[] {
+  return (ARTIST_TRACKS[artistName] ?? []).map((track) => ({
+    ...track,
+    id: `track:${genre.id}:${slugify(artistName)}:${slugify(track.title)}`,
+    artistName,
+    spotifyUrl: track.spotifyUrl ?? musicSearchUrl('spotify', `${artistName} ${track.title}`),
+    genreId: genre.id,
+    genreName: genre.name,
+    family: genre.family,
+  }));
 }
 
 function artistNodesForGenre(genre: Genre): ArtistNode[] {
@@ -77,6 +116,7 @@ function artistNodesForGenre(genre: Genre): ArtistNode[] {
     ],
     spotifyUrl: artist.spotifyUrl,
     appleMusicUrl: artist.appleMusicUrl,
+    tracks: trackNodesForArtist(artist.name, genre),
     genreId: genre.id,
     genreName: genre.name,
     family: genre.family,
@@ -94,6 +134,7 @@ function artistNodesForGenre(genre: Genre): ArtistNode[] {
     ],
     spotifyUrl: musicSearchUrl('spotify', name),
     appleMusicUrl: musicSearchUrl('apple', name),
+    tracks: trackNodesForArtist(name, genre),
     genreId: genre.id,
     genreName: genre.name,
     family: genre.family,
@@ -116,6 +157,7 @@ const GraphExplorer = forwardRef<GraphHandle, Props>(function GraphExplorer(
   const svgRef = useRef<SVGSVGElement>(null);
   const [expanded, setExpanded] = useState<Set<string>>(new Set());
   const [expandedArtists, setExpandedArtists] = useState<Set<string>>(new Set());
+  const [expandedTracks, setExpandedTracks] = useState<Set<string>>(new Set());
   const [showAll, setShowAll] = useState(false);
   const [hoveredId, setHoveredId] = useState<string | null>(null);
   const hoveredIdRef = useRef<string | null>(null);
@@ -147,7 +189,15 @@ const GraphExplorer = forwardRef<GraphHandle, Props>(function GraphExplorer(
       const node = e.nodeById.get(activeId);
         if (node) {
           focus = new Set([activeId]);
-        if (node.kind === 'artist' && node.parentGenreId) { focus.add(node.parentGenreId); }
+        if (node.kind === 'track' && node.parentArtistId) {
+          focus.add(node.parentArtistId);
+          const artistNode = e.nodeById.get(node.parentArtistId);
+          if (artistNode?.parentGenreId) focus.add(artistNode.parentGenreId);
+        }
+        if (node.kind === 'artist' && node.parentGenreId) {
+          focus.add(node.parentGenreId);
+          e.nodes.forEach((n) => { if (n.parentArtistId === node.id) focus!.add(n.id); });
+        }
         if (node.kind === 'sub' && node.genre?.parentId) { focus.add(node.genre.parentId); focus.add(HUB_ID); }
         if (node.kind === 'family') {
           focus.add(HUB_ID);
@@ -159,13 +209,14 @@ const GraphExplorer = forwardRef<GraphHandle, Props>(function GraphExplorer(
 
     e.gNode.selectAll<SVGGElement, GNode>('g.gnode').select<SVGTextElement>('text.lbl')
       .interrupt()
-      .text((d) => d.kind === 'sub' || d.kind === 'artist' ? truncate(d.name) : d.name)
-      .attr('font-size', (d) => d.kind === 'hub' ? '12px' : d.kind === 'family' ? '11px' : d.kind === 'artist' ? '8.5px' : '9.5px')
-      .attr('font-weight', (d) => d.kind === 'sub' || d.kind === 'artist' ? 500 : 700)
+      .text((d) => d.kind === 'sub' || d.kind === 'artist' || d.kind === 'track' ? truncate(d.name) : d.name)
+      .attr('font-size', (d) => d.kind === 'hub' ? '12px' : d.kind === 'family' ? '11px' : d.kind === 'artist' ? '8.5px' : d.kind === 'track' ? '7.5px' : '9.5px')
+      .attr('font-weight', (d) => d.kind === 'sub' || d.kind === 'artist' || d.kind === 'track' ? 500 : 700)
       .attr('dy', (d) => d.kind === 'hub' ? 4 : R[d.kind] + 12)
       .style('display', (d) => {
         if (d.kind === 'hub' || d.kind === 'family') return null;
         if (focus && focus.has(d.id)) return null;
+        if (d.kind === 'track') return zoomKRef.current >= TRACK_LABEL_ZOOM ? null : 'none';
         if (d.kind === 'artist') return zoomKRef.current >= ARTIST_LABEL_ZOOM ? null : 'none';
         if (zoomKRef.current >= LABEL_ZOOM) return null;
         return 'none';
@@ -173,6 +224,7 @@ const GraphExplorer = forwardRef<GraphHandle, Props>(function GraphExplorer(
       .style('opacity', (d) => {
         if (d.kind === 'hub' || d.kind === 'family') return 1;
         if (focus && focus.has(d.id)) return 1;
+        if (d.kind === 'track') return zoomKRef.current >= TRACK_LABEL_ZOOM ? 1 : 0;
         if (d.kind === 'artist') return zoomKRef.current >= ARTIST_LABEL_ZOOM ? 1 : 0;
         if (zoomKRef.current >= LABEL_ZOOM) return 1;
         return 0;
@@ -198,16 +250,16 @@ const GraphExplorer = forwardRef<GraphHandle, Props>(function GraphExplorer(
   }, [genres]);
 
   // ---- Derive which node ids should currently exist ----
-  const desiredNodes = useCallback((): { id: string; genre: Genre | null; artist: ArtistNode | null; kind: Kind; parentGenreId?: string }[] => {
-    const out: { id: string; genre: Genre | null; artist: ArtistNode | null; kind: Kind; parentGenreId?: string }[] = [
-      { id: HUB_ID, genre: null, artist: null, kind: 'hub' },
+  const desiredNodes = useCallback((): { id: string; genre: Genre | null; artist: ArtistNode | null; track: TrackNode | null; kind: Kind; parentGenreId?: string; parentArtistId?: string }[] => {
+    const out: { id: string; genre: Genre | null; artist: ArtistNode | null; track: TrackNode | null; kind: Kind; parentGenreId?: string; parentArtistId?: string }[] = [
+      { id: HUB_ID, genre: null, artist: null, track: null, kind: 'hub' },
     ];
     const expandedFamilies = showAll ? new Set(families.map((f) => f.id)) : expanded;
 
     families.forEach((f) => {
-      out.push({ id: f.id, genre: f, artist: null, kind: 'family' });
+      out.push({ id: f.id, genre: f, artist: null, track: null, kind: 'family' });
       if (expandedFamilies.has(f.id)) {
-        (subsByParent.get(f.id) ?? []).forEach((s) => out.push({ id: s.id, genre: s, artist: null, kind: 'sub' }));
+        (subsByParent.get(f.id) ?? []).forEach((s) => out.push({ id: s.id, genre: s, artist: null, track: null, kind: 'sub' }));
       }
     });
     const visibleGenreIds = new Set(out.filter((node) => node.genre).map((node) => node.id));
@@ -215,11 +267,24 @@ const GraphExplorer = forwardRef<GraphHandle, Props>(function GraphExplorer(
     out.filter((node) => node.genre && expandedArtistBranches.has(node.id) && visibleGenreIds.has(node.id))
       .forEach((node) => {
         artistNodesForGenre(node.genre!).forEach((artist) => {
-          out.push({ id: artist.id, genre: node.genre, artist, kind: 'artist', parentGenreId: node.id });
+          out.push({ id: artist.id, genre: node.genre, artist, track: null, kind: 'artist', parentGenreId: node.id });
+          if (expandedTracks.has(artist.id)) {
+            artist.tracks.forEach((track) => {
+              out.push({
+                id: track.id,
+                genre: node.genre,
+                artist,
+                track,
+                kind: 'track',
+                parentGenreId: node.id,
+                parentArtistId: artist.id,
+              });
+            });
+          }
         });
       });
     return out;
-  }, [families, expanded, expandedArtists, showAll, subsByParent]);
+  }, [families, expanded, expandedArtists, expandedTracks, showAll, subsByParent]);
 
   // ---------------------------------------------------------------------------
   // SETUP (once)
@@ -260,21 +325,21 @@ const GraphExplorer = forwardRef<GraphHandle, Props>(function GraphExplorer(
         d3
           .forceLink<GNode, GLink>([])
           .id((d) => d.id)
-          .distance((l) => ((l.target as GNode).kind === 'artist' ? 72 : (l.source as GNode).kind === 'hub' ? ring1 : 84))
-          .strength((l) => ((l.target as GNode).kind === 'artist' ? 0.26 : (l.source as GNode).kind === 'hub' ? 0.08 : 0.42))
+          .distance((l) => ((l.target as GNode).kind === 'track' ? 44 : (l.target as GNode).kind === 'artist' ? 72 : (l.source as GNode).kind === 'hub' ? ring1 : 84))
+          .strength((l) => ((l.target as GNode).kind === 'track' ? 0.5 : (l.target as GNode).kind === 'artist' ? 0.26 : (l.source as GNode).kind === 'hub' ? 0.08 : 0.42))
       )
       .force(
         'charge',
         d3.forceManyBody<GNode>().strength((d) =>
-          d.kind === 'hub' ? -120 : d.kind === 'family' ? -680 : -240
+          d.kind === 'hub' ? -120 : d.kind === 'family' ? -680 : d.kind === 'track' ? -90 : -240
         ).distanceMax(520)
       )
       .force(
         'radial',
         d3.forceRadial<GNode>(
-          (d) => (d.kind === 'hub' ? 0 : d.kind === 'family' ? ring1 : d.kind === 'artist' ? ring2 + 70 : ring2),
+          (d) => (d.kind === 'hub' ? 0 : d.kind === 'family' ? ring1 : d.kind === 'artist' ? ring2 + 70 : d.kind === 'track' ? ring2 + 112 : ring2),
           cx, cy
-        ).strength((d) => (d.kind === 'hub' ? 1 : d.kind === 'family' ? 0.45 : d.kind === 'artist' ? 0.1 : 0.16))
+        ).strength((d) => (d.kind === 'hub' ? 1 : d.kind === 'family' ? 0.45 : d.kind === 'artist' ? 0.1 : d.kind === 'track' ? 0.08 : 0.16))
       )
       .force('collide', d3.forceCollide<GNode>().radius((d) => COLLIDE[d.kind]).strength(0.95).iterations(3))
       .velocityDecay(0.42)
@@ -299,7 +364,7 @@ const GraphExplorer = forwardRef<GraphHandle, Props>(function GraphExplorer(
 
     const hub: GNode = {
       id: HUB_ID, name: 'EDM', kind: 'hub', family: 'hub', genre: null,
-      artist: null,
+      artist: null, track: null,
       childCount: families.length, x: cx, y: cy, fx: cx, fy: cy,
     };
 
@@ -319,9 +384,9 @@ const GraphExplorer = forwardRef<GraphHandle, Props>(function GraphExplorer(
       const hubN = e.nodeById.get(HUB_ID);
       if (hubN) { hubN.fx = e.W / 2; hubN.fy = e.H / 2; }
       e.sim.force('radial', d3.forceRadial<GNode>(
-        (d) => (d.kind === 'hub' ? 0 : d.kind === 'family' ? Math.min(e.W, e.H) * 0.27 : d.kind === 'artist' ? Math.min(e.W, e.H) * 0.42 + 70 : Math.min(e.W, e.H) * 0.42),
+        (d) => (d.kind === 'hub' ? 0 : d.kind === 'family' ? Math.min(e.W, e.H) * 0.27 : d.kind === 'artist' ? Math.min(e.W, e.H) * 0.42 + 70 : d.kind === 'track' ? Math.min(e.W, e.H) * 0.42 + 112 : Math.min(e.W, e.H) * 0.42),
         e.W / 2, e.H / 2
-      ).strength((d) => (d.kind === 'hub' ? 1 : d.kind === 'family' ? 0.45 : d.kind === 'artist' ? 0.1 : 0.14)));
+      ).strength((d) => (d.kind === 'hub' ? 1 : d.kind === 'family' ? 0.45 : d.kind === 'artist' ? 0.1 : d.kind === 'track' ? 0.08 : 0.14)));
       e.sim.alpha(0.3).restart();
     });
     ro.observe(container);
@@ -358,14 +423,18 @@ const GraphExplorer = forwardRef<GraphHandle, Props>(function GraphExplorer(
         const arr = newSubsByParent.get(w.parentGenreId) ?? [];
         arr.push(w.id);
         newSubsByParent.set(w.parentGenreId, arr);
+      } else if (w.kind === 'track' && w.parentArtistId) {
+        const arr = newSubsByParent.get(w.parentArtistId) ?? [];
+        arr.push(w.id);
+        newSubsByParent.set(w.parentArtistId, arr);
       }
     });
 
     want.forEach((w) => {
       if (e.nodeById.has(w.id)) return;
       let sx = cx, sy = cy;
-      const parentId = w.kind === 'artist' ? w.parentGenreId : w.genre?.parentId;
-      if ((w.kind === 'sub' || w.kind === 'artist') && parentId) {
+      const parentId = w.kind === 'track' ? w.parentArtistId : w.kind === 'artist' ? w.parentGenreId : w.genre?.parentId;
+      if ((w.kind === 'sub' || w.kind === 'artist' || w.kind === 'track') && parentId) {
         const p = e.nodeById.get(parentId);
         if (p) {
           const px = p.x ?? cx, py = p.y ?? cy;
@@ -373,9 +442,9 @@ const GraphExplorer = forwardRef<GraphHandle, Props>(function GraphExplorer(
           const outAng = Math.atan2(py - cy, px - cx);
           const siblings = newSubsByParent.get(parentId) ?? [w.id];
           const idx = siblings.indexOf(w.id);
-          const spread = w.kind === 'artist' ? Math.PI * 1.25 : Math.PI * 0.9;
+          const spread = w.kind === 'track' ? Math.PI * 0.85 : w.kind === 'artist' ? Math.PI * 1.25 : Math.PI * 0.9;
           const a = outAng + (idx - (siblings.length - 1) / 2) * (spread / Math.max(siblings.length, 1));
-          const dist = w.kind === 'artist' ? 74 : 52;
+          const dist = w.kind === 'track' ? 42 : w.kind === 'artist' ? 74 : 52;
           sx = px + Math.cos(a) * dist;
           sy = py + Math.sin(a) * dist;
         }
@@ -386,11 +455,13 @@ const GraphExplorer = forwardRef<GraphHandle, Props>(function GraphExplorer(
         sx = cx + Math.cos(ang) * ring; sy = cy + Math.sin(ang) * ring;
       }
       const node: GNode = {
-        id: w.id, name: w.artist?.name ?? w.genre?.name ?? 'EDM', kind: w.kind,
+        id: w.id, name: w.track?.title ?? w.artist?.name ?? w.genre?.name ?? 'EDM', kind: w.kind,
         family: w.genre?.family ?? 'hub', genre: w.genre,
         artist: w.artist,
+        track: w.track,
         parentGenreId: w.parentGenreId,
-        childCount: w.kind === 'family' ? (subsByParent.get(w.id) ?? []).length : w.genre ? artistNodesForGenre(w.genre).length : 0,
+        parentArtistId: w.parentArtistId,
+        childCount: w.kind === 'family' ? (subsByParent.get(w.id) ?? []).length : w.kind === 'artist' ? (w.artist?.tracks.length ?? 0) : w.genre ? artistNodesForGenre(w.genre).length : 0,
         x: sx, y: sy,
       };
       e.nodes.push(node);
@@ -407,30 +478,32 @@ const GraphExplorer = forwardRef<GraphHandle, Props>(function GraphExplorer(
       if (n.kind === 'artist' && n.parentGenreId && e.nodeById.has(n.parentGenreId)) {
         e.links.push({ source: n.parentGenreId, target: n.id });
       }
+      if (n.kind === 'track' && n.parentArtistId && e.nodeById.has(n.parentArtistId)) {
+        e.links.push({ source: n.parentArtistId, target: n.id });
+      }
     });
 
     e.sim.nodes(e.nodes);
     (e.sim.force('link') as d3.ForceLink<GNode, GLink>).links(e.links);
     (e.sim.force('link') as d3.ForceLink<GNode, GLink>)
-      .distance((l) => ((l.target as GNode).kind === 'artist' ? 72 : (l.source as GNode).kind === 'hub' ? Math.min(e.W, e.H) * 0.27 : 84))
-      .strength((l) => ((l.target as GNode).kind === 'artist' ? 0.26 : (l.source as GNode).kind === 'hub' ? 0.08 : 0.42));
+      .distance((l) => ((l.target as GNode).kind === 'track' ? 44 : (l.target as GNode).kind === 'artist' ? 72 : (l.source as GNode).kind === 'hub' ? Math.min(e.W, e.H) * 0.27 : 84))
+      .strength((l) => ((l.target as GNode).kind === 'track' ? 0.5 : (l.target as GNode).kind === 'artist' ? 0.26 : (l.source as GNode).kind === 'hub' ? 0.08 : 0.42));
 
     // join links
     e.gLink.selectAll<SVGLineElement, GLink>('line')
       .data(e.links, (d) => `${(d.source as GNode).id ?? d.source}->${(d.target as GNode).id ?? d.target}`)
       .join(
         (enter) => enter.append('line')
-          .attr('stroke-width', (d) => ((d.target as GNode).kind === 'artist' ? 0.8 : 1))
-          .attr('stroke', (d) => {
-            const target = d.target as GNode;
-            return target.kind === 'artist'
-              ? `${getFamilyColor(target.family).primary}88`
-              : 'rgba(255,255,255,0.08)';
-          })
-          .attr('stroke-dasharray', (d) => ((d.target as GNode).kind === 'artist' ? '2 4' : null))
+          .attr('stroke-width', linkWidth)
+          .attr('stroke', linkFamilyColor)
+          .attr('stroke-linecap', 'round')
           .attr('opacity', 0)
-          .call((s) => s.transition().duration(300).attr('opacity', 1)),
-        (update) => update,
+          .call((s) => s.transition().duration(300).attr('opacity', linkOpacity)),
+        (update) => update
+          .attr('stroke-width', linkWidth)
+          .attr('stroke', linkFamilyColor)
+          .attr('stroke-linecap', 'round')
+          .attr('opacity', linkOpacity),
         (exit) => exit.interrupt().remove()
       );
 
@@ -443,11 +516,12 @@ const GraphExplorer = forwardRef<GraphHandle, Props>(function GraphExplorer(
           g.transition().duration(300).style('opacity', 1);
           g.append('circle')
             .attr('r', (d) => R[d.kind])
-            .attr('fill', (d) => d.kind === 'hub' ? '#1a1722' : d.kind === 'family' ? getFamilyColor(d.family).primary : d.kind === 'artist' ? '#0f0f14' : getFamilyColor(d.family).glow)
+            .attr('fill', (d) => d.kind === 'hub' ? '#1a1722' : d.kind === 'family' ? getFamilyColor(d.family).primary : d.kind === 'artist' ? '#0f0f14' : d.kind === 'track' ? getFamilyColor(d.family).primary : getFamilyColor(d.family).glow)
             .attr('stroke', (d) => d.kind === 'hub' ? '#8b80e0' : getFamilyColor(d.family).primary)
-            .attr('stroke-width', (d) => d.kind === 'family' ? 1.8 : d.kind === 'hub' ? 2.2 : d.kind === 'artist' ? 1 : 1.2);
+            .attr('stroke-width', (d) => d.kind === 'family' ? 1.8 : d.kind === 'hub' ? 2.2 : d.kind === 'artist' ? 1 : d.kind === 'track' ? 0.9 : 1.2)
+            .attr('opacity', (d) => (d.kind === 'track' ? 0.86 : 1));
           // expand indicator ring for families with children
-          g.filter((d) => d.kind !== 'artist' && d.kind !== 'hub' && d.childCount > 0)
+          g.filter((d) => d.kind !== 'track' && d.kind !== 'hub' && d.childCount > 0)
             .append('circle').attr('class', 'expand-ring')
             .attr('r', (d) => R[d.kind] + 4).attr('fill', 'none')
             .attr('stroke', (d) => getFamilyColor(d.family).primary)
@@ -457,12 +531,12 @@ const GraphExplorer = forwardRef<GraphHandle, Props>(function GraphExplorer(
             .attr('fill', '#f4f4f6')
             .attr('pointer-events', 'none')
             .style('text-shadow', '0 1px 5px rgba(0,0,0,0.95), 0 0 3px rgba(0,0,0,0.9)')
-            .text((d) => d.kind === 'sub' || d.kind === 'artist' ? truncate(d.name) : d.name)
-            .attr('font-size', (d) => d.kind === 'hub' ? '12px' : d.kind === 'family' ? '11px' : d.kind === 'artist' ? '8.5px' : '9.5px')
-            .attr('font-weight', (d) => d.kind === 'sub' || d.kind === 'artist' ? 500 : 700)
+            .text((d) => d.kind === 'sub' || d.kind === 'artist' || d.kind === 'track' ? truncate(d.name) : d.name)
+            .attr('font-size', (d) => d.kind === 'hub' ? '12px' : d.kind === 'family' ? '11px' : d.kind === 'artist' ? '8.5px' : d.kind === 'track' ? '7.5px' : '9.5px')
+            .attr('font-weight', (d) => d.kind === 'sub' || d.kind === 'artist' || d.kind === 'track' ? 500 : 700)
             .attr('dy', (d) => d.kind === 'hub' ? 4 : R[d.kind] + 12)
-            .style('display', (d) => d.kind === 'sub' || d.kind === 'artist' ? 'none' : null)
-            .style('opacity', (d) => d.kind === 'sub' || d.kind === 'artist' ? 0 : 1);
+            .style('display', (d) => d.kind === 'sub' || d.kind === 'artist' || d.kind === 'track' ? 'none' : null)
+            .style('opacity', (d) => d.kind === 'sub' || d.kind === 'artist' || d.kind === 'track' ? 0 : 1);
           return g;
         },
         (update) => update,
@@ -477,7 +551,11 @@ const GraphExplorer = forwardRef<GraphHandle, Props>(function GraphExplorer(
           const rect = svgRef.current!.getBoundingClientRect();
           setTooltip({
             text: d.name,
-            sub: d.kind === 'artist' && d.artist ? `Artist · ${d.artist.genreName}` : d.genre ? `${d.genre.originDecade}${d.genre.bpmRange ? ' · ' + d.genre.bpmRange : ''}` : '',
+            sub: d.kind === 'track' && d.track
+              ? `Track · ${d.track.artistName}`
+              : d.kind === 'artist' && d.artist
+                ? `Artist · ${d.artist.genreName}${d.artist.tracks.length ? ' · songs available' : ''}`
+                : d.genre ? `${d.genre.originDecade}${d.genre.bpmRange ? ' · ' + d.genre.bpmRange : ''}` : '',
             x: event.clientX - rect.left, y: event.clientY - rect.top - 16,
           });
         }
@@ -488,8 +566,13 @@ const GraphExplorer = forwardRef<GraphHandle, Props>(function GraphExplorer(
       })
       .on('mouseleave', () => { setHoveredId(null); setTooltip(null); })
       .on('click', (_evt, d) => {
-        if (d.kind === 'hub') { setShowAll(false); setExpanded(new Set()); setExpandedArtists(new Set()); return; }
+        if (d.kind === 'hub') { setShowAll(false); setExpanded(new Set()); setExpandedArtists(new Set()); setExpandedTracks(new Set()); return; }
+        if (d.kind === 'track' && d.track) {
+          window.open(d.track.appleMusicUrl, '_blank', 'noopener,noreferrer');
+          return;
+        }
         if (d.kind === 'artist' && d.artist) {
+          setExpandedTracks((prev) => (prev.has(d.id) && prev.size === 1 ? new Set() : new Set([d.id])));
           onSelectArtist(d.artist);
           return;
         }
@@ -503,6 +586,7 @@ const GraphExplorer = forwardRef<GraphHandle, Props>(function GraphExplorer(
         }
         if (d.genre) {
           setShowAll(false);
+          setExpandedTracks(new Set());
           setExpandedArtists((prev) => (prev.has(d.id) && prev.size === 1 ? new Set() : new Set([d.id])));
           onSelect(d.genre);
         }
@@ -518,7 +602,7 @@ const GraphExplorer = forwardRef<GraphHandle, Props>(function GraphExplorer(
   useEffect(() => {
     if (eng.current) updateGraph();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [expanded, expandedArtists, showAll, genres]);
+  }, [expanded, expandedArtists, expandedTracks, showAll, genres]);
 
   // ---------------------------------------------------------------------------
   // VISUAL UPDATE (focus mode, hover, label LOD) — cheap, no reheat
@@ -533,7 +617,15 @@ const GraphExplorer = forwardRef<GraphHandle, Props>(function GraphExplorer(
       const node = e.nodeById.get(activeId);
       if (node) {
         focus = new Set([activeId]);
-        if (node.kind === 'artist' && node.parentGenreId) { focus.add(node.parentGenreId); }
+        if (node.kind === 'track' && node.parentArtistId) {
+          focus.add(node.parentArtistId);
+          const artistNode = e.nodeById.get(node.parentArtistId);
+          if (artistNode?.parentGenreId) focus.add(artistNode.parentGenreId);
+        }
+        if (node.kind === 'artist' && node.parentGenreId) {
+          focus.add(node.parentGenreId);
+          e.nodes.forEach((n) => { if (n.parentArtistId === node.id) focus!.add(n.id); });
+        }
         if (node.kind === 'sub' && node.genre?.parentId) { focus.add(node.genre.parentId); focus.add(HUB_ID); }
         if (node.kind === 'family') {
           focus.add(HUB_ID);
@@ -560,7 +652,7 @@ const GraphExplorer = forwardRef<GraphHandle, Props>(function GraphExplorer(
     // selected ring pulse
     e.gNode.selectAll<SVGGElement, GNode>('g.gnode').select('.expand-ring')
       .transition().duration(160)
-      .attr('opacity', (d) => (expanded.has(d.id) ? 0 : 0.5))
+      .attr('opacity', (d) => ((d.kind === 'artist' ? expandedTracks.has(d.id) : expanded.has(d.id)) ? 0 : 0.5))
       .attr('r', (d) => R[d.kind] + 4);
 
     // links
@@ -568,23 +660,23 @@ const GraphExplorer = forwardRef<GraphHandle, Props>(function GraphExplorer(
       .transition().duration(160)
       .attr('stroke', (l) => {
         const s = (l.source as GNode).id, t = (l.target as GNode).id;
-        if (focus && focus.has(s) && focus.has(t)) {
-          const fam = e.nodeById.get(t)?.family ?? 'house';
-          return `${getFamilyColor(fam).primary}cc`;
-        }
-        const target = l.target as GNode;
-        if (target.kind === 'artist') return focus ? `${getFamilyColor(target.family).primary}33` : `${getFamilyColor(target.family).primary}88`;
-        return focus ? 'rgba(255,255,255,0.03)' : 'rgba(255,255,255,0.08)';
+        if (focus && focus.has(s) && focus.has(t)) return linkFamilyColor(l);
+        return linkFamilyColor(l);
       })
       .attr('stroke-width', (l) => {
         const s = (l.source as GNode).id, t = (l.target as GNode).id;
-        const target = l.target as GNode;
-        if (focus && focus.has(s) && focus.has(t)) return target.kind === 'artist' ? 1.2 : 1.8;
-        return target.kind === 'artist' ? 0.8 : 1;
+        if (focus && focus.has(s) && focus.has(t)) return linkWidth(l) + 0.55;
+        return linkWidth(l);
+      })
+      .attr('opacity', (l) => {
+        const s = (l.source as GNode).id, t = (l.target as GNode).id;
+        if (focus && focus.has(s) && focus.has(t)) return 0.9;
+        if (focus) return Math.max(0.18, linkOpacity(l) * 0.45);
+        return linkOpacity(l);
       });
 
     updateLabelVisibility();
-  }, [selectedId, hoveredId, expanded, updateLabelVisibility]);
+  }, [selectedId, hoveredId, expanded, expandedTracks, updateLabelVisibility]);
 
   // ---------------------------------------------------------------------------
   // Imperative: search jumps here
@@ -600,6 +692,7 @@ const GraphExplorer = forwardRef<GraphHandle, Props>(function GraphExplorer(
       });
     }
     setShowAll(false);
+    setExpandedTracks(new Set());
     setExpandedArtists(new Set([genre.id]));
     onSelect(genre);
     // center on node after it settles
@@ -616,7 +709,7 @@ const GraphExplorer = forwardRef<GraphHandle, Props>(function GraphExplorer(
 
   useImperativeHandle(ref, () => ({
     focusGenre,
-    collapseAll: () => { setShowAll(false); setExpanded(new Set()); setExpandedArtists(new Set()); },
+    collapseAll: () => { setShowAll(false); setExpanded(new Set()); setExpandedArtists(new Set()); setExpandedTracks(new Set()); },
   }), [focusGenre]);
 
   const resetZoom = () => {
@@ -631,9 +724,11 @@ const GraphExplorer = forwardRef<GraphHandle, Props>(function GraphExplorer(
       if (next) {
         setExpanded(new Set(families.map((family) => family.id)));
         setExpandedArtists(new Set());
+        setExpandedTracks(new Set());
       } else {
         setExpanded(new Set());
         setExpandedArtists(new Set());
+        setExpandedTracks(new Set());
       }
       return next;
     });
