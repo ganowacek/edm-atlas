@@ -48,6 +48,9 @@ export const genres: Genre[] = [
     moods: ['melancholic', 'introspective', 'soulful', 'late-night'],
     beginnerFriendly: true,
     deepCut: false,
+    essentialTracks: [
+      { title: 'Mystery of Love', artist: 'Mr. Fingers', spotifyTrackId: '6AvtRMA6AzFNYZ3qEMYpch', appleMusicSongId: '1272313508', reason: 'Written by Larry Heard on the first day with his new synth and drum machine in 1984, its giddy, sparse chords set the emotional, jazz-inflected template that deep house has followed ever since.' },
+    ],
     artists: [
       { name: 'Larry Heard (Mr. Fingers)', importance: 'Defined the deep house template with sparse, emotional productions' , spotifyArtistId: '3j7teie3p6UnbA8nW51Trz' },
       { name: 'Kerri Chandler', importance: 'New Jersey producer known for soulful, raw deep house with a jazz sensibility' , spotifyArtistId: '7nqpEU6DCHkNtK1bYsyS3W' },
@@ -71,6 +74,9 @@ export const genres: Genre[] = [
     moods: ['driving', 'hypnotic', 'club', 'functional'],
     beginnerFriendly: true,
     deepCut: false,
+    essentialTracks: [
+      { title: 'Losing It', artist: 'Fisher', spotifyTrackId: '6ho0GyrWZN3mhi9zVRW7xi', appleMusicSongId: '1579442434', reason: 'A 2018 breakout that hit #1 on the Australian and US club charts and earned a Grammy nomination, proving a stripped-back, vocal-chop tech house groove could dominate festival mainstages.' },
+    ],
     artists: [
       { name: 'Fisher', importance: 'Australian DJ/producer who brought raucous, bass-forward tech house to festival main stages' , spotifyArtistId: '1VJ0briNOlXRtJUAzoUJdt' },
       { name: 'Chris Lake', importance: 'UK producer known for punchy, groove-led tech house with strong bass hooks' , spotifyArtistId: '5Igpc9iLZ3YGtKeYfSrrOE' },
@@ -93,6 +99,9 @@ export const genres: Genre[] = [
     moods: ['building', 'euphoric', 'emotional', 'epic'],
     beginnerFriendly: true,
     deepCut: false,
+    essentialTracks: [
+      { title: 'Xpander', artist: 'Sasha', spotifyTrackId: '76mh0rcSJpNhoCCqazptWm', appleMusicSongId: '1308821701', reason: 'An 11-minute, multi-part dancefloor journey from 1999 that became the genre\'s defining epic — its slow-build structure is the blueprint progressive house is named for.' },
+    ],
     artists: [
       { name: 'Sasha', importance: 'UK DJ/producer who shaped progressive house\'s epic, layered sound throughout the 90s' , spotifyArtistId: '6u4jLGLPuarS3i2XWHVxoS' },
       { name: 'John Digweed', importance: 'Long-time collaborator with Sasha; defined the progressive house aesthetic at Bedrock' , spotifyArtistId: '3xnDktxhudJR2Wv3HZDQ9W' },
@@ -115,6 +124,9 @@ export const genres: Genre[] = [
     moods: ['aggressive', 'energetic', 'club', 'festival'],
     beginnerFriendly: true,
     deepCut: false,
+    essentialTracks: [
+      { title: 'Satisfaction', artist: 'Benny Benassi', spotifyTrackId: '213yG5o4EISfGoceayLo6u', reason: 'Released in 2002 as Benny Benassi Presents The Biz, its distorted, squelching bassline became the defining sound of electro house and spawned countless remixes and imitators.' },
+    ],
     artists: [
       { name: 'Benny Benassi', importance: 'Italian producer whose distorted bass sound helped define electro house globally' , spotifyArtistId: '4Ws2otunReOa6BbwxxpCt6' },
       { name: 'Knife Party', importance: 'Duo (members of Pendulum) who pushed electro house into big festival drops' , spotifyArtistId: '2DuJi13MWHjRHrqRUwk8vH' },
@@ -137,6 +149,9 @@ export const genres: Genre[] = [
     moods: ['tribal', 'spiritual', 'deep', 'groovy'],
     beginnerFriendly: false,
     deepCut: true,
+    essentialTracks: [
+      { title: 'Superman (feat. Bucie)', artist: 'Black Coffee', spotifyTrackId: '2a8zMZ5BirCPCccgedP9EQ', appleMusicSongId: '1442361217', reason: 'A 2012 South African house anthem whose tribal percussion and Bucie\'s soaring vocal carried Afro house onto international dancefloors years before the genre\'s global festival boom.' },
+    ],
     artists: [
       { name: 'Black Coffee', importance: 'South African DJ/producer who brought Afro house to global festival audiences', spotifyArtistId: '6wMr4zKPrrR0UVz08WtUWc', appleMusicArtistId: '386491518' },
       { name: 'Themba', importance: 'South African DJ with a percussive, energetic take on Afro house' , spotifyArtistId: '64tzIMKX4Npx37YLcNZZNC' },
@@ -159,6 +174,9 @@ export const genres: Genre[] = [
     moods: ['funky', 'nostalgic', 'warm', 'groovy'],
     beginnerFriendly: true,
     deepCut: false,
+    essentialTracks: [
+      { title: 'Around the World', artist: 'Daft Punk', spotifyTrackId: '1pKYYY0dkg23sQQXi0Q5zN', appleMusicSongId: '696886431', reason: 'A 1997 single built on a single repeated bassline and vocoded phrase, it announced French house\'s filtered-disco aesthetic to the world and remains the genre\'s most recognisable record.' },
+    ],
     artists: [
       { name: 'Daft Punk', importance: 'Defined French house globally with filtered samples, vocoders, and robot personas', spotifyArtistId: '4tZwfgrHOc3mvqYlEYSvVi', appleMusicArtistId: '5468295' },
       { name: 'Cassius', importance: 'Parisian duo whose funky, soulful productions helped define the Roule/Ed Banger aesthetic' , spotifyArtistId: '4sf3QZW8a3xZ14IGsOAzoy' },
@@ -181,6 +199,9 @@ export const genres: Genre[] = [
     moods: ['melodic', 'playful', 'uplifting', 'mainstream'],
     beginnerFriendly: true,
     deepCut: false,
+    essentialTracks: [
+      { title: 'Gecko', artist: 'Oliver Heldens', spotifyTrackId: '0g4ar6033TW1DRDpdq9JsD', reason: 'Released in January 2014 when Heldens was still a teenager, its plucky bassline and FM-style lead established the future house sound months before its Becky Hill-featuring "Overdrive" remix took it global.' },
+    ],
     artists: [
       { name: 'Oliver Heldens', importance: 'Dutch DJ credited with creating and popularising future house' , spotifyArtistId: '5nki7yRhxgM509M5ADlN1p' },
       { name: 'Don Diablo', importance: 'Dutch producer who helped bring future house to mainstream festivals' , spotifyArtistId: '1l2ekx5skC4gJH8djERwh1' },
@@ -203,6 +224,9 @@ export const genres: Genre[] = [
     moods: ['emotional', 'melodic', 'streaming', 'mainstream'],
     beginnerFriendly: true,
     deepCut: false,
+    essentialTracks: [
+      { title: 'Ride It', artist: 'Regard', spotifyTrackId: '6DMwKhpM9wztCCaDW911TB', appleMusicSongId: '1472026722', reason: 'Regard\'s 2019 house flip of an 11-year-old Jay Sean R&B ballad went viral on TikTok and streamed over a billion times, becoming the genre\'s breakout, chart-topping calling card.' },
+    ],
     artists: [
       { name: 'Imanbek', importance: 'Kazakh producer who brought slap house to global #1s with his remix of "Roses"' , spotifyArtistId: '5rGrDvrLOV2VV8SCFVGWlj' },
       { name: 'Topic', importance: 'German producer known for slap house anthems with emotional hooks' , spotifyArtistId: '0u6GtibW46tFX7koQ6uNJZ' },
@@ -254,6 +278,9 @@ export const genres: Genre[] = [
     moods: ['hypnotic', 'sparse', 'cerebral', 'slow-burn'],
     beginnerFriendly: false,
     deepCut: true,
+    essentialTracks: [
+      { title: 'Spastik', artist: 'Plastikman', spotifyTrackId: '553HOkDZQktOEBKvxTBPS1', appleMusicSongId: '1508239038', reason: 'A 1993 Richie Hawtin production built from a single drum pattern repeated for nine hypnotic minutes — the most extreme distillation of minimal techno\'s "less is more" philosophy.' },
+    ],
     artists: [
       { name: 'Richie Hawtin', importance: 'Created Plastikman — the defining minimal techno project — and pioneered laptop DJing', spotifyArtistId: '3AhwIUus3pIaA3CvYBEtpy' },
       { name: 'Ricardo Villalobos', importance: 'Chilean-German DJ whose marathon minimal sets redefined how long music could unfold', spotifyArtistId: '0s2YIpNnjdf0FY4tNrF8Y4' },
@@ -276,6 +303,9 @@ export const genres: Genre[] = [
     moods: ['brutal', 'dark', 'confrontational', 'underground'],
     beginnerFriendly: false,
     deepCut: true,
+    essentialTracks: [
+      { title: 'My Head Is Slowly Exploding', artist: 'Perc', spotifyTrackId: '0VaedEOb0QXZluGvl9xmNr', reason: 'A 2011 release from Perc\'s "Wicker & Steel" album that fused noise textures with a punishing 4/4 kick, helping define the harsher, post-industrial techno sound that took over Berlin warehouses in the 2010s.' },
+    ],
     artists: [
       { name: 'Phase Fatale', importance: 'US-born Berlin-based DJ/producer known for dark, warehouse industrial techno', spotifyArtistId: '1jjplgZcgCwhU7JlGhBQiw' },
       { name: 'Paula Temple', importance: 'British producer whose work straddles industrial noise and techno', spotifyArtistId: '4iy2RFU8gIpXF5yaK0l8ZT' },
@@ -298,6 +328,9 @@ export const genres: Genre[] = [
     moods: ['aggressive', 'relentless', 'rave', 'intense'],
     beginnerFriendly: false,
     deepCut: false,
+    essentialTracks: [
+      { title: 'Doppler', artist: 'Charlotte de Witte', spotifyTrackId: '0TtgKq96j4bpE5UQUDXrwH', appleMusicSongId: '1678835626', reason: 'A 2021 release whose relentless, distorted kick and acid-tinged groove became a generational anthem, soundtracking the post-2020 surge of hard techno among younger club audiences.' },
+    ],
     artists: [
       { name: 'Chris Liebing', importance: 'Frankfurt DJ who helped define hard, functional techno at the CLR label', spotifyArtistId: '21444lX8gpmOX36icLmbFI' },
       { name: 'DJ Rush', importance: 'Chicago-born artist known for punishing, relentless hard techno DJ sets', spotifyArtistId: '6gBmUpKvNYtnQTSLK5vwS5' },
@@ -320,6 +353,9 @@ export const genres: Genre[] = [
     moods: ['emotional', 'melodic', 'euphoric', 'cinematic'],
     beginnerFriendly: true,
     deepCut: false,
+    essentialTracks: [
+      { title: 'Singularity', artist: 'Stephan Bodzin', spotifyTrackId: '0yuJtvXsapVOQfNDYxQ5mw', reason: 'A widely-played 2015 cut whose cinematic synth lead and driving groove exemplify the emotional, festival-scale sound that carried melodic techno out of the underground in the 2010s.' },
+    ],
     artists: [
       { name: 'Bicep', importance: 'Belfast duo whose melodic techno crossover "Glue" and debut album broke the style mainstream', spotifyArtistId: '73A3bLnfnz5BoQjb4gNCga' },
       { name: 'Solomun', importance: 'Bosnian-German DJ/producer who helped define the Ibiza-influenced melodic techno sound', spotifyArtistId: '5wJK4kQAkVGjqM9x46KQOC' },
@@ -342,6 +378,9 @@ export const genres: Genre[] = [
     moods: ['acidic', 'hypnotic', 'rave', 'underground'],
     beginnerFriendly: false,
     deepCut: true,
+    essentialTracks: [
+      { title: 'Acperience 1', artist: 'Hardfloor', spotifyTrackId: '0sz7HvLfzKGWKM4PMzbtnw', appleMusicSongId: '158241297', reason: 'A 1992 German release whose duelling TB-303 lines defined acid techno\'s squelching, hypnotic sound and remains one of the most sampled and referenced acid records ever made.' },
+    ],
     artists: [
       { name: 'Emmanuel Top', importance: 'French producer known for driving, melodic acid techno of the early-to-mid 1990s', spotifyArtistId: '5y8522WHbYqJVt1jSwNSfA' },
       { name: 'Liberator DJs', importance: 'Central figures of the London acid techno scene through Stay Up Forever records' },
@@ -364,6 +403,9 @@ export const genres: Genre[] = [
     moods: ['deep', 'spatial', 'hypnotic', 'meditative'],
     beginnerFriendly: false,
     deepCut: true,
+    essentialTracks: [
+      { title: 'Phylyps Trak', artist: 'Basic Channel', spotifyTrackId: '3kpEWFAzNVgFTGdxVX3E8w', reason: 'A 1993 Berlin release where Moritz von Oswald and Mark Ernestus stripped techno to a dub-soaked pulse of reverb and bass — the foundational record of dub techno as a style.' },
+    ],
     artists: [
       { name: 'Basic Channel', importance: 'Maurizio & Mark Ernestus — founders of the dub techno style and the Chain Reaction label', spotifyArtistId: '37um1uxI92g4ll61LzrtB5' },
       { name: 'Deepchord', importance: 'Detroit artist whose dense, textured dub techno sets span hours of immersive sound', spotifyArtistId: '45g23Apmqo2x4obM7LjmpW' },
