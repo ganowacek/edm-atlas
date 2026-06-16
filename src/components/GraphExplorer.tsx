@@ -183,6 +183,7 @@ const GraphExplorer = forwardRef<GraphHandle, Props>(function GraphExplorer(
   const zoomKRef = useRef(1);
   const isDraggingRef = useRef(false);
   const dragTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const isSettlingRef = useRef(false);
   const [tooltip, setTooltip] = useState<{ text: string; sub: string; x: number; y: number } | null>(null);
 
   // Persistent D3 state across renders
@@ -235,7 +236,10 @@ const GraphExplorer = forwardRef<GraphHandle, Props>(function GraphExplorer(
       .attr('dy', (d) => d.kind === 'hub' ? 4 : R[d.kind] + 12)
       .style('display', (d) => {
         if (d.kind === 'hub') return null;
-        if (isDraggingRef.current) return d.kind === 'family' ? null : 'none';
+        // While dragging or the simulation is settling, nodes are moving on
+        // screen — hide every non-anchor label so moving text can't trail.
+        const moving = isDraggingRef.current || isSettlingRef.current;
+        if (moving) return 'none';
         if (d.kind === 'family') return null;
         if (focus && focus.has(d.id)) return null;
         if (d.kind === 'track') return zoomKRef.current >= TRACK_LABEL_ZOOM ? null : 'none';
@@ -245,7 +249,8 @@ const GraphExplorer = forwardRef<GraphHandle, Props>(function GraphExplorer(
       })
       .style('opacity', (d) => {
         if (d.kind === 'hub') return 1;
-        if (isDraggingRef.current) return d.kind === 'family' ? 1 : 0;
+        const moving = isDraggingRef.current || isSettlingRef.current;
+        if (moving) return 0;
         if (d.kind === 'family') return 1;
         if (focus && focus.has(d.id)) return 1;
         if (d.kind === 'track') return zoomKRef.current >= TRACK_LABEL_ZOOM ? 1 : 0;
@@ -394,6 +399,19 @@ const GraphExplorer = forwardRef<GraphHandle, Props>(function GraphExplorer(
           d.y = d.y ?? cy;
           return `translate(${d.x},${d.y})`;
         });
+      // While the simulation is hot (nodes moving), hide labels so moving
+      // SVG text can't leave paint trails on mobile Safari. Restore on settle.
+      const hot = e.sim.alpha() > 0.08;
+      if (hot !== isSettlingRef.current) {
+        isSettlingRef.current = hot;
+        updateLabelVisibility();
+      }
+    });
+    sim.on('end', () => {
+      if (isSettlingRef.current) {
+        isSettlingRef.current = false;
+        updateLabelVisibility();
+      }
     });
 
     const hub: GNode = {
@@ -571,7 +589,12 @@ const GraphExplorer = forwardRef<GraphHandle, Props>(function GraphExplorer(
             .attr('text-anchor', 'middle')
             .attr('fill', '#f4f4f6')
             .attr('pointer-events', 'none')
-            .style('text-shadow', '0 1px 5px rgba(0,0,0,0.95), 0 0 3px rgba(0,0,0,0.9)')
+            // Stroke outline instead of text-shadow: legible over any background
+            // without the iOS Safari paint-trail that drop-shadows leave on moving text.
+            .attr('stroke', 'rgba(8,8,12,0.92)')
+            .attr('stroke-width', 2.6)
+            .attr('stroke-linejoin', 'round')
+            .attr('paint-order', 'stroke')
             .text((d) => d.kind === 'sub' || d.kind === 'artist' || d.kind === 'track' ? truncate(d.name) : d.name)
             .attr('font-size', (d) => d.kind === 'hub' ? '12px' : d.kind === 'family' ? '11px' : d.kind === 'artist' ? '8.5px' : d.kind === 'track' ? '7.5px' : '9.5px')
             .attr('font-weight', (d) => d.kind === 'sub' || d.kind === 'artist' || d.kind === 'track' ? 500 : 700)
