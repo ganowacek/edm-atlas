@@ -268,7 +268,7 @@ const GraphExplorer = forwardRef<GraphHandle, Props>(function GraphExplorer(
         (enter) => enter.append('line').attr('stroke-width', 1).attr('stroke', 'rgba(255,255,255,0.08)').attr('opacity', 0)
           .call((s) => s.transition().duration(300).attr('opacity', 1)),
         (update) => update,
-        (exit) => exit.transition().duration(200).attr('opacity', 0).remove()
+        (exit) => exit.interrupt().remove()
       );
 
     // join nodes
@@ -297,7 +297,7 @@ const GraphExplorer = forwardRef<GraphHandle, Props>(function GraphExplorer(
           return g;
         },
         (update) => update,
-        (exit) => exit.transition().duration(200).style('opacity', 0).remove()
+        (exit) => exit.interrupt().remove()
       );
 
     // wire events (rebind every update so new nodes get handlers)
