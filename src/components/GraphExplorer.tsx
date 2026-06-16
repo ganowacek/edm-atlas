@@ -332,6 +332,8 @@ const GraphExplorer = forwardRef<GraphHandle, Props>(function GraphExplorer(
     const expandedArtistBranches = showAll ? visibleGenreIds : expandedArtists;
     out.filter((node) => node.genre && expandedArtistBranches.has(node.id) && visibleGenreIds.has(node.id))
       .forEach((node) => {
+        const visibleChildGenres = (subsByParent.get(node.id) ?? []).filter((child) => visibleGenreIds.has(child.id));
+        if (visibleChildGenres.length > 0) return;
         artistNodesForGenre(node.genre!).forEach((artist) => {
           out.push({ id: artist.id, genre: node.genre, artist, track: null, kind: 'artist', parentGenreId: node.id });
           if (expandedTracks.has(artist.id)) {
@@ -673,11 +675,19 @@ const GraphExplorer = forwardRef<GraphHandle, Props>(function GraphExplorer(
         }
         if (d.kind === 'family') {
           setShowAll(false);
+          const childIds = (subsByParent.get(d.id) ?? []).map((child) => child.id);
           setExpanded((prev) => {
             const next = new Set(prev);
             if (next.has(d.id)) next.delete(d.id); else next.add(d.id);
             return next;
           });
+          setExpandedTracks(new Set());
+          setExpandedArtists((prev) => {
+            const isOpen = prev.size === childIds.length && childIds.every((id) => prev.has(id));
+            return isOpen ? new Set() : new Set(childIds.length > 0 ? childIds : [d.id]);
+          });
+          if (d.genre) onSelect(d.genre);
+          return;
         }
         if (d.genre) {
           setShowAll(false);
@@ -789,7 +799,20 @@ const GraphExplorer = forwardRef<GraphHandle, Props>(function GraphExplorer(
     }
     setShowAll(false);
     setExpandedTracks(new Set());
-    setExpandedArtists(new Set([genre.id]));
+    if (genre.parentId) {
+      setExpandedArtists(new Set([genre.id]));
+    } else {
+      const children = subsByParent.get(genre.id) ?? [];
+      if (children.length > 0) {
+        setExpanded((prev) => {
+          if (prev.has(genre.id)) return prev;
+          const next = new Set(prev); next.add(genre.id); return next;
+        });
+        setExpandedArtists(new Set(children.map((child) => child.id)));
+      } else {
+        setExpandedArtists(new Set([genre.id]));
+      }
+    }
     onSelect(genre);
     // center on node after it settles
     window.setTimeout(() => {
@@ -802,7 +825,7 @@ const GraphExplorer = forwardRef<GraphHandle, Props>(function GraphExplorer(
       const t = d3.zoomIdentity.translate(e.W / 2 - node.x * k, e.H / 2 - node.y * k + verticalOffset).scale(k);
       d3.select(svgRef.current).transition().duration(600).call(e.zoom.transform, t);
     }, genre.parentId ? 380 : 60);
-  }, [genres, onSelect]);
+  }, [genres, onSelect, subsByParent]);
 
   useImperativeHandle(ref, () => ({
     focusGenre,
