@@ -255,14 +255,16 @@ function patchGenresSource(source: string, appleCache: AppleCache, spotifyCache:
       const appleMusicArtistId = rest.includes('appleMusicArtistId')
         ? undefined
         : appleCache.artists[artistKey(name)]?.artistId;
-      const spotifyArtistId = rest.includes('spotifyArtistId')
-        ? undefined
-        : spotifyCache[artistKey(name)]?.spotifyArtistId;
+      const spotifyArtistId = spotifyCache[artistKey(name)]?.spotifyArtistId;
+      let nextMatch = match;
+      if (spotifyArtistId && rest.includes('spotifyArtistId')) {
+        nextMatch = nextMatch.replace(/spotifyArtistId: '[^']*'/, `spotifyArtistId: '${spotifyArtistId}'`);
+      }
       const additions = [
         appleMusicArtistId ? `appleMusicArtistId: '${appleMusicArtistId}'` : '',
-        spotifyArtistId ? `spotifyArtistId: '${spotifyArtistId}'` : '',
+        spotifyArtistId && !rest.includes('spotifyArtistId') ? `spotifyArtistId: '${spotifyArtistId}'` : '',
       ].filter(Boolean);
-      if (additions.length === 0) return match;
+      if (additions.length === 0) return nextMatch;
       return `{ name: '${rawName}', importance: '${importance}'${rest.trimEnd()}, ${additions.join(', ')} }`;
     }
   );

@@ -660,6 +660,7 @@ export const ARTIST_TRACKS: Record<string, ArtistTrackSuggestion[]> = {
     },
     {
       title: 'Everybody Dance',
+      spotifyTrackId: '15ifyO8wYntwyXAptfxhKr',
       reason: 'Everybody Dance is a curated Disco reference point for Chic / Nile Rodgers, chosen from the EDM Atlas roadmap for how it represents this branch of electronic music history.',
     },
   ],
@@ -1091,6 +1092,7 @@ export const ARTIST_TRACKS: Record<string, ArtistTrackSuggestion[]> = {
   'DJ Rush': [
     {
       title: 'Get on Up',
+      spotifyTrackId: '5NV9wxF7vKed57ZdLwLG3s',
       reason: 'Get on Up is a curated Hard Techno reference point for DJ Rush, chosen from the EDM Atlas roadmap for how it represents this branch of electronic music history.',
     },
     {
@@ -1099,26 +1101,31 @@ export const ARTIST_TRACKS: Record<string, ArtistTrackSuggestion[]> = {
     },
     {
       title: 'I Wanna',
+      spotifyTrackId: '6ktKMFU1ExX4nYLPvC5QPt',
       reason: 'I Wanna is a curated Hard Techno reference point for DJ Rush, chosen from the EDM Atlas roadmap for how it represents this branch of electronic music history.',
     },
   ],
   'DJ Shadow': [
     {
       title: 'Midnight in a Perfect World',
+      spotifyTrackId: '1a9maLxqpx3cxjY1lTj62B',
       reason: 'Midnight in a Perfect World is a curated Downtempo / Trip-Hop reference point for DJ Shadow, chosen from the EDM Atlas roadmap for how it represents this branch of electronic music history.',
     },
     {
       title: 'Building Steam with a Grain of Salt',
+      spotifyTrackId: '4Ms0GKHCtr5Lpg4dKOhO2I',
       reason: 'Building Steam with a Grain of Salt is a curated Downtempo / Trip-Hop reference point for DJ Shadow, chosen from the EDM Atlas roadmap for how it represents this branch of electronic music history.',
     },
     {
       title: 'Organ Donor',
+      spotifyTrackId: '1XNM8FcPNYK0w3Vc7q46TN',
       reason: 'Organ Donor is a curated Downtempo / Trip-Hop reference point for DJ Shadow, chosen from the EDM Atlas roadmap for how it represents this branch of electronic music history.',
     },
   ],
   'DJ Spinn': [
     {
       title: 'Dubby',
+      spotifyTrackId: '5e9NRIv3GThR74u3jvtvNa',
       reason: 'Dubby is a curated Footwork / Juke reference point for DJ Spinn, chosen from the EDM Atlas roadmap for how it represents this branch of electronic music history.',
     },
     {
@@ -1133,10 +1140,12 @@ export const ARTIST_TRACKS: Record<string, ArtistTrackSuggestion[]> = {
   'Don Diablo': [
     {
       title: 'On My Mind',
+      spotifyTrackId: '40dweDLovf20EbZCq1Kwj1',
       reason: 'On My Mind is a curated Future House reference point for Don Diablo, chosen from the EDM Atlas roadmap for how it represents this branch of electronic music history.',
     },
     {
       title: 'Cutting Shapes',
+      spotifyTrackId: '3hENlPbIlUZXQ3MiosF87Q',
       reason: 'Cutting Shapes is a curated Future House reference point for Don Diablo, chosen from the EDM Atlas roadmap for how it represents this branch of electronic music history.',
     },
     {
