@@ -3,7 +3,9 @@ import { X, MapPin, Zap, ExternalLink } from 'lucide-react';
 import type { Genre } from '../types';
 import { accentText, familyTintStyle, getFamilyColor, tintStyle } from '../data/colors';
 import { useIsMobile } from '../hooks/useMediaQuery';
-import { spotifyArtistUrl, appleMusicArtistUrl } from '../data/urls';
+import { spotifyArtistUrl, appleMusicArtistUrl, spotifyTrackUrl, appleMusicSongUrl, appleMusicTrackUrl } from '../data/urls';
+import { resolveEntityReference } from '../data/entityLinks';
+import LinkedText from './LinkedText';
 import BottomSheet from './BottomSheet';
 
 const DECADES = ['1970s', '1980s', '1990s', '2000s', '2010s', '2020s'];
@@ -17,10 +19,9 @@ interface Props {
   onClose: () => void;
   onJumpToGenre?: (genreId: string) => void;
   onJumpToArtist?: (genreId: string, artistName: string) => void;
-  allGenres: Genre[];
 }
 
-export default function DetailPanel({ genre, onClose, onJumpToGenre, onJumpToArtist, allGenres }: Props) {
+export default function DetailPanel({ genre, onClose, onJumpToGenre, onJumpToArtist }: Props) {
   const isMobile = useIsMobile();
 
   useEffect(() => {
@@ -33,9 +34,6 @@ export default function DetailPanel({ genre, onClose, onJumpToGenre, onJumpToArt
   const color = getFamilyColor(genre.family);
   const familyText = accentText(color.primary);
   const familyBadgeStyle = familyTintStyle(color, 18, 42);
-
-  const findByName = (name: string) =>
-    allGenres.find((g) => g.name.toLowerCase() === name.toLowerCase());
 
   const body = (
     <div className="overflow-y-auto h-full" style={{ background: 'var(--surface-1)' }}>
@@ -83,14 +81,18 @@ export default function DetailPanel({ genre, onClose, onJumpToGenre, onJumpToArt
           </div>
         </div>
 
-        <p className="text-sm leading-relaxed" style={{ color: 'var(--text-2)' }}>{genre.description}</p>
+        <p className="text-sm leading-relaxed" style={{ color: 'var(--text-2)' }}>
+          <LinkedText text={genre.description} genreId={genre.id} onJumpToGenre={onJumpToGenre} onJumpToArtist={onJumpToArtist} />
+        </p>
 
         {genre.history && genre.history.length > 0 && (
           <div>
             <p className="text-[10px] uppercase tracking-widest mb-2" style={{ color: 'var(--text-3)' }}>Deep history</p>
             <div className="space-y-2">
               {genre.history.map((item) => (
-                <p key={item} className="text-xs leading-relaxed" style={{ color: 'var(--text-2)' }}>{item}</p>
+                <p key={item} className="text-xs leading-relaxed" style={{ color: 'var(--text-2)' }}>
+                  <LinkedText text={item} genreId={genre.id} onJumpToGenre={onJumpToGenre} onJumpToArtist={onJumpToArtist} />
+                </p>
               ))}
             </div>
           </div>
@@ -138,7 +140,9 @@ export default function DetailPanel({ genre, onClose, onJumpToGenre, onJumpToArt
                 <p className="text-[10px] uppercase tracking-widest mb-2" style={{ color: 'var(--text-3)' }}>Scene context</p>
                 <div className="space-y-1.5">
                   {genre.sceneNotes.map((item) => (
-                    <div key={item} className="text-xs leading-relaxed" style={{ color: 'var(--text-2)' }}>{item}</div>
+                    <div key={item} className="text-xs leading-relaxed" style={{ color: 'var(--text-2)' }}>
+                      <LinkedText text={item} genreId={genre.id} onJumpToGenre={onJumpToGenre} onJumpToArtist={onJumpToArtist} />
+                    </div>
                   ))}
                 </div>
               </div>
@@ -148,9 +152,24 @@ export default function DetailPanel({ genre, onClose, onJumpToGenre, onJumpToArt
               <div>
                 <p className="text-[10px] uppercase tracking-widest mb-2" style={{ color: 'var(--text-3)' }}>Labels & institutions</p>
                 <div className="flex flex-wrap gap-1.5">
-                  {genre.labels.map((item) => (
-                    <span key={item} className="text-xs px-2 py-1 rounded" style={familyTintStyle(color, 14, 34)}>{item}</span>
-                  ))}
+                  {genre.labels.map((item) => {
+                    const ref = resolveEntityReference(item);
+                    if (ref?.type === 'genre' && onJumpToGenre) {
+                      return (
+                        <button key={item} onClick={() => onJumpToGenre(ref.id)}
+                          className="text-xs px-2 py-1 rounded hover:underline transition-colors"
+                          style={familyTintStyle(color, 14, 34)}>{item}</button>
+                      );
+                    }
+                    if (ref?.type === 'artist' && onJumpToArtist) {
+                      return (
+                        <button key={item} onClick={() => onJumpToArtist(genre.id, ref.label)}
+                          className="text-xs px-2 py-1 rounded hover:underline transition-colors"
+                          style={familyTintStyle(color, 14, 34)}>{item}</button>
+                      );
+                    }
+                    return <span key={item} className="text-xs px-2 py-1 rounded" style={familyTintStyle(color, 14, 34)}>{item}</span>;
+                  })}
                 </div>
               </div>
             )}
@@ -165,9 +184,9 @@ export default function DetailPanel({ genre, onClose, onJumpToGenre, onJumpToArt
                 <p className="text-[10px] uppercase tracking-widest mb-2" style={{ color: 'var(--text-3)' }}>Influenced by</p>
                 <div className="space-y-1">
                   {genre.influences.map((inf) => {
-                    const match = findByName(inf);
-                    return match && onJumpToGenre ? (
-                      <button key={inf} onClick={() => onJumpToGenre(match.id)}
+                    const ref = resolveEntityReference(inf);
+                    return ref?.type === 'genre' && onJumpToGenre ? (
+                      <button key={inf} onClick={() => onJumpToGenre(ref.id)}
                         className="block text-left text-xs hover:underline" style={{ color: familyText }}>← {inf}</button>
                     ) : (
                       <span key={inf} className="block text-xs" style={{ color: 'var(--text-2)' }}>← {inf}</span>
@@ -181,9 +200,9 @@ export default function DetailPanel({ genre, onClose, onJumpToGenre, onJumpToArt
                 <p className="text-[10px] uppercase tracking-widest mb-2" style={{ color: 'var(--text-3)' }}>Influenced</p>
                 <div className="space-y-1">
                   {genre.influenced.map((inf) => {
-                    const match = findByName(inf);
-                    return match && onJumpToGenre ? (
-                      <button key={inf} onClick={() => onJumpToGenre(match.id)}
+                    const ref = resolveEntityReference(inf);
+                    return ref?.type === 'genre' && onJumpToGenre ? (
+                      <button key={inf} onClick={() => onJumpToGenre(ref.id)}
                         className="block text-left text-xs hover:underline" style={{ color: familyText }}>→ {inf}</button>
                     ) : (
                       <span key={inf} className="block text-xs" style={{ color: 'var(--text-2)' }}>→ {inf}</span>
@@ -199,12 +218,38 @@ export default function DetailPanel({ genre, onClose, onJumpToGenre, onJumpToArt
         {genre.essentialTracks && genre.essentialTracks.length > 0 && (
           <div>
             <p className="text-[10px] uppercase tracking-widest mb-2" style={{ color: 'var(--text-3)' }}>Essential tracks</p>
-            <div className="space-y-1.5">
-              {genre.essentialTracks.map((t) => (
-                <div key={t} className="text-sm flex items-start gap-2" style={{ color: 'var(--text-2)' }}>
-                  <span style={{ color: 'var(--text-3)' }}>▸</span>{t}
-                </div>
-              ))}
+            <div className="space-y-2">
+              {genre.essentialTracks.map((t) => {
+                const artistRef = resolveEntityReference(t.artist);
+                return (
+                  <div key={`${t.artist}-${t.title}`} className="rounded-xl p-3 border" style={{ background: 'var(--surface-2)', borderColor: 'var(--border)' }}>
+                    <p className="font-semibold text-sm" style={{ color: 'var(--text-1)' }}>{t.title}</p>
+                    {artistRef?.type === 'artist' && onJumpToArtist ? (
+                      <button onClick={() => onJumpToArtist(genre.id, artistRef.label)}
+                        className="text-xs hover:underline transition-colors" style={{ color: familyText }}>{t.artist}</button>
+                    ) : (
+                      <p className="text-xs" style={{ color: familyText }}>{t.artist}</p>
+                    )}
+                    <p className="text-xs leading-relaxed mt-1.5 mb-2.5" style={{ color: 'var(--text-2)' }}>{t.reason}</p>
+                    <div className="flex gap-2">
+                      {t.spotifyTrackId && (
+                        <a href={spotifyTrackUrl(t.spotifyTrackId)} target="_blank" rel="noopener noreferrer" aria-label={`${t.title} on Spotify`}
+                          className="flex items-center gap-1 text-[11px] font-medium px-2.5 py-1 rounded-lg transition-colors"
+                          style={SPOTIFY_LINK_STYLE}>
+                          <ExternalLink size={10} />Spotify
+                        </a>
+                      )}
+                      {t.appleMusicSongId && (
+                        <a href={t.appleMusicAlbumId ? appleMusicSongUrl(t.appleMusicAlbumId, t.appleMusicSongId) : appleMusicTrackUrl(t.appleMusicSongId)} target="_blank" rel="noopener noreferrer" aria-label={`${t.title} on Apple Music`}
+                          className="flex items-center gap-1 text-[11px] font-medium px-2.5 py-1 rounded-lg transition-colors"
+                          style={APPLE_MUSIC_LINK_STYLE}>
+                          <ExternalLink size={10} />Apple Music
+                        </a>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           </div>
         )}
@@ -251,10 +296,18 @@ export default function DetailPanel({ genre, onClose, onJumpToGenre, onJumpToArt
             <p className="text-[10px] uppercase tracking-widest mb-3" style={{ color: 'var(--text-3)' }}>More artists to explore</p>
             <div className="flex flex-wrap gap-2">
               {genre.moreArtists.map((name) => (
-                <span key={name} className="inline-flex items-center rounded-lg border px-2.5 py-1.5 text-xs"
-                  style={{ background: 'var(--surface-2)', borderColor: 'var(--border)', color: 'var(--text-1)' }}>
-                  {name}
-                </span>
+                onJumpToArtist ? (
+                  <button key={name} onClick={() => onJumpToArtist(genre.id, name)}
+                    className="inline-flex items-center rounded-lg border px-2.5 py-1.5 text-xs hover:underline transition-colors"
+                    style={{ background: 'var(--surface-2)', borderColor: 'var(--border)', color: 'var(--text-1)' }}>
+                    {name}
+                  </button>
+                ) : (
+                  <span key={name} className="inline-flex items-center rounded-lg border px-2.5 py-1.5 text-xs"
+                    style={{ background: 'var(--surface-2)', borderColor: 'var(--border)', color: 'var(--text-1)' }}>
+                    {name}
+                  </span>
+                )
               ))}
             </div>
           </div>

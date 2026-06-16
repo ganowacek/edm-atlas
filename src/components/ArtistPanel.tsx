@@ -3,6 +3,7 @@ import { ExternalLink, Music, Network, X } from 'lucide-react';
 import type { ArtistNode, Genre } from '../types';
 import { accentText, familyTintStyle, getFamilyColor, tintStyle } from '../data/colors';
 import { useIsMobile } from '../hooks/useMediaQuery';
+import LinkedText from './LinkedText';
 import BottomSheet from './BottomSheet';
 
 interface Props {
@@ -10,12 +11,13 @@ interface Props {
   genre: Genre | null;
   onClose: () => void;
   onJumpToGenre: (genreId: string) => void;
+  onJumpToArtist?: (genreId: string, artistName: string) => void;
 }
 
 const SPOTIFY_LINK_STYLE = tintStyle('#1db954', 14, 34);
 const APPLE_MUSIC_LINK_STYLE = tintStyle('#d173ad', 14, 34);
 
-export default function ArtistPanel({ artist, genre, onClose, onJumpToGenre }: Props) {
+export default function ArtistPanel({ artist, genre, onClose, onJumpToGenre, onJumpToArtist }: Props) {
   const isMobile = useIsMobile();
 
   useEffect(() => {
@@ -54,7 +56,9 @@ export default function ArtistPanel({ artist, genre, onClose, onJumpToGenre }: P
       </div>
 
       <div className="px-5 py-4 space-y-5 pb-10">
-        <p className="text-sm leading-relaxed" style={{ color: 'var(--text-2)' }}>{artist.importance}</p>
+        <p className="text-sm leading-relaxed" style={{ color: 'var(--text-2)' }}>
+          <LinkedText text={artist.importance} genreId={artist.genreId} onJumpToGenre={onJumpToGenre} onJumpToArtist={onJumpToArtist} />
+        </p>
 
         <div className="flex flex-wrap gap-2">
           {artist.spotifyUrl && (
@@ -116,7 +120,9 @@ export default function ArtistPanel({ artist, genre, onClose, onJumpToGenre }: P
           <p className="text-[10px] uppercase tracking-widest mb-2" style={{ color: 'var(--text-3)' }}>Artist history</p>
           <div className="space-y-2">
             {artist.history.map((item) => (
-              <p key={item} className="text-xs leading-relaxed" style={{ color: 'var(--text-2)' }}>{item}</p>
+              <p key={item} className="text-xs leading-relaxed" style={{ color: 'var(--text-2)' }}>
+                <LinkedText text={item} genreId={artist.genreId} onJumpToGenre={onJumpToGenre} onJumpToArtist={onJumpToArtist} />
+              </p>
             ))}
           </div>
         </div>

@@ -101,7 +101,7 @@ export default function TimelinePage() {
         </div>
       </div>
 
-      <DetailPanel genre={selected} onClose={() => setSelected(null)} allGenres={genres} />
+      <DetailPanel genre={selected} onClose={() => setSelected(null)} />
     </div>
   );
 }

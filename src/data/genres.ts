@@ -21,7 +21,11 @@ export const genres: Genre[] = [
     moods: ['euphoric', 'groovy', 'soulful', 'energetic'],
     beginnerFriendly: true,
     deepCut: false,
-    essentialTracks: ['Frankie Knuckles – Your Love', 'Larry Heard – Can You Feel It', 'Ten City – That\'s the Way Love Is'],
+    essentialTracks: [
+      { title: 'Your Love', artist: 'Frankie Knuckles', spotifyTrackId: '0clsHlE7wCxM68zYCpripr', appleMusicSongId: '1601915277', reason: 'The signature Chicago house anthem from "The Godfather of House" — its hypnotic bassline and Jamie Principle\'s vocal became a blueprint for house music\'s romantic, soulful strain.' },
+      { title: 'Can You Feel It', artist: 'Larry Heard', spotifyTrackId: '2T5i6wxwVffRf3QjMwEAXk', appleMusicSongId: '1272313498', reason: 'Released as Mr. Fingers, this is widely considered the foundational deep house record — its warm chords and gospel-tinged speech sample defined house\'s emotional, spiritual register.' },
+      { title: "That's the Way Love Is", artist: 'Ten City', spotifyTrackId: '3OlMwUHDVVuNQ3l98JAgZ8', reason: 'A gospel-house crossover hit that topped Billboard\'s dance chart and cracked the UK Top 10, proving house music\'s vocal, soulful side could reach the pop mainstream.' },
+    ],
     artists: [
       { name: 'Frankie Knuckles', importance: 'Godfather of House — resident DJ at the Warehouse who defined the genre' , spotifyArtistId: '63yl9nDNrHpiAYGlNJxxjc' },
       { name: 'Larry Heard', importance: 'Pioneer known as Mr. Fingers; brought emotional depth to house with "Can You Feel It"' , spotifyArtistId: '3j7teie3p6UnbA8nW51Trz' },
@@ -223,7 +227,11 @@ export const genres: Genre[] = [
     moods: ['mechanical', 'hypnotic', 'dark', 'futuristic'],
     beginnerFriendly: false,
     deepCut: false,
-    essentialTracks: ['Derrick May – Strings of Life', 'Juan Atkins – No UFOs', 'Kevin Saunderson – Big Fun'],
+    essentialTracks: [
+      { title: 'Strings of Life', artist: 'Derrick May', spotifyTrackId: '7N3FfUFMud1rjI6Vgw71mm', appleMusicSongId: '1804523655', reason: 'A piano-driven Detroit techno anthem (released as Rhythim Is Rhythim) that became a UK rave staple, proving techno could carry euphoric melody alongside machine rhythm.' },
+      { title: "No UFO's", artist: 'Juan Atkins', spotifyTrackId: '0shMp9Vkjr8X77jQCWlaEP', reason: 'Released as Model 500, one of the first true Detroit techno records — its stark drum-machine groove and Afrofuturist framing set the genre\'s founding aesthetic.' },
+      { title: 'Big Fun', artist: 'Kevin Saunderson', spotifyTrackId: '62s4BJHLdbyLKqxGWxXGax', appleMusicSongId: '724914276', reason: 'Released as Inner City with vocalist Paris Grey, it paired Detroit techno production with pop songcraft and became an international chart hit.' },
+    ],
     artists: [
       { name: 'Derrick May', importance: 'One of the Belleville Three; his "Strings of Life" is among the most influential electronic tracks ever made' , spotifyArtistId: '0v6N0xV7AfHHKVcgUOjC51' },
       { name: 'Juan Atkins', importance: 'Originator of the Detroit techno concept; his Model 500 project set the template' , spotifyArtistId: '208EQzx7RmoE2Ng9gF2edh' },
@@ -380,7 +388,11 @@ export const genres: Genre[] = [
     moods: ['intense', 'energetic', 'cerebral', 'dark'],
     beginnerFriendly: false,
     deepCut: false,
-    essentialTracks: ['Goldie – Inner City Life', 'LTJ Bukem – Music', 'Andy C – Cool Down'],
+    essentialTracks: [
+      { title: 'Inner City Life', artist: 'Goldie', spotifyTrackId: '0O7xFEqePrcTUgOi4qe0uB', appleMusicSongId: '1420032789', reason: 'A genre-defining jungle/drum & bass single that brought Diane Charlemagne\'s soulful vocal and orchestral ambition to the genre, helping it gain mainstream recognition.' },
+      { title: 'Music', artist: 'LTJ Bukem', spotifyTrackId: '6CsR5QRDFvvvfEFbG4Ae8S', reason: 'A foundational "intelligent" jungle/drum & bass track that fused jazz-inflected atmosphere with breakbeats, helping define the smoother sound Bukem pioneered.' },
+      { title: 'Cool Down', artist: 'Andy C', spotifyTrackId: '02RwQbdZI4Dz1r7WLJJwtq', reason: 'A mid-90s Andy C release exemplifying the era\'s breakbeat science and helping establish him as one of the scene\'s defining DJ-producers.' },
+    ],
     artists: [
       { name: 'Goldie', importance: 'Pioneering artist whose "Timeless" album set the template for D&B\'s ambitions', spotifyArtistId: '2SYqJ3uDLLXZNyZdLKBy4M', appleMusicArtistId: '3518427' },
       { name: 'LTJ Bukem', importance: 'Created the atmospheric, jazz-influenced D&B known as Intelligent D&B in the early 90s', spotifyArtistId: '5Wfn5sc1w3DhMTpU7oPJZL' },
@@ -493,7 +505,11 @@ export const genres: Genre[] = [
     moods: ['dark', 'heavy', 'sub-heavy', 'nocturnal'],
     beginnerFriendly: false,
     deepCut: false,
-    essentialTracks: ['Digital Mystikz – Anti War Dub', 'Burial – Archangel', 'Skream – Midnight Request Line'],
+    essentialTracks: [
+      { title: 'Anti War Dub', artist: 'Digital Mystikz', spotifyTrackId: '2McvwBtG5WHCOsM2AHWXoZ', reason: 'A defining DMZ-era dubstep record known for its sparse, weighty sub-bass and political voiceover, capturing the genre\'s early South London soundsystem culture — it famously appeared in the film Children of Men.' },
+      { title: 'Archangel', artist: 'Burial', spotifyTrackId: '2agb1CPPGWXqXnrKn6cx7u', appleMusicSongId: '893175788', reason: 'From the landmark album Untrue, its pitched vocal samples and skeletal, melancholic production became one of the most influential tracks in the genre\'s evolution beyond pure dubstep.' },
+      { title: 'Midnight Request Line', artist: 'Skream', spotifyTrackId: '6saiu3uHwIpzPl8GKtRRNR', appleMusicSongId: '1419699132', reason: 'Widely considered the track that codified dubstep\'s low-end-driven, sub-bass blueprint, hugely influential on the productions that followed.' },
+    ],
     artists: [
       { name: 'Skream', importance: 'One of the definitive early dubstep producers, with a raw, bass-forward South London style', spotifyArtistId: '2jbP92oFLWqPqogflK1wlW' },
       { name: 'Benga', importance: 'South London producer whose "Diary of an Afro Warrior" is a dubstep landmark', spotifyArtistId: '6lyYDuLxgcxPLH5RjUPH5p' },
@@ -606,7 +622,11 @@ export const genres: Genre[] = [
     moods: ['euphoric', 'emotional', 'uplifting', 'spiritual'],
     beginnerFriendly: true,
     deepCut: false,
-    essentialTracks: ['Tiësto – Adagio for Strings', 'ATB – 9 PM (Till I Come)', 'Paul van Dyk – For An Angel'],
+    essentialTracks: [
+      { title: 'Adagio for Strings', artist: 'Tiësto', spotifyTrackId: '3Q2M6sNKDwoqZGBvwdFqZr', appleMusicSongId: '1793811654', reason: 'A trance adaptation of Samuel Barber\'s classical piece that became one of the genre\'s most iconic crossover anthems, helping bring trance to a global festival audience.' },
+      { title: '9PM (Till I Come)', artist: 'ATB', spotifyTrackId: '1CgbwsrNDlFrRuk2ebQ7zr', appleMusicSongId: '350475463', reason: 'A UK No. 1 single and one of trance\'s biggest mainstream crossover hits, its melodic, radio-friendly sound helped popularize the genre outside clubs.' },
+      { title: 'For An Angel', artist: 'Paul van Dyk', spotifyTrackId: '3PbDqZ1VMsBTjXCbs6Jv7P', appleMusicSongId: '1605918726', reason: 'An early trance classic that helped define the genre\'s uplifting, melodic sound and established van Dyk as one of trance\'s most important pioneers.' },
+    ],
     artists: [
       { name: 'Paul van Dyk', importance: 'Berlin DJ who became one of the world\'s most recognised trance artists through the late 90s and 2000s' },
       { name: 'Tiësto', importance: 'Dutch DJ/producer who became the most recognisable name in trance before crossover pop success' , spotifyArtistId: '2o5jDhtHVPhrJdv3cEQ99Z' },
@@ -1081,7 +1101,11 @@ export const genres: Genre[] = [
     moods: ['celebratory', 'sensual', 'groovy', 'liberating'],
     beginnerFriendly: true,
     deepCut: false,
-    essentialTracks: ['Donna Summer – I Feel Love', 'Gloria Gaynor – I Will Survive', 'Chic – Le Freak'],
+    essentialTracks: [
+      { title: 'I Feel Love', artist: 'Donna Summer', spotifyTrackId: '4rS63BySQrdWuTswkkZ5iS', appleMusicSongId: '1423304604', reason: 'A Giorgio Moroder/Pete Bellotte production whose all-synthesizer arrangement is widely credited as the bridge from disco to electronic dance music, directly influencing house and techno.' },
+      { title: 'I Will Survive', artist: 'Gloria Gaynor', spotifyTrackId: '7rIovIsXE6kMn629b7kDig', appleMusicSongId: '1475169107', reason: 'One of disco\'s most enduring anthems, its message of resilience made it a foundational dancefloor and queer-culture classic.' },
+      { title: 'Le Freak', artist: 'Chic', spotifyTrackId: '7z3aH1QV2zwMKXxShBNOGe', appleMusicSongId: '301649381', reason: 'One of the best-selling singles of the disco era, its Nile Rodgers guitar riff and infectious groove epitomized disco\'s commercial peak.' },
+    ],
     artists: [
       { name: 'Giorgio Moroder', importance: 'Italian producer who created the synth-driven disco template with Donna Summer' },
       { name: 'Nile Rodgers (Chic)', importance: 'Guitarist and producer whose funk-disco sound has influenced music for five decades' },
@@ -1128,7 +1152,11 @@ export const genres: Genre[] = [
     moods: ['melancholic', 'cinematic', 'smoky', 'introspective'],
     beginnerFriendly: true,
     deepCut: false,
-    essentialTracks: ['Massive Attack – Teardrop', 'Portishead – Sour Times', 'Tricky – Black Steel'],
+    essentialTracks: [
+      { title: 'Teardrop', artist: 'Massive Attack', spotifyTrackId: '67Hna13dNDkZvBpTXRIaOJ', appleMusicSongId: '725818578', reason: 'A defining trip-hop single combining Elizabeth Fraser\'s ethereal vocal with the genre\'s signature hip-hop-derived beats, often cited as the genre\'s creative peak.' },
+      { title: 'Sour Times', artist: 'Portishead', spotifyTrackId: '6vTtCOimcPs5H1Jr9d0Aep', reason: 'From the album Dummy, its noir strings and Beth Gibbons\' aching vocal helped establish trip-hop\'s melancholic, cinematic identity.' },
+      { title: 'Black Steel', artist: 'Tricky', spotifyTrackId: '2MRS933wyIBi9ZNn8GQcG4', appleMusicSongId: '1444028930', reason: 'A radical reworking of Public Enemy\'s "Black Steel in the Hour of Chaos" into a queasy, guitar-laced trip-hop track, showing the genre\'s roots in hip-hop and its willingness to subvert it.' },
+    ],
     artists: [
       { name: 'Massive Attack', importance: 'Bristol collective whose music defined what trip-hop could be emotionally and sonically' },
       { name: 'Portishead', importance: 'Bristol group whose cinematic, melancholic sound is among the most distinctive in electronic music' },

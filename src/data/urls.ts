@@ -14,6 +14,10 @@ export function appleMusicSongUrl(albumId: string, songId: string): string {
   return `https://music.apple.com/us/album/${albumId}?i=${songId}`;
 }
 
+export function appleMusicTrackUrl(songId: string): string {
+  return `https://music.apple.com/us/song/track/${songId}`;
+}
+
 export function spotifyAlbumUrl(id: string): string {
   return `https://open.spotify.com/album/${id}`;
 }

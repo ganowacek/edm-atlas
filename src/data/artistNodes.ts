@@ -1,6 +1,6 @@
 import type { ArtistNode, Genre, TrackNode } from '../types';
 import { ARTIST_TRACKS } from './artistTracks';
-import { spotifyArtistUrl, appleMusicArtistUrl, spotifyTrackUrl, appleMusicSongUrl } from './urls';
+import { spotifyArtistUrl, appleMusicArtistUrl, spotifyTrackUrl, appleMusicSongUrl, appleMusicTrackUrl } from './urls';
 
 export function slugify(s: string) {
   return s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
@@ -13,7 +13,9 @@ export function trackNodesForArtist(artistName: string, genre: Genre): TrackNode
     artistName,
     appleMusicUrl: track.appleMusicAlbumId && track.appleMusicSongId
       ? appleMusicSongUrl(track.appleMusicAlbumId, track.appleMusicSongId)
-      : undefined,
+      : track.appleMusicSongId
+        ? appleMusicTrackUrl(track.appleMusicSongId)
+        : undefined,
     spotifyUrl: track.spotifyTrackId ? spotifyTrackUrl(track.spotifyTrackId) : undefined,
     genreId: genre.id,
     genreName: genre.name,

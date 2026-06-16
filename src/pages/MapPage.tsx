@@ -1,12 +1,15 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import GraphExplorer, { type GraphHandle } from '../components/GraphExplorer';
 import DetailPanel from '../components/DetailPanel';
 import ArtistPanel from '../components/ArtistPanel';
 import SongPanel from '../components/SongPanel';
 import SearchBar from '../components/SearchBar';
+import Breadcrumb from '../components/Breadcrumb';
+import RecentlyExplored from '../components/RecentlyExplored';
 import genres from '../data/genres';
 import { FAMILY_COLORS, accentText, familyTintStyle } from '../data/colors';
-import { artistNodesForGenre, findArtistAnchor } from '../data/artistNodes';
+import { artistNodesForGenre, findArtistAnchor, slugify } from '../data/artistNodes';
+import { useExplorationHistory, type HistoryEntry } from '../hooks/useExplorationHistory';
 import type { ArtistNode, Genre, TrackNode } from '../types';
 import { SlidersHorizontal, ChevronDown } from 'lucide-react';
 import { useIsMobile } from '../hooks/useMediaQuery';
@@ -19,6 +22,11 @@ export default function MapPage() {
   const [familyFilter, setFamilyFilter] = useState<string | null>(null);
   const [filtersOpen, setFiltersOpen] = useState(false);
   const isMobile = useIsMobile();
+  const { history, record, clear } = useExplorationHistory();
+
+  useEffect(() => { if (selected) record({ type: 'genre', data: selected }); }, [selected, record]);
+  useEffect(() => { if (selectedArtist) record({ type: 'artist', data: selectedArtist }); }, [selectedArtist, record]);
+  useEffect(() => { if (selectedTrack) record({ type: 'track', data: selectedTrack }); }, [selectedTrack, record]);
 
   const visibleGenres = familyFilter
     ? genres.filter((g) => g.family === familyFilter)
@@ -60,6 +68,33 @@ export default function MapPage() {
     requestAnimationFrame(() => graphRef.current?.focusArtist(anchor.id, node.id));
   };
 
+  const handleHome = () => {
+    setSelected(null);
+    setSelectedArtist(null);
+    setSelectedTrack(null);
+    graphRef.current?.collapseAll();
+  };
+
+  const handleHistorySelect = (entry: HistoryEntry) => {
+    if (entry.type === 'genre') {
+      setSelectedArtist(null);
+      setSelectedTrack(null);
+      setSelected(entry.data);
+      handleJump(entry.data.id);
+    } else if (entry.type === 'artist') {
+      setSelected(null);
+      setSelectedTrack(null);
+      setSelectedArtist(entry.data);
+      requestAnimationFrame(() => graphRef.current?.focusArtist(entry.data.genreId, entry.data.id));
+    } else {
+      setSelected(null);
+      setSelectedArtist(null);
+      setSelectedTrack(entry.data);
+      const artistId = `artist:${entry.data.genreId}:${slugify(entry.data.artistName)}`;
+      requestAnimationFrame(() => graphRef.current?.focusArtist(entry.data.genreId, artistId));
+    }
+  };
+
   return (
     <div className="fixed left-0 right-0 bottom-0 flex flex-col" style={{ top: '56px', background: 'var(--bg)' }}>
       {/* top control strip */}
@@ -97,7 +132,18 @@ export default function MapPage() {
             <ChevronDown size={13} className={filtersOpen ? 'rotate-180 transition-transform' : 'transition-transform'} />
           </button>
         )}
+
+        <RecentlyExplored history={history} onSelect={handleHistorySelect} onClear={clear} />
       </div>
+
+      <Breadcrumb
+        genres={genres}
+        selected={selected}
+        selectedArtist={selectedArtist}
+        selectedTrack={selectedTrack}
+        onHome={handleHome}
+        onJumpToGenre={handleJump}
+      />
 
       {/* mobile collapsible filter chips */}
       {isMobile && filtersOpen && (
@@ -136,7 +182,6 @@ export default function MapPage() {
         onClose={() => setSelected(null)}
         onJumpToGenre={handleJump}
         onJumpToArtist={handleJumpToArtist}
-        allGenres={genres}
       />
 
       <ArtistPanel
@@ -149,6 +194,7 @@ export default function MapPage() {
           if (genre) setSelected(genre);
           handleJump(genreId);
         }}
+        onJumpToArtist={handleJumpToArtist}
       />
 
       <SongPanel
