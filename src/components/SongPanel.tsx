@@ -1,13 +1,16 @@
 import { useEffect } from 'react';
 import { ExternalLink, Music, X } from 'lucide-react';
 import type { TrackNode } from '../types';
-import { getFamilyColor } from '../data/colors';
+import { accentText, familyTintStyle, getFamilyColor, tintStyle } from '../data/colors';
 import { useIsMobile } from '../hooks/useMediaQuery';
 
 interface Props {
   track: TrackNode | null;
   onClose: () => void;
 }
+
+const SPOTIFY_LINK_STYLE = tintStyle('#1db954', 16, 34);
+const APPLE_MUSIC_LINK_STYLE = tintStyle('#d173ad', 16, 34);
 
 export default function SongPanel({ track, onClose }: Props) {
   const isMobile = useIsMobile();
@@ -20,6 +23,7 @@ export default function SongPanel({ track, onClose }: Props) {
 
   if (!track) return null;
   const color = getFamilyColor(track.family);
+  const familyText = accentText(color.primary);
 
   const body = (
     <div className="overflow-y-auto h-full" style={{ background: 'var(--surface-1)' }}>
@@ -29,12 +33,12 @@ export default function SongPanel({ track, onClose }: Props) {
           <div className="min-w-0">
             <div className="flex items-center gap-1.5 mb-1.5 flex-wrap">
               <span className="text-[10px] font-semibold uppercase tracking-widest px-2 py-0.5 rounded"
-                style={{ background: `${color.glow}55`, color: color.text }}>song</span>
+                style={familyTintStyle(color, 18, 42)}>song</span>
               <span className="text-[10px] font-medium uppercase tracking-wider px-2 py-0.5 rounded"
-                style={{ background: 'var(--surface-2)', color: color.text }}>{track.genreName}</span>
+                style={familyTintStyle(color, 12, 30)}>{track.genreName}</span>
             </div>
-            <h2 className="text-xl font-bold text-white leading-tight">{track.title}</h2>
-            <p className="text-sm mt-0.5" style={{ color: color.text }}>{track.artistName}</p>
+            <h2 className="text-xl font-bold leading-tight" style={{ color: 'var(--text-1)' }}>{track.title}</h2>
+            <p className="text-sm mt-0.5" style={{ color: familyText }}>{track.artistName}</p>
           </div>
           <button onClick={onClose} aria-label="Close"
             className="p-1.5 rounded-lg hover:bg-white/8 transition-colors flex-shrink-0"
@@ -47,24 +51,31 @@ export default function SongPanel({ track, onClose }: Props) {
       <div className="px-5 py-4 space-y-5 pb-10">
         <div className="rounded-xl p-4 border flex items-start gap-3"
           style={{ background: 'var(--surface-2)', borderColor: 'var(--border)' }}>
-          <Music size={16} className="flex-shrink-0 mt-0.5" style={{ color: color.text }} />
+          <Music size={16} className="flex-shrink-0 mt-0.5" style={{ color: familyText }} />
           <p className="text-sm leading-relaxed" style={{ color: 'var(--text-2)' }}>{track.reason}</p>
         </div>
 
         <div>
           <p className="text-[10px] uppercase tracking-widest mb-3" style={{ color: 'var(--text-3)' }}>Listen</p>
           <div className="flex flex-wrap gap-2">
-            <a href={track.appleMusicUrl} target="_blank" rel="noopener noreferrer"
-              className="flex items-center gap-2 text-sm font-medium px-4 py-2.5 rounded-xl transition-colors"
-              style={{ background: 'rgba(209,115,173,0.16)', color: '#e394c4', border: '1px solid rgba(209,115,173,0.25)' }}>
-              <ExternalLink size={14} />Apple Music
-            </a>
+            {track.appleMusicUrl && (
+              <a href={track.appleMusicUrl} target="_blank" rel="noopener noreferrer"
+                className="flex items-center gap-2 text-sm font-medium px-4 py-2.5 rounded-xl transition-colors"
+                style={APPLE_MUSIC_LINK_STYLE}>
+                <ExternalLink size={14} />Apple Music
+              </a>
+            )}
             {track.spotifyUrl && (
               <a href={track.spotifyUrl} target="_blank" rel="noopener noreferrer"
                 className="flex items-center gap-2 text-sm font-medium px-4 py-2.5 rounded-xl transition-colors"
-                style={{ background: 'rgba(64,184,154,0.16)', color: '#5fcab0', border: '1px solid rgba(64,184,154,0.25)' }}>
+                style={SPOTIFY_LINK_STYLE}>
                 <ExternalLink size={14} />Spotify
               </a>
+            )}
+            {!track.appleMusicUrl && !track.spotifyUrl && (
+              <span className="text-xs leading-relaxed" style={{ color: 'var(--text-3)' }}>
+                Canonical streaming IDs are queued for this roadmap track.
+              </span>
             )}
           </div>
         </div>
@@ -99,8 +110,8 @@ export default function SongPanel({ track, onClose }: Props) {
   }
 
   return (
-    <div className="fixed top-0 right-0 bottom-0 z-50 w-[min(380px,90vw)] anim-panel shadow-2xl"
-      style={{ borderLeft: '1px solid var(--border-strong)', borderTop: `2px solid ${color.primary}` }}>
+    <div className="fixed right-0 bottom-0 z-[70] w-[min(380px,90vw)] anim-panel shadow-2xl"
+      style={{ top: '56px', borderLeft: '1px solid var(--border-strong)', borderTop: `2px solid ${color.primary}` }}>
       {body}
     </div>
   );

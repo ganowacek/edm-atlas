@@ -1,8 +1,12 @@
 import type { Page } from '../App';
+import type { Theme } from '../App';
+import ThemeToggle from './ThemeToggle';
 
 interface NavProps {
   current: Page;
   onNavigate: (page: Page) => void;
+  theme: Theme;
+  onToggleTheme: () => void;
 }
 
 const links: { id: Page; label: string; shortLabel: string }[] = [
@@ -12,7 +16,7 @@ const links: { id: Page; label: string; shortLabel: string }[] = [
   { id: 'about', label: 'About', shortLabel: 'About' },
 ];
 
-export default function Nav({ current, onNavigate }: NavProps) {
+export default function Nav({ current, onNavigate, theme, onToggleTheme }: NavProps) {
   return (
     <nav className="fixed top-0 left-0 right-0 z-40 border-b backdrop-blur-md"
       style={{ background: 'color-mix(in srgb, var(--bg) 80%, transparent)', borderColor: 'var(--border)' }}>
@@ -36,6 +40,7 @@ export default function Nav({ current, onNavigate }: NavProps) {
             </button>
           ))}
         </div>
+        <ThemeToggle theme={theme} onToggle={onToggleTheme} />
       </div>
     </nav>
   );

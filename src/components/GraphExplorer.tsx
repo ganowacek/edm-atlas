@@ -48,6 +48,7 @@ const COLLIDE: Record<Kind, number> = { hub: 42, family: 48, sub: 40, artist: 34
 const LABEL_ZOOM = 1.25;
 const ARTIST_LABEL_ZOOM = 1.7;
 const TRACK_LABEL_ZOOM = 2.15;
+const LABEL_VIEWPORT_MARGIN = 96;
 
 function linkFamilyColor(link: GLink) {
   const target = link.target as GNode;
@@ -116,7 +117,9 @@ function trackNodesForArtist(artistName: string, genre: Genre): TrackNode[] {
     ...track,
     id: `track:${genre.id}:${slugify(artistName)}:${slugify(track.title)}`,
     artistName,
-    appleMusicUrl: appleMusicSongUrl(track.appleMusicAlbumId, track.appleMusicSongId),
+    appleMusicUrl: track.appleMusicAlbumId && track.appleMusicSongId
+      ? appleMusicSongUrl(track.appleMusicAlbumId, track.appleMusicSongId)
+      : undefined,
     spotifyUrl: track.spotifyTrackId ? spotifyTrackUrl(track.spotifyTrackId) : undefined,
     genreId: genre.id,
     genreName: genre.name,
@@ -181,9 +184,10 @@ const GraphExplorer = forwardRef<GraphHandle, Props>(function GraphExplorer(
   const hoveredIdRef = useRef<string | null>(null);
   const selectedIdRef = useRef<string | null>(selectedId);
   const zoomKRef = useRef(1);
-  const isDraggingRef = useRef(false);
-  const dragTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const isSettlingRef = useRef(false);
+  const currentTransformRef = useRef<d3.ZoomTransform>(d3.zoomIdentity);
+  const isInteractingRef = useRef(false);
+  const interactionTimerRef = useRef<number | null>(null);
   const [tooltip, setTooltip] = useState<{ text: string; sub: string; x: number; y: number } | null>(null);
 
   // Persistent D3 state across renders
@@ -200,6 +204,66 @@ const GraphExplorer = forwardRef<GraphHandle, Props>(function GraphExplorer(
     H: number;
   } | null>(null);
 
+  const labelIsInViewport = useCallback((node: GNode) => {
+    const e = eng.current;
+    if (!e || node.x == null || node.y == null) return true;
+    const transform = currentTransformRef.current;
+    const labelY = node.y + (node.kind === 'hub' ? 4 : R[node.kind] + 12);
+    const screenX = node.x * transform.k + transform.x;
+    const screenY = labelY * transform.k + transform.y;
+    return screenX >= -LABEL_VIEWPORT_MARGIN
+      && screenX <= e.W + LABEL_VIEWPORT_MARGIN
+      && screenY >= -LABEL_VIEWPORT_MARGIN
+      && screenY <= e.H + LABEL_VIEWPORT_MARGIN;
+  }, []);
+
+  const labelShouldRender = useCallback((node: GNode, focus: Set<string> | null) => {
+    if (!labelIsInViewport(node)) return false;
+    // While dragging/zooming or the simulation is settling, nodes (including
+    // family nodes) are moving on screen — hide every non-anchor label so
+    // moving text can't trail.
+    const moving = isInteractingRef.current || isSettlingRef.current;
+    if (moving && node.kind !== 'hub') return false;
+    if (node.kind === 'hub' || node.kind === 'family') return true;
+    if (focus && focus.has(node.id)) return true;
+    if (node.kind === 'track') return zoomKRef.current >= TRACK_LABEL_ZOOM;
+    if (node.kind === 'artist') return zoomKRef.current >= ARTIST_LABEL_ZOOM;
+    return zoomKRef.current >= LABEL_ZOOM;
+  }, [labelIsInViewport]);
+
+  const validateGraphIntegrity = useCallback(() => {
+    if (!import.meta.env.DEV) return;
+    const e = eng.current;
+    if (!e) return;
+    const groups = e.gNode.selectAll<SVGGElement, GNode>('g.gnode').nodes();
+    const ids = new Set<string>();
+    const duplicateIds: string[] = [];
+    const missingLabels: string[] = [];
+    let detachedLabels = 0;
+
+    groups.forEach((group) => {
+      const datum = d3.select<SVGGElement, GNode>(group).datum();
+      if (!datum?.id) return;
+      if (ids.has(datum.id)) duplicateIds.push(datum.id);
+      ids.add(datum.id);
+      if (!group.querySelector('text.lbl')) missingLabels.push(datum.id);
+    });
+
+    e.gNode.selectAll<SVGTextElement, GNode>('text.lbl').nodes().forEach((label) => {
+      if (!label.closest('g.gnode')) detachedLabels += 1;
+    });
+
+    if (groups.length !== e.nodes.length || missingLabels.length || duplicateIds.length || detachedLabels) {
+      console.warn('EDM Atlas graph label integrity warning', {
+        expectedNodes: e.nodes.length,
+        renderedNodes: groups.length,
+        missingLabels,
+        duplicateIds,
+        detachedLabels,
+      });
+    }
+  }, []);
+
   const updateLabelVisibility = useCallback(() => {
     const e = eng.current;
     if (!e) return;
@@ -208,8 +272,8 @@ const GraphExplorer = forwardRef<GraphHandle, Props>(function GraphExplorer(
     let focus: Set<string> | null = null;
     if (activeId) {
       const node = e.nodeById.get(activeId);
-        if (node) {
-          focus = new Set([activeId]);
+      if (node) {
+        focus = new Set([activeId]);
         if (node.kind === 'track' && node.parentArtistId) {
           focus.add(node.parentArtistId);
           const artistNode = e.nodeById.get(node.parentArtistId);
@@ -234,31 +298,9 @@ const GraphExplorer = forwardRef<GraphHandle, Props>(function GraphExplorer(
       .attr('font-size', (d) => d.kind === 'hub' ? '12px' : d.kind === 'family' ? '11px' : d.kind === 'artist' ? '8.5px' : d.kind === 'track' ? '7.5px' : '9.5px')
       .attr('font-weight', (d) => d.kind === 'sub' || d.kind === 'artist' || d.kind === 'track' ? 500 : 700)
       .attr('dy', (d) => d.kind === 'hub' ? 4 : R[d.kind] + 12)
-      .style('display', (d) => {
-        if (d.kind === 'hub') return null;
-        // While dragging or the simulation is settling, nodes are moving on
-        // screen — hide every non-anchor label so moving text can't trail.
-        const moving = isDraggingRef.current || isSettlingRef.current;
-        if (moving) return 'none';
-        if (d.kind === 'family') return null;
-        if (focus && focus.has(d.id)) return null;
-        if (d.kind === 'track') return zoomKRef.current >= TRACK_LABEL_ZOOM ? null : 'none';
-        if (d.kind === 'artist') return zoomKRef.current >= ARTIST_LABEL_ZOOM ? null : 'none';
-        if (zoomKRef.current >= LABEL_ZOOM) return null;
-        return 'none';
-      })
-      .style('opacity', (d) => {
-        if (d.kind === 'hub') return 1;
-        const moving = isDraggingRef.current || isSettlingRef.current;
-        if (moving) return 0;
-        if (d.kind === 'family') return 1;
-        if (focus && focus.has(d.id)) return 1;
-        if (d.kind === 'track') return zoomKRef.current >= TRACK_LABEL_ZOOM ? 1 : 0;
-        if (d.kind === 'artist') return zoomKRef.current >= ARTIST_LABEL_ZOOM ? 1 : 0;
-        if (zoomKRef.current >= LABEL_ZOOM) return 1;
-        return 0;
-      });
-  }, []);
+      .style('display', (d) => (labelShouldRender(d, focus) ? null : 'none'))
+      .style('opacity', (d) => (labelShouldRender(d, focus) ? 1 : 0));
+  }, [labelShouldRender]);
 
   useEffect(() => {
     hoveredIdRef.current = hoveredId;
@@ -295,9 +337,11 @@ const GraphExplorer = forwardRef<GraphHandle, Props>(function GraphExplorer(
     const expandedArtistBranches = showAll ? visibleGenreIds : expandedArtists;
     out.filter((node) => node.genre && expandedArtistBranches.has(node.id) && visibleGenreIds.has(node.id))
       .forEach((node) => {
+        const visibleChildGenres = (subsByParent.get(node.id) ?? []).filter((child) => visibleGenreIds.has(child.id));
+        if (visibleChildGenres.length > 0) return;
         artistNodesForGenre(node.genre!).forEach((artist) => {
           out.push({ id: artist.id, genre: node.genre, artist, track: null, kind: 'artist', parentGenreId: node.id });
-          if (expandedTracks.has(artist.id)) {
+          if (showAll || expandedTracks.has(artist.id)) {
             artist.tracks.forEach((track) => {
               out.push({
                 id: track.id,
@@ -337,21 +381,22 @@ const GraphExplorer = forwardRef<GraphHandle, Props>(function GraphExplorer(
       .zoom<SVGSVGElement, unknown>()
       .scaleExtent([0.4, 4])
       .on('start', () => {
-        isDraggingRef.current = true;
-        if (dragTimerRef.current) clearTimeout(dragTimerRef.current);
+        isInteractingRef.current = true;
+        if (interactionTimerRef.current) window.clearTimeout(interactionTimerRef.current);
         updateLabelVisibility();
       })
       .on('zoom', (e) => {
+        currentTransformRef.current = e.transform;
         root.attr('transform', e.transform.toString());
         zoomKRef.current = e.transform.k;
+        updateLabelVisibility();
       })
       .on('end', () => {
-        isDraggingRef.current = false;
-        dragTimerRef.current = setTimeout(() => {
-          isDraggingRef.current = false;
+        if (interactionTimerRef.current) window.clearTimeout(interactionTimerRef.current);
+        interactionTimerRef.current = window.setTimeout(() => {
+          isInteractingRef.current = false;
           updateLabelVisibility();
-        }, 80);
-        updateLabelVisibility();
+        }, 110);
       });
     svg.call(zoom);
     svg.on('dblclick.zoom', null);
@@ -408,10 +453,9 @@ const GraphExplorer = forwardRef<GraphHandle, Props>(function GraphExplorer(
       }
     });
     sim.on('end', () => {
-      if (isSettlingRef.current) {
-        isSettlingRef.current = false;
-        updateLabelVisibility();
-      }
+      isSettlingRef.current = false;
+      updateLabelVisibility();
+      validateGraphIntegrity();
     });
 
     const hub: GNode = {
@@ -444,7 +488,11 @@ const GraphExplorer = forwardRef<GraphHandle, Props>(function GraphExplorer(
     });
     ro.observe(container);
 
-    return () => { ro.disconnect(); sim.stop(); };
+    return () => {
+      if (interactionTimerRef.current) window.clearTimeout(interactionTimerRef.current);
+      ro.disconnect();
+      sim.stop();
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -571,11 +619,14 @@ const GraphExplorer = forwardRef<GraphHandle, Props>(function GraphExplorer(
       .data(e.nodes, (d) => d.id)
       .join(
         (enter) => {
-          const g = enter.append('g').attr('class', 'gnode').style('opacity', 0);
+          const g = enter.append('g')
+            .attr('class', 'gnode')
+            .attr('data-node-id', (d) => d.id)
+            .style('opacity', 0);
           g.transition().duration(300).style('opacity', 1);
           g.append('circle')
             .attr('r', (d) => R[d.kind])
-            .attr('fill', (d) => d.kind === 'hub' ? '#1a1722' : d.kind === 'family' ? getFamilyColor(d.family).primary : d.kind === 'artist' ? '#0f0f14' : d.kind === 'track' ? getFamilyColor(d.family).primary : getFamilyColor(d.family).glow)
+            .attr('fill', (d) => d.kind === 'hub' ? 'var(--graph-hub-fill)' : d.kind === 'family' ? getFamilyColor(d.family).primary : d.kind === 'artist' ? 'var(--graph-artist-fill)' : d.kind === 'track' ? getFamilyColor(d.family).primary : getFamilyColor(d.family).glow)
             .attr('stroke', (d) => d.kind === 'hub' ? '#8b80e0' : getFamilyColor(d.family).primary)
             .attr('stroke-width', (d) => d.kind === 'family' ? 1.8 : d.kind === 'hub' ? 2.2 : d.kind === 'artist' ? 1 : d.kind === 'track' ? 0.9 : 1.2)
             .attr('opacity', (d) => (d.kind === 'track' ? 0.86 : 1));
@@ -587,14 +638,9 @@ const GraphExplorer = forwardRef<GraphHandle, Props>(function GraphExplorer(
             .attr('stroke-width', 1).attr('stroke-dasharray', '2 3').attr('opacity', 0.5);
           g.append('text').attr('class', 'lbl')
             .attr('text-anchor', 'middle')
-            .attr('fill', '#f4f4f6')
+            .attr('fill', 'var(--graph-label)')
             .attr('pointer-events', 'none')
-            // Stroke outline instead of text-shadow: legible over any background
-            // without the iOS Safari paint-trail that drop-shadows leave on moving text.
-            .attr('stroke', 'rgba(8,8,12,0.92)')
-            .attr('stroke-width', 2.6)
-            .attr('stroke-linejoin', 'round')
-            .attr('paint-order', 'stroke')
+            .style('text-shadow', 'var(--graph-label-shadow)')
             .text((d) => d.kind === 'sub' || d.kind === 'artist' || d.kind === 'track' ? truncate(d.name) : d.name)
             .attr('font-size', (d) => d.kind === 'hub' ? '12px' : d.kind === 'family' ? '11px' : d.kind === 'artist' ? '8.5px' : d.kind === 'track' ? '7.5px' : '9.5px')
             .attr('font-weight', (d) => d.kind === 'sub' || d.kind === 'artist' || d.kind === 'track' ? 500 : 700)
@@ -603,7 +649,7 @@ const GraphExplorer = forwardRef<GraphHandle, Props>(function GraphExplorer(
             .style('opacity', (d) => d.kind === 'sub' || d.kind === 'artist' || d.kind === 'track' ? 0 : 1);
           return g;
         },
-        (update) => update,
+        (update) => update.attr('data-node-id', (d) => d.id),
         (exit) => exit.interrupt().remove()
       );
 
@@ -642,11 +688,24 @@ const GraphExplorer = forwardRef<GraphHandle, Props>(function GraphExplorer(
         }
         if (d.kind === 'family') {
           setShowAll(false);
+          const children = subsByParent.get(d.id) ?? [];
+          const childIds = children.map((child) => child.id);
           setExpanded((prev) => {
             const next = new Set(prev);
             if (next.has(d.id)) next.delete(d.id); else next.add(d.id);
             return next;
           });
+          setExpandedTracks(new Set());
+          setExpandedArtists((prev) => {
+            if (children.length === 0) {
+              return prev.has(d.id) && prev.size === 1 ? new Set() : new Set([d.id]);
+            }
+            const next = new Set(prev);
+            childIds.forEach((id) => next.delete(id));
+            return next;
+          });
+          if (d.genre) onSelect(d.genre);
+          return;
         }
         if (d.genre) {
           setShowAll(false);
@@ -659,8 +718,9 @@ const GraphExplorer = forwardRef<GraphHandle, Props>(function GraphExplorer(
     if (instant) e.sim.alpha(0.9).restart();
     else e.sim.alpha(0.7).alphaTarget(0).velocityDecay(0.38).restart();
     updateLabelVisibility();
+    validateGraphIntegrity();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [desiredNodes, families, onSelect, onSelectArtist, updateLabelVisibility]);
+  }, [desiredNodes, families, onSelect, onSelectArtist, updateLabelVisibility, validateGraphIntegrity]);
 
   // run structural update when expansion / data changes
   useEffect(() => {
@@ -716,7 +776,14 @@ const GraphExplorer = forwardRef<GraphHandle, Props>(function GraphExplorer(
     // selected ring pulse
     e.gNode.selectAll<SVGGElement, GNode>('g.gnode').select('.expand-ring')
       .transition().duration(160)
-      .attr('opacity', (d) => ((d.kind === 'artist' ? expandedTracks.has(d.id) : expanded.has(d.id)) ? 0 : 0.5))
+      .attr('opacity', (d) => {
+        const isExpanded = d.kind === 'artist'
+          ? expandedTracks.has(d.id)
+          : d.kind === 'sub'
+            ? expandedArtists.has(d.id)
+            : expanded.has(d.id);
+        return isExpanded ? 0 : 0.5;
+      })
       .attr('r', (d) => R[d.kind] + 4);
 
     // links
@@ -740,7 +807,7 @@ const GraphExplorer = forwardRef<GraphHandle, Props>(function GraphExplorer(
       });
 
     updateLabelVisibility();
-  }, [selectedId, hoveredId, expanded, expandedTracks, updateLabelVisibility]);
+  }, [selectedId, hoveredId, expanded, expandedArtists, expandedTracks, updateLabelVisibility]);
 
   // ---------------------------------------------------------------------------
   // Imperative: search jumps here
@@ -757,7 +824,20 @@ const GraphExplorer = forwardRef<GraphHandle, Props>(function GraphExplorer(
     }
     setShowAll(false);
     setExpandedTracks(new Set());
-    setExpandedArtists(new Set([genre.id]));
+    if (genre.parentId) {
+      setExpandedArtists(new Set([genre.id]));
+    } else {
+      const children = subsByParent.get(genre.id) ?? [];
+      if (children.length > 0) {
+        setExpanded((prev) => {
+          if (prev.has(genre.id)) return prev;
+          const next = new Set(prev); next.add(genre.id); return next;
+        });
+        setExpandedArtists(new Set());
+      } else {
+        setExpandedArtists(new Set([genre.id]));
+      }
+    }
     onSelect(genre);
     // center on node after it settles
     window.setTimeout(() => {
@@ -770,7 +850,7 @@ const GraphExplorer = forwardRef<GraphHandle, Props>(function GraphExplorer(
       const t = d3.zoomIdentity.translate(e.W / 2 - node.x * k, e.H / 2 - node.y * k + verticalOffset).scale(k);
       d3.select(svgRef.current).transition().duration(600).call(e.zoom.transform, t);
     }, genre.parentId ? 380 : 60);
-  }, [genres, onSelect]);
+  }, [genres, onSelect, subsByParent]);
 
   useImperativeHandle(ref, () => ({
     focusGenre,
@@ -799,6 +879,12 @@ const GraphExplorer = forwardRef<GraphHandle, Props>(function GraphExplorer(
     d3.select(svgRef.current).transition().duration(duration).call(e.zoom.transform, t);
   }, []);
 
+  useEffect(() => {
+    if (!eng.current) return;
+    const timeout = window.setTimeout(() => fitToGraph(showAll ? 900 : 650), showAll ? 1250 : 850);
+    return () => window.clearTimeout(timeout);
+  }, [expanded, expandedArtists, expandedTracks, showAll, fitToGraph]);
+
   const resetZoom = () => fitToGraph(500);
 
   const toggleAll = () => {
@@ -820,8 +906,8 @@ const GraphExplorer = forwardRef<GraphHandle, Props>(function GraphExplorer(
   };
 
   return (
-    <div className="relative w-full h-full">
-      <svg ref={svgRef} className="w-full h-full touch-none" style={{ WebkitBackfaceVisibility: 'hidden' }} />
+    <div className="graph-shell relative w-full h-full">
+      <svg ref={svgRef} className="graph-svg w-full h-full touch-none" style={{ WebkitBackfaceVisibility: 'hidden' }} />
 
       {tooltip && (
         <div
@@ -829,7 +915,7 @@ const GraphExplorer = forwardRef<GraphHandle, Props>(function GraphExplorer(
           style={{ left: tooltip.x, top: tooltip.y, transform: 'translate(-50%, -100%)' }}
         >
           <div className="rounded-lg px-2.5 py-1.5 shadow-xl border" style={{ background: 'var(--surface-2)', borderColor: 'var(--border-strong)' }}>
-            <div className="text-xs font-semibold text-white whitespace-nowrap">{tooltip.text}</div>
+            <div className="text-xs font-semibold whitespace-nowrap" style={{ color: 'var(--text-1)' }}>{tooltip.text}</div>
             {tooltip.sub && <div className="text-[10px] font-mono mt-0.5 whitespace-nowrap" style={{ color: 'var(--text-3)' }}>{tooltip.sub}</div>}
           </div>
         </div>
@@ -842,8 +928,8 @@ const GraphExplorer = forwardRef<GraphHandle, Props>(function GraphExplorer(
           style={{
             background: showAll ? 'var(--accent)' : 'var(--surface-1)',
             borderColor: showAll ? 'var(--accent)' : 'var(--border)',
-            color: showAll ? '#0a0a0e' : 'var(--text-2)',
-          }} aria-label={showAll ? 'Collapse all families' : 'Expand all families'}>
+            color: showAll ? 'var(--accent-contrast)' : 'var(--text-2)',
+          }} aria-label={showAll ? 'Collapse full graph' : 'Expand full graph'}>
           <GitBranch size={15} />
         </button>
         <button onClick={() => { const e = eng.current; if (e && svgRef.current) d3.select(svgRef.current).transition().duration(200).call(e.zoom.scaleBy, 1.3); }}

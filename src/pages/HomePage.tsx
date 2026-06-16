@@ -1,10 +1,19 @@
 import type { Page } from '../App';
+import type { Theme } from '../App';
+import ThemeToggle from '../components/ThemeToggle';
 
-interface HomePageProps { onNavigate: (page: Page) => void; }
+interface HomePageProps {
+  onNavigate: (page: Page) => void;
+  theme: Theme;
+  onToggleTheme: () => void;
+}
 
-export default function HomePage({ onNavigate }: HomePageProps) {
+export default function HomePage({ onNavigate, theme, onToggleTheme }: HomePageProps) {
   return (
     <div className="min-h-screen flex flex-col items-center justify-center relative overflow-hidden" style={{ background: 'var(--bg)' }}>
+      <div className="absolute right-4 top-4 z-20">
+        <ThemeToggle theme={theme} onToggle={onToggleTheme} />
+      </div>
       <div className="absolute inset-0 opacity-[0.025]"
         style={{
           backgroundImage: `linear-gradient(rgba(139,128,224,0.6) 1px, transparent 1px), linear-gradient(90deg, rgba(139,128,224,0.6) 1px, transparent 1px)`,
@@ -29,7 +38,7 @@ export default function HomePage({ onNavigate }: HomePageProps) {
         <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center">
           <button onClick={() => onNavigate('map')}
             className="px-7 py-3 min-h-11 font-semibold rounded-lg transition-all active:scale-95"
-            style={{ background: 'var(--accent)', color: '#0a0a0e' }}>
+            style={{ background: 'var(--accent)', color: 'var(--accent-contrast)' }}>
             Explore the map →
           </button>
           <button onClick={() => onNavigate('timeline')}

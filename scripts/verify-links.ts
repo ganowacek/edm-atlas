@@ -33,8 +33,6 @@ interface LinkReport {
 }
 
 const report: LinkReport[] = [];
-let searchUrlCount = 0;
-let missingIdCount = 0;
 
 async function checkUrl(url: string): Promise<number> {
   try {
@@ -81,7 +79,6 @@ async function main() {
         artistLinks.push({ type: 'spotify-artist', name: artist.name, url, status: 'ok' });
       } else {
         artistLinks.push({ type: 'spotify-artist', name: artist.name, url: '', status: 'missing-id' });
-        missingIdCount++;
       }
 
       // Apple Music artist
@@ -90,7 +87,6 @@ async function main() {
         artistLinks.push({ type: 'apple-artist', name: artist.name, url, status: 'ok' });
       } else {
         artistLinks.push({ type: 'apple-artist', name: artist.name, url: '', status: 'missing-id' });
-        missingIdCount++;
       }
     }
   }
@@ -99,13 +95,16 @@ async function main() {
   const trackLinks: Omit<LinkReport, 'httpStatus'>[] = [];
   for (const [artistName, tracks] of Object.entries(ARTIST_TRACKS)) {
     for (const track of tracks) {
-      // Apple Music song (required)
-      const amUrl = appleMusicSongUrl(track.appleMusicAlbumId, track.appleMusicSongId);
-      if (isSearchUrl(amUrl)) {
-        trackLinks.push({ type: 'apple-track', name: `${artistName} – ${track.title}`, url: amUrl, status: 'search-url' });
-        searchUrlCount++;
+      // Apple Music song
+      if (track.appleMusicAlbumId && track.appleMusicSongId) {
+        const amUrl = appleMusicSongUrl(track.appleMusicAlbumId, track.appleMusicSongId);
+        if (isSearchUrl(amUrl)) {
+          trackLinks.push({ type: 'apple-track', name: `${artistName} – ${track.title}`, url: amUrl, status: 'search-url' });
+        } else {
+          trackLinks.push({ type: 'apple-track', name: `${artistName} – ${track.title}`, url: amUrl, status: 'ok' });
+        }
       } else {
-        trackLinks.push({ type: 'apple-track', name: `${artistName} – ${track.title}`, url: amUrl, status: 'ok' });
+        trackLinks.push({ type: 'apple-track', name: `${artistName} – ${track.title}`, url: '', status: 'missing-id' });
       }
 
       // Spotify track (optional)
@@ -181,10 +180,35 @@ async function main() {
   console.log(`\nTRACK IDs (from ARTIST_TRACKS)`);
   console.log('------------------------------');
   const totalTracks = Object.values(ARTIST_TRACKS).flat().length;
+  const tracksWithApple = Object.values(ARTIST_TRACKS).flat().filter((t) => t.appleMusicAlbumId && t.appleMusicSongId).length;
   const tracksWithSpotify = Object.values(ARTIST_TRACKS).flat().filter((t) => t.spotifyTrackId).length;
   console.log(`  Total tracks       : ${totalTracks}`);
+  console.log(`  With Apple ID      : ${tracksWithApple}`);
+  console.log(`  Without Apple ID   : ${totalTracks - tracksWithApple}`);
   console.log(`  With Spotify ID    : ${tracksWithSpotify}`);
   console.log(`  Without Spotify ID : ${totalTracks - tracksWithSpotify}`);
+
+  const primaryArtists = genres.flatMap((g) => g.artists.map((artist) => ({
+    name: artist.name,
+    genreName: g.name,
+    trackCount: ARTIST_TRACKS[artist.name]?.length ?? 0,
+  })));
+  const primaryArtistsWithTracks = primaryArtists.filter((artist) => artist.trackCount >= 3);
+  const primaryArtistsWithoutTracks = primaryArtists.filter((artist) => artist.trackCount < 3);
+
+  console.log(`\nROADMAP COVERAGE`);
+  console.log('----------------');
+  console.log(`  Primary graph artists with 3+ tracks : ${primaryArtistsWithTracks.length}`);
+  console.log(`  Primary graph artists needing tracks : ${primaryArtistsWithoutTracks.length}`);
+  if (primaryArtistsWithoutTracks.length > 0) {
+    console.log('\n  Primary artists needing roadmap tracks:');
+    primaryArtistsWithoutTracks.slice(0, 40).forEach((artist) => {
+      console.log(`    - ${artist.name} (${artist.genreName})`);
+    });
+    if (primaryArtistsWithoutTracks.length > 40) {
+      console.log(`    ... and ${primaryArtistsWithoutTracks.length - 40} more`);
+    }
+  }
 
   if (byStatus.searchUrl > 0) {
     console.log('\n✗ SEARCH URLS FOUND (must be fixed):');

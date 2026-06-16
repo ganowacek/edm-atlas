@@ -1,6 +1,7 @@
 # EDM Atlas 🎵
 
 An interactive, educational map of electronic dance music history — genres, subgenres, artists, and the connections between them.
+Found at https://ganowacek.github.io/edm-atlas/
 
 ## What it is
 

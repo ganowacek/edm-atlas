@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import genres from '../data/genres';
-import { getFamilyColor } from '../data/colors';
+import { getFamilyColor, tintStyle } from '../data/colors';
 import type { Genre } from '../types';
 import DetailPanel from '../components/DetailPanel';
 
@@ -17,6 +17,8 @@ const DESC: Record<string, string> = {
   '2010s': 'Festival EDM dominates; underground refines with hard techno, melodic techno, future bass.',
   '2020s': 'Hard techno revival, Afro house boom, and ongoing genre hybridisation.',
 };
+const BEGINNER_BADGE_STYLE = tintStyle('#40b89a', 18, 34);
+const DEEP_BADGE_STYLE = tintStyle('#d4ad4a', 18, 34);
 
 export default function TimelinePage() {
   const [decade, setDecade] = useState('1990s');
@@ -47,7 +49,7 @@ export default function TimelinePage() {
                       borderColor: sel ? 'var(--accent)' : 'var(--border-strong)',
                       boxShadow: sel ? '0 0 18px rgba(139,128,224,0.4)' : 'none',
                     }}>
-                    <span className="text-xs font-bold font-mono" style={{ color: sel ? '#0a0a0e' : 'var(--text-2)' }}>{count}</span>
+                    <span className="text-xs font-bold font-mono" style={{ color: sel ? 'var(--accent-contrast)' : 'var(--text-2)' }}>{count}</span>
                   </div>
                   <span className="text-xs font-medium" style={{ color: sel ? 'var(--text-1)' : 'var(--text-3)' }}>{d}</span>
                 </button>
@@ -82,8 +84,8 @@ export default function TimelinePage() {
                       <div className="flex items-start justify-between gap-2 mb-1.5">
                         <h4 className="font-semibold text-sm" style={{ color: 'var(--text-1)' }}>{g.name}</h4>
                         <div className="flex gap-1 flex-shrink-0">
-                          {g.beginnerFriendly && <span className="text-[9px] px-1.5 py-0.5 rounded font-medium" style={{ background: 'rgba(64,184,154,0.15)', color: '#9fe0cd' }}>beginner</span>}
-                          {g.deepCut && <span className="text-[9px] px-1.5 py-0.5 rounded font-medium" style={{ background: 'rgba(212,173,74,0.15)', color: '#ecd699' }}>deep</span>}
+                          {g.beginnerFriendly && <span className="text-[9px] px-1.5 py-0.5 rounded font-medium" style={BEGINNER_BADGE_STYLE}>beginner</span>}
+                          {g.deepCut && <span className="text-[9px] px-1.5 py-0.5 rounded font-medium" style={DEEP_BADGE_STYLE}>deep</span>}
                         </div>
                       </div>
                       <p className="text-xs leading-relaxed line-clamp-2" style={{ color: 'var(--text-2)' }}>{g.description}</p>
