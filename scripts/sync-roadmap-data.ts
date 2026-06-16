@@ -24,6 +24,7 @@ interface ResolvedTrack {
   title: string;
   appleMusicAlbumId?: string;
   appleMusicSongId?: string;
+  spotifyTrackId?: string;
   reason: string;
 }
 
@@ -296,6 +297,7 @@ async function buildTrackData(rows: RoadmapArtist[]) {
           title,
           appleMusicAlbumId: existing.appleMusicAlbumId,
           appleMusicSongId: existing.appleMusicSongId,
+          spotifyTrackId: existing.spotifyTrackId,
           reason: reasonFor(row.artistName, row.genreName, title),
         });
         continue;
@@ -310,6 +312,7 @@ async function buildTrackData(rows: RoadmapArtist[]) {
         title,
         appleMusicAlbumId: resolved ? String(resolved.collectionId) : undefined,
         appleMusicSongId: resolved ? String(resolved.trackId) : undefined,
+        spotifyTrackId: existing?.spotifyTrackId,
         reason: reasonFor(row.artistName, row.genreName, title),
       });
     }
@@ -362,6 +365,7 @@ function renderArtistTracks(tracksByArtist: Map<string, ResolvedTrack[]>) {
       lines.push(`      title: '${escapeTsString(track.title)}',`);
       if (track.appleMusicAlbumId) lines.push(`      appleMusicAlbumId: '${track.appleMusicAlbumId}',`);
       if (track.appleMusicSongId) lines.push(`      appleMusicSongId: '${track.appleMusicSongId}',`);
+      if (track.spotifyTrackId) lines.push(`      spotifyTrackId: '${track.spotifyTrackId}',`);
       lines.push(`      reason: '${escapeTsString(track.reason)}',`);
       lines.push('    },');
     }

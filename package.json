@@ -8,6 +8,8 @@
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
+    "enrich-links": "tsx scripts/enrich-links.ts",
+    "enrich-links:apply": "tsx scripts/enrich-links.ts --apply-only",
     "sync-roadmap-data": "tsx scripts/sync-roadmap-data.ts",
     "sync-roadmap-data:resolve": "tsx scripts/sync-roadmap-data.ts --resolve-apple",
     "verify-links": "tsx scripts/verify-links.ts",

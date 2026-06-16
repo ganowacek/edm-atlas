@@ -4,108 +4,131 @@ export const ARTIST_TRACKS: Record<string, ArtistTrackSuggestion[]> = {
   'Above & Beyond': [
     {
       title: 'Sun & Moon',
+      spotifyTrackId: '072qkZtviQdaPDhfHPtnZi',
       reason: 'Sun & Moon is a curated Uplifting Trance reference point for Above & Beyond, chosen from the EDM Atlas roadmap for how it represents this branch of electronic music history.',
     },
     {
       title: 'Alone Tonight',
+      spotifyTrackId: '1U7rQQ5otjJPuAMMK49MMI',
       reason: 'Alone Tonight is a curated Uplifting Trance reference point for Above & Beyond, chosen from the EDM Atlas roadmap for how it represents this branch of electronic music history.',
     },
     {
       title: 'Thing Called Love',
+      spotifyTrackId: '04dOtnqQD8Sn8RJ8DJZFZb',
       reason: 'Thing Called Love is a curated Uplifting Trance reference point for Above & Beyond, chosen from the EDM Atlas roadmap for how it represents this branch of electronic music history.',
     },
   ],
   'Acen': [
     {
       title: 'Trip II the Moon',
+      spotifyTrackId: '3ri7bk6El6HZG4tY0q3UVQ',
       reason: 'Trip II the Moon is a curated Hardcore reference point for Acen, chosen from the EDM Atlas roadmap for how it represents this branch of electronic music history.',
     },
     {
       title: 'Close Your Eyes',
+      spotifyTrackId: '71YUmw93134WvIrxGWRTkf',
       reason: 'Close Your Eyes is a curated Hardcore reference point for Acen, chosen from the EDM Atlas roadmap for how it represents this branch of electronic music history.',
     },
     {
       title: 'Window in the Sky',
+      spotifyTrackId: '1b1tLDPsCkVe9mJETu3eFf',
       reason: 'Window in the Sky is a curated Hardcore reference point for Acen, chosen from the EDM Atlas roadmap for how it represents this branch of electronic music history.',
     },
   ],
   'Actress': [
     {
       title: 'Hubble',
+      spotifyTrackId: '0SxrRiPi9jqOhISdjBelfU',
       reason: 'Hubble is a curated Post-Dubstep reference point for Actress, chosen from the EDM Atlas roadmap for how it represents this branch of electronic music history.',
     },
     {
       title: 'Maze',
+      spotifyTrackId: '2MZ7yLXyIFAquxk3VvMbvY',
       reason: 'Maze is a curated Post-Dubstep reference point for Actress, chosen from the EDM Atlas roadmap for how it represents this branch of electronic music history.',
     },
     {
       title: 'X22RME',
+      spotifyTrackId: '3xQTGuuLdG90idrVMyCrTC',
       reason: 'X22RME is a curated Post-Dubstep reference point for Actress, chosen from the EDM Atlas roadmap for how it represents this branch of electronic music history.',
     },
   ],
   'Afrika Bambaataa': [
     {
       title: 'Planet Rock',
+      spotifyTrackId: '4FupIlegZgvXUuK79qcoKW',
       reason: 'Planet Rock is a curated Electro reference point for Afrika Bambaataa, chosen from the EDM Atlas roadmap for how it represents this branch of electronic music history.',
     },
     {
       title: 'Looking for the Perfect Beat',
+      spotifyTrackId: '3grljpi1aYIRA6TuXvGigL',
       reason: 'Looking for the Perfect Beat is a curated Electro reference point for Afrika Bambaataa, chosen from the EDM Atlas roadmap for how it represents this branch of electronic music history.',
     },
     {
       title: 'Renegades of Funk',
+      spotifyTrackId: '7iPXWodYIIDwXcbDTbLup5',
       reason: 'Renegades of Funk is a curated Electro reference point for Afrika Bambaataa, chosen from the EDM Atlas roadmap for how it represents this branch of electronic music history.',
     },
   ],
   'Air': [
     {
       title: 'La Femme d’Argent',
+      spotifyTrackId: '6tEaLXZlN8b71vWV1SSsRf',
       reason: 'La Femme d’Argent is a curated Chillout reference point for Air, chosen from the EDM Atlas roadmap for how it represents this branch of electronic music history.',
     },
     {
       title: 'Sexy Boy',
+      spotifyTrackId: '7Fx3o9QtK1vtpkEWkM6OJu',
       reason: 'Sexy Boy is a curated Chillout reference point for Air, chosen from the EDM Atlas roadmap for how it represents this branch of electronic music history.',
     },
     {
       title: 'All I Need',
+      spotifyTrackId: '7jOM0KIKgIppqIEvEjixaj',
       reason: 'All I Need is a curated Chillout reference point for Air, chosen from the EDM Atlas roadmap for how it represents this branch of electronic music history.',
     },
   ],
   'Alignment': [
     {
       title: 'Ever Gone',
+      spotifyTrackId: '7v1JbouuzwrFU5waJXR5cu',
       reason: 'Ever Gone is a curated Hard Techno reference point for Alignment, chosen from the EDM Atlas roadmap for how it represents this branch of electronic music history.',
     },
     {
       title: 'Nothingness',
+      spotifyTrackId: '3pgzPWlj84QJAHfIvBjDkk',
       reason: 'Nothingness is a curated Hard Techno reference point for Alignment, chosen from the EDM Atlas roadmap for how it represents this branch of electronic music history.',
     },
     {
       title: 'Attack',
+      spotifyTrackId: '2ZOo2V27Gvj38dZwGOEwLS',
       reason: 'Attack is a curated Hard Techno reference point for Alignment, chosen from the EDM Atlas roadmap for how it represents this branch of electronic music history.',
     },
   ],
   'Âme': [
     {
       title: 'Rej',
+      spotifyTrackId: '5l3TZLe5uEk7vdXbHghZZW',
       reason: 'Rej is a curated Melodic Techno reference point for Âme, chosen from the EDM Atlas roadmap for how it represents this branch of electronic music history.',
     },
     {
       title: 'Dream House',
+      spotifyTrackId: '6fxc8BAB79A7JMoecqge01',
       reason: 'Dream House is a curated Melodic Techno reference point for Âme, chosen from the EDM Atlas roadmap for how it represents this branch of electronic music history.',
     },
     {
       title: 'No War',
+      spotifyTrackId: '1ESzyXxkUwxQF3Blh7O3Dt',
       reason: 'No War is a curated Melodic Techno reference point for Âme, chosen from the EDM Atlas roadmap for how it represents this branch of electronic music history.',
     },
   ],
   'Ancient Methods': [
     {
       title: 'Knights & Bishops',
+      spotifyTrackId: '53QdkrCeeSQKA9WsojpAp0',
       reason: 'Knights & Bishops is a curated Industrial Techno reference point for Ancient Methods, chosen from the EDM Atlas roadmap for how it represents this branch of electronic music history.',
     },
     {
       title: 'A German Love',
+      spotifyTrackId: '5AqBVXX2gczGekS8JEt35Z',
       reason: 'A German Love is a curated Industrial Techno reference point for Ancient Methods, chosen from the EDM Atlas roadmap for how it represents this branch of electronic music history.',
     },
     {
@@ -116,52 +139,63 @@ export const ARTIST_TRACKS: Record<string, ArtistTrackSuggestion[]> = {
   'Andy C': [
     {
       title: 'Body Rock',
+      spotifyTrackId: '0qtjn6dbQ8VDNJwJQ9w7Cy',
       reason: 'Body Rock is a curated Drum & Bass reference point for Andy C, chosen from the EDM Atlas roadmap for how it represents this branch of electronic music history.',
     },
     {
       title: 'Cool Down',
+      spotifyTrackId: '02RwQbdZI4Dz1r7WLJJwtq',
       reason: 'Cool Down is a curated Drum & Bass reference point for Andy C, chosen from the EDM Atlas roadmap for how it represents this branch of electronic music history.',
     },
     {
       title: 'Heartbeat Loud',
+      spotifyTrackId: '5PuJ00qKGWqbGeeWbt8WJb',
       reason: 'Heartbeat Loud is a curated Drum & Bass reference point for Andy C, chosen from the EDM Atlas roadmap for how it represents this branch of electronic music history.',
     },
   ],
   'Andy Moor': [
     {
       title: 'Fake Awake',
+      spotifyTrackId: '1TtpbREsMga9Q1miMArksS',
       reason: 'Fake Awake is a curated Uplifting Trance reference point for Andy Moor, chosen from the EDM Atlas roadmap for how it represents this branch of electronic music history.',
     },
     {
       title: 'Air for Life',
+      spotifyTrackId: '4O3kdtUwxOxE5aPLL6WhuM',
       reason: 'Air for Life is a curated Uplifting Trance reference point for Andy Moor, chosen from the EDM Atlas roadmap for how it represents this branch of electronic music history.',
     },
     {
       title: 'YearZero',
+      spotifyTrackId: '1rwRJNLQERQaJT7dHNo1WB',
       reason: 'YearZero is a curated Uplifting Trance reference point for Andy Moor, chosen from the EDM Atlas roadmap for how it represents this branch of electronic music history.',
     },
   ],
   'Angerfist': [
     {
       title: 'Raise Your Fist',
+      spotifyTrackId: '58tCGbeOd7wbqhzlln090T',
       reason: 'Raise Your Fist is a curated Gabber reference point for Angerfist, chosen from the EDM Atlas roadmap for how it represents this branch of electronic music history.',
     },
     {
       title: 'Incoming',
+      spotifyTrackId: '4XiGPZPtOG6r6jT6rB0XJR',
       reason: 'Incoming is a curated Gabber reference point for Angerfist, chosen from the EDM Atlas roadmap for how it represents this branch of electronic music history.',
     },
     {
       title: 'Criminally Insane',
+      spotifyTrackId: '1JyrjxvP3MoGgOWnYinhwu',
       reason: 'Criminally Insane is a curated Gabber reference point for Angerfist, chosen from the EDM Atlas roadmap for how it represents this branch of electronic music history.',
     },
   ],
   'Antiserum': [
     {
       title: 'Trippy',
+      spotifyTrackId: '2Rn5vJr2DYNcv0hZd646qJ',
       reason: 'Trippy is a curated Riddim reference point for Antiserum, chosen from the EDM Atlas roadmap for how it represents this branch of electronic music history.',
     },
     {
       title: 'Hustle',
+      spotifyTrackId: '2bYK0bWS4JqqpMHs5Qfmwn',
       reason: 'Hustle is a curated Riddim reference point for Antiserum, chosen from the EDM Atlas roadmap for how it represents this branch of electronic music history.',
     },
     {
@@ -172,154 +206,187 @@ export const ARTIST_TRACKS: Record<string, ArtistTrackSuggestion[]> = {
   'Aphex Twin': [
     {
       title: 'Xtal',
+      spotifyTrackId: '7o2AeQZzfCERsRmOM86EcB',
       reason: 'Xtal is a curated Ambient reference point for Aphex Twin, chosen from the EDM Atlas roadmap for how it represents this branch of electronic music history.',
     },
     {
       title: 'Windowlicker',
+      spotifyTrackId: '409z4jUHpq7eIkg3N3FzZh',
       reason: 'Windowlicker is a curated Ambient reference point for Aphex Twin, chosen from the EDM Atlas roadmap for how it represents this branch of electronic music history.',
     },
     {
       title: 'Alberto Balsalm',
+      spotifyTrackId: '6gbmylJ7sB7NFfMfTQHosf',
       reason: 'Alberto Balsalm is a curated Ambient reference point for Aphex Twin, chosen from the EDM Atlas roadmap for how it represents this branch of electronic music history.',
     },
   ],
   'Armin van Buuren': [
     {
       title: 'Shivers',
+      spotifyTrackId: '0pfJH3eRkM4t9wlg6LwuTU',
       reason: 'Shivers is a curated Uplifting Trance reference point for Armin van Buuren, chosen from the EDM Atlas roadmap for how it represents this branch of electronic music history.',
     },
     {
       title: 'Communication',
+      spotifyTrackId: '3Xoqg8LNJaGYvnpdsIYmOh',
       reason: 'Communication is a curated Uplifting Trance reference point for Armin van Buuren, chosen from the EDM Atlas roadmap for how it represents this branch of electronic music history.',
     },
     {
       title: 'This Is What It Feels Like',
+      spotifyTrackId: '5GjnIpUlLGEIYk052ISOw9',
       reason: 'This Is What It Feels Like is a curated Uplifting Trance reference point for Armin van Buuren, chosen from the EDM Atlas roadmap for how it represents this branch of electronic music history.',
     },
   ],
   'Artful Dodger': [
     {
       title: 'Re-Rewind',
+      spotifyTrackId: '1n0MDSnWrdOWWRGZnRd7Ep',
       reason: 'Re-Rewind is a curated UK Garage reference point for Artful Dodger, chosen from the EDM Atlas roadmap for how it represents this branch of electronic music history.',
     },
     {
       title: 'Movin’ Too Fast',
+      spotifyTrackId: '0ba7hLQYM4CZ6Y8wmQ7iUt',
       reason: 'Movin’ Too Fast is a curated UK Garage reference point for Artful Dodger, chosen from the EDM Atlas roadmap for how it represents this branch of electronic music history.',
     },
     {
       title: 'Woman Trouble',
+      spotifyTrackId: '0Csb1b1I6BkMiLYSD2lJsW',
       reason: 'Woman Trouble is a curated UK Garage reference point for Artful Dodger, chosen from the EDM Atlas roadmap for how it represents this branch of electronic music history.',
     },
   ],
   'Astral Projection': [
     {
       title: 'Mahadeva',
+      spotifyTrackId: '4fKBKp6v52BBYHw3ePMXFp',
       reason: 'Mahadeva is a curated Psytrance reference point for Astral Projection, chosen from the EDM Atlas roadmap for how it represents this branch of electronic music history.',
     },
     {
       title: 'People Can Fly',
+      spotifyTrackId: '7ecv2oC1QL7Q6o3PuFqWzn',
       reason: 'People Can Fly is a curated Psytrance reference point for Astral Projection, chosen from the EDM Atlas roadmap for how it represents this branch of electronic music history.',
     },
     {
       title: 'Dancing Galaxy',
+      spotifyTrackId: '2C7M7Zcivd5gcUyb7ZzczW',
       reason: 'Dancing Galaxy is a curated Psytrance reference point for Astral Projection, chosen from the EDM Atlas roadmap for how it represents this branch of electronic music history.',
     },
   ],
   'ATB': [
     {
       title: '9 PM',
+      spotifyTrackId: '5KwpWZxOUmXnpFddmQqxZG',
       reason: '9 PM is a curated Trance reference point for ATB, chosen from the EDM Atlas roadmap for how it represents this branch of electronic music history.',
     },
     {
       title: 'Ecstasy',
+      spotifyTrackId: '2E09FnAzgoLEw8RzEJEEy9',
       reason: 'Ecstasy is a curated Trance reference point for ATB, chosen from the EDM Atlas roadmap for how it represents this branch of electronic music history.',
     },
     {
       title: 'Don’t Stop',
+      spotifyTrackId: '0ygoI3HcoGScxt879A23Uk',
       reason: 'Don’t Stop is a curated Trance reference point for ATB, chosen from the EDM Atlas roadmap for how it represents this branch of electronic music history.',
     },
   ],
   'Autechre': [
     {
       title: 'Bike',
+      spotifyTrackId: '3Om7xxNAn64xJOuU9WVKtp',
       reason: 'Bike is a curated Ambient reference point for Autechre, chosen from the EDM Atlas roadmap for how it represents this branch of electronic music history.',
     },
     {
       title: 'Gantz Graf',
+      spotifyTrackId: '5OyrWto6OxYrxHGm93W3fE',
       reason: 'Gantz Graf is a curated Ambient reference point for Autechre, chosen from the EDM Atlas roadmap for how it represents this branch of electronic music history.',
     },
     {
       title: 'Eutow',
+      spotifyTrackId: '4uRXAyNL5T4KY7iawdfJBZ',
       reason: 'Eutow is a curated Ambient reference point for Autechre, chosen from the EDM Atlas roadmap for how it represents this branch of electronic music history.',
     },
   ],
   'Basic Channel': [
     {
       title: 'Phylyps Trak',
+      spotifyTrackId: '3Rw0KHJTkrlQWp98AG5Wv1',
       reason: 'Phylyps Trak is a curated Dub Techno reference point for Basic Channel, chosen from the EDM Atlas roadmap for how it represents this branch of electronic music history.',
     },
     {
       title: 'Quadrant Dub',
+      spotifyTrackId: '0dC0x8MaaASf0zenCVA4zc',
       reason: 'Quadrant Dub is a curated Dub Techno reference point for Basic Channel, chosen from the EDM Atlas roadmap for how it represents this branch of electronic music history.',
     },
     {
       title: 'Enforcement',
+      spotifyTrackId: '2m8N5NDF3OuNXVUAUquszc',
       reason: 'Enforcement is a curated Dub Techno reference point for Basic Channel, chosen from the EDM Atlas roadmap for how it represents this branch of electronic music history.',
     },
   ],
   'Bassnectar': [
     {
       title: 'Bass Head',
+      spotifyTrackId: '7Em0GU0uX7BzhIzy7V5D9I',
       reason: 'Bass Head is a curated Brostep reference point for Bassnectar, chosen from the EDM Atlas roadmap for how it represents this branch of electronic music history.',
     },
     {
       title: 'Timestretch',
+      spotifyTrackId: '2O2gPss8XE08fsodduWsvt',
       reason: 'Timestretch is a curated Brostep reference point for Bassnectar, chosen from the EDM Atlas roadmap for how it represents this branch of electronic music history.',
     },
     {
       title: 'Vava Voom',
+      spotifyTrackId: '6dgj3KX78OR35ps0Eewi2A',
       reason: 'Vava Voom is a curated Brostep reference point for Bassnectar, chosen from the EDM Atlas roadmap for how it represents this branch of electronic music history.',
     },
   ],
   'Benga': [
     {
       title: '26 Basslines',
+      spotifyTrackId: '2H9ZUD7Z5SoLqHcePi2htf',
       reason: '26 Basslines is a curated Dubstep reference point for Benga, chosen from the EDM Atlas roadmap for how it represents this branch of electronic music history.',
     },
     {
       title: 'Night',
+      spotifyTrackId: '5wh6goFgG68FrFhpWHTumK',
       reason: 'Night is a curated Dubstep reference point for Benga, chosen from the EDM Atlas roadmap for how it represents this branch of electronic music history.',
     },
     {
       title: 'Crunked Up',
+      spotifyTrackId: '0lh4XiOhw4SCUBMqg1dc8K',
       reason: 'Crunked Up is a curated Dubstep reference point for Benga, chosen from the EDM Atlas roadmap for how it represents this branch of electronic music history.',
     },
   ],
   'Benny Benassi': [
     {
       title: 'Satisfaction',
+      spotifyTrackId: '5JZnjM9ijpit0d5zjT8MM7',
       reason: 'Satisfaction is a curated Electro House reference point for Benny Benassi, chosen from the EDM Atlas roadmap for how it represents this branch of electronic music history.',
     },
     {
       title: 'Cinema - Skrillex Remix',
+      spotifyTrackId: '4pq0mCy82zpzeluVz78LSX',
       reason: 'Cinema - Skrillex Remix is a curated Electro House reference point for Benny Benassi, chosen from the EDM Atlas roadmap for how it represents this branch of electronic music history.',
     },
     {
       title: 'Able to Love',
+      spotifyTrackId: '463fAXVKkswwGRSyp7lFd9',
       reason: 'Able to Love is a curated Electro House reference point for Benny Benassi, chosen from the EDM Atlas roadmap for how it represents this branch of electronic music history.',
     },
   ],
   'Bicep': [
     {
       title: 'Glue',
+      spotifyTrackId: '2aJDlirz6v2a4HREki98cP',
       reason: 'Glue is a curated Melodic Techno reference point for Bicep, chosen from the EDM Atlas roadmap for how it represents this branch of electronic music history.',
     },
     {
       title: 'Apricots',
+      spotifyTrackId: '0WfOuXw05LJq4ik1lVvTzi',
       reason: 'Apricots is a curated Melodic Techno reference point for Bicep, chosen from the EDM Atlas roadmap for how it represents this branch of electronic music history.',
     },
     {
       title: 'Atlas',
+      spotifyTrackId: '54TgI46OnNqcf0SyzQyCL6',
       reason: 'Atlas is a curated Melodic Techno reference point for Bicep, chosen from the EDM Atlas roadmap for how it represents this branch of electronic music history.',
     },
   ],
@@ -328,30 +395,36 @@ export const ARTIST_TRACKS: Record<string, ArtistTrackSuggestion[]> = {
       title: 'Superman',
       appleMusicAlbumId: '1440869988',
       appleMusicSongId: '1440870001',
+      spotifyTrackId: '752l1xT5G1OHzg71ZBnTyZ',
       reason: 'Superman is a curated Afro House reference point for Black Coffee, chosen from the EDM Atlas roadmap for how it represents this branch of electronic music history.',
     },
     {
       title: 'Drive',
       appleMusicAlbumId: '1425338276',
       appleMusicSongId: '1425338283',
+      spotifyTrackId: '33dI106R5aisHtTUVpwGQi',
       reason: 'Drive is a curated Afro House reference point for Black Coffee, chosen from the EDM Atlas roadmap for how it represents this branch of electronic music history.',
     },
     {
       title: 'Turn Me On',
+      spotifyTrackId: '2fSAzJ6LKW1Ausdmdd7mTK',
       reason: 'Turn Me On is a curated Afro House reference point for Black Coffee, chosen from the EDM Atlas roadmap for how it represents this branch of electronic music history.',
     },
   ],
   'Black Sun Empire': [
     {
       title: 'Arrakis',
+      spotifyTrackId: '4eGd3CVt2IyFdvQ3r0srlB',
       reason: 'Arrakis is a curated Neurofunk reference point for Black Sun Empire, chosen from the EDM Atlas roadmap for how it represents this branch of electronic music history.',
     },
     {
       title: 'Breach',
+      spotifyTrackId: '4yEZBygwppUME6dcojmCZ1',
       reason: 'Breach is a curated Neurofunk reference point for Black Sun Empire, chosen from the EDM Atlas roadmap for how it represents this branch of electronic music history.',
     },
     {
       title: 'Dawn of a Dark Day',
+      spotifyTrackId: '37lB5RVKYn6viBzU1nVpXE',
       reason: 'Dawn of a Dark Day is a curated Neurofunk reference point for Black Sun Empire, chosen from the EDM Atlas roadmap for how it represents this branch of electronic music history.',
     },
   ],
@@ -366,44 +439,53 @@ export const ARTIST_TRACKS: Record<string, ArtistTrackSuggestion[]> = {
     },
     {
       title: 'Vibe Decorium',
+      spotifyTrackId: '757B4ZJIRWk70Q2vRWz696',
       reason: 'Vibe Decorium is a curated Industrial Techno reference point for Blawan, chosen from the EDM Atlas roadmap for how it represents this branch of electronic music history.',
     },
   ],
   'Boards of Canada': [
     {
       title: 'Roygbiv',
+      spotifyTrackId: '5Hf2h59YLInKlic7ooWZVd',
       reason: 'Roygbiv is a curated Ambient reference point for Boards of Canada, chosen from the EDM Atlas roadmap for how it represents this branch of electronic music history.',
     },
     {
       title: 'Music Is Math',
+      spotifyTrackId: '3MF9cjIlg3R9osw3SgRmEb',
       reason: 'Music Is Math is a curated Ambient reference point for Boards of Canada, chosen from the EDM Atlas roadmap for how it represents this branch of electronic music history.',
     },
     {
       title: 'Dayvan Cowboy',
+      spotifyTrackId: '2J4lJMCuFCA0zlwFOjePD5',
       reason: 'Dayvan Cowboy is a curated Ambient reference point for Boards of Canada, chosen from the EDM Atlas roadmap for how it represents this branch of electronic music history.',
     },
   ],
   'Bonobo': [
     {
       title: 'Kiara',
+      spotifyTrackId: '7sqii6BhIDpJChYpU3WjwS',
       reason: 'Kiara is a curated Downtempo / Trip-Hop reference point for Bonobo, chosen from the EDM Atlas roadmap for how it represents this branch of electronic music history.',
     },
     {
       title: 'Cirrus',
+      spotifyTrackId: '2lJ4d8MCT6ZlDRHKJ1br14',
       reason: 'Cirrus is a curated Downtempo / Trip-Hop reference point for Bonobo, chosen from the EDM Atlas roadmap for how it represents this branch of electronic music history.',
     },
     {
       title: 'Kerala',
+      spotifyTrackId: '5DAjrJqXqYtgr67pVhmUeR',
       reason: 'Kerala is a curated Downtempo / Trip-Hop reference point for Bonobo, chosen from the EDM Atlas roadmap for how it represents this branch of electronic music history.',
     },
   ],
   'Breeze': [
     {
       title: 'Heartbeatz',
+      spotifyTrackId: '3TmDp09lTQBp5ach4wICYJ',
       reason: 'Heartbeatz is a curated Happy Hardcore reference point for Breeze, chosen from the EDM Atlas roadmap for how it represents this branch of electronic music history.',
     },
     {
       title: 'You’re Shining',
+      spotifyTrackId: '16GnkXpmz4SzGJIUqlQ4WS',
       reason: 'You’re Shining is a curated Happy Hardcore reference point for Breeze, chosen from the EDM Atlas roadmap for how it represents this branch of electronic music history.',
     },
     {
@@ -414,14 +496,17 @@ export const ARTIST_TRACKS: Record<string, ArtistTrackSuggestion[]> = {
   'Brian Eno': [
     {
       title: '1/1',
+      spotifyTrackId: '1M88dT5bjWKgPpuDSmaZRR',
       reason: '1/1 is a curated Ambient reference point for Brian Eno, chosen from the EDM Atlas roadmap for how it represents this branch of electronic music history.',
     },
     {
       title: 'An Ending',
+      spotifyTrackId: '2AnjFrR9x5vsCpU9NEObnP',
       reason: 'An Ending is a curated Ambient reference point for Brian Eno, chosen from the EDM Atlas roadmap for how it represents this branch of electronic music history.',
     },
     {
       title: 'Thursday Afternoon',
+      spotifyTrackId: '6iDZTMT9xdH84NS4N5L39x',
       reason: 'Thursday Afternoon is a curated Ambient reference point for Brian Eno, chosen from the EDM Atlas roadmap for how it represents this branch of electronic music history.',
     },
   ],
@@ -432,24 +517,29 @@ export const ARTIST_TRACKS: Record<string, ArtistTrackSuggestion[]> = {
     },
     {
       title: 'Dance Like Machines',
+      spotifyTrackId: '6m9Lk2i7UBlNQ12qCKo3un',
       reason: 'Dance Like Machines is a curated Nu-Electro reference point for Brodinski, chosen from the EDM Atlas roadmap for how it represents this branch of electronic music history.',
     },
     {
       title: 'Let the Beat Control Your Body',
+      spotifyTrackId: '5Ku0pfmAZUyEbO5grfQsyP',
       reason: 'Let the Beat Control Your Body is a curated Nu-Electro reference point for Brodinski, chosen from the EDM Atlas roadmap for how it represents this branch of electronic music history.',
     },
   ],
   'BT': [
     {
       title: 'Flaming June',
+      spotifyTrackId: '5Vh9T9b7t7764fDEWMd9Fs',
       reason: 'Flaming June is a curated Trance reference point for BT, chosen from the EDM Atlas roadmap for how it represents this branch of electronic music history.',
     },
     {
       title: 'Mercury and Solace',
+      spotifyTrackId: '7FBuFnQf1MtbJVTOpwMiAh',
       reason: 'Mercury and Solace is a curated Trance reference point for BT, chosen from the EDM Atlas roadmap for how it represents this branch of electronic music history.',
     },
     {
       title: 'Dreaming',
+      spotifyTrackId: '5tG0QxkDDJPQHkR6I4gHee',
       reason: 'Dreaming is a curated Trance reference point for BT, chosen from the EDM Atlas roadmap for how it represents this branch of electronic music history.',
     },
   ],
@@ -458,94 +548,114 @@ export const ARTIST_TRACKS: Record<string, ArtistTrackSuggestion[]> = {
       title: 'Archangel',
       appleMusicAlbumId: '893175779',
       appleMusicSongId: '893175788',
+      spotifyTrackId: '55gnBQAhU5rGzLsXTAx2MM',
       reason: 'Archangel is a curated Dubstep reference point for Burial, chosen from the EDM Atlas roadmap for how it represents this branch of electronic music history.',
     },
     {
       title: 'Ghost Hardware',
+      spotifyTrackId: '5m1VR5YlkswXMoHSmGWFqa',
       reason: 'Ghost Hardware is a curated Dubstep reference point for Burial, chosen from the EDM Atlas roadmap for how it represents this branch of electronic music history.',
     },
     {
       title: 'Distant Lights',
+      spotifyTrackId: '4CetCOzy2sv4DcMJJBa8lj',
       reason: 'Distant Lights is a curated Dubstep reference point for Burial, chosen from the EDM Atlas roadmap for how it represents this branch of electronic music history.',
     },
   ],
   'Calibre': [
     {
       title: 'Even If',
+      spotifyTrackId: '5nVkaIXaqQtoMX4V1jncdO',
       reason: 'Even If is a curated Liquid D&B reference point for Calibre, chosen from the EDM Atlas roadmap for how it represents this branch of electronic music history.',
     },
     {
       title: 'Mr. Maverick',
+      spotifyTrackId: '5jPGG0sycNwxFNMIf4exGY',
       reason: 'Mr. Maverick is a curated Liquid D&B reference point for Calibre, chosen from the EDM Atlas roadmap for how it represents this branch of electronic music history.',
     },
     {
       title: 'Drop It Down',
+      spotifyTrackId: '051XVf58Tqgld15zs2Rv0X',
       reason: 'Drop It Down is a curated Liquid D&B reference point for Calibre, chosen from the EDM Atlas roadmap for how it represents this branch of electronic music history.',
     },
   ],
   'Camelphat': [
     {
       title: 'Cola',
+      spotifyTrackId: '0aL5jEWqfIwNDB3tdzyzH4',
       reason: 'Cola is a curated Tech House reference point for CamelPhat, chosen from the EDM Atlas roadmap for how it represents this branch of electronic music history.',
     },
     {
       title: 'Panic Room',
+      spotifyTrackId: '3MkuFR7t25mu7Iscp6GGiV',
       reason: 'Panic Room is a curated Tech House reference point for CamelPhat, chosen from the EDM Atlas roadmap for how it represents this branch of electronic music history.',
     },
     {
       title: 'Breathe',
+      spotifyTrackId: '6TR0FGw4zhlGbQALN065AI',
       reason: 'Breathe is a curated Tech House reference point for CamelPhat, chosen from the EDM Atlas roadmap for how it represents this branch of electronic music history.',
     },
   ],
   'CamelPhat': [
     {
       title: 'Cola',
+      spotifyTrackId: '0aL5jEWqfIwNDB3tdzyzH4',
       reason: 'Cola is a curated Tech House reference point for CamelPhat, chosen from the EDM Atlas roadmap for how it represents this branch of electronic music history.',
     },
     {
       title: 'Panic Room',
+      spotifyTrackId: '3MkuFR7t25mu7Iscp6GGiV',
       reason: 'Panic Room is a curated Tech House reference point for CamelPhat, chosen from the EDM Atlas roadmap for how it represents this branch of electronic music history.',
     },
     {
       title: 'Breathe',
+      spotifyTrackId: '6TR0FGw4zhlGbQALN065AI',
       reason: 'Breathe is a curated Tech House reference point for CamelPhat, chosen from the EDM Atlas roadmap for how it represents this branch of electronic music history.',
     },
   ],
   'Camo & Krooked': [
     {
       title: 'Ember',
+      spotifyTrackId: '3IOqfD7PNduOuoziFfi4tG',
       reason: 'Ember is a curated Halftime reference point for Camo & Krooked, chosen from the EDM Atlas roadmap for how it represents this branch of electronic music history.',
     },
     {
       title: 'Witchdoctor',
+      spotifyTrackId: '438G7RYrJERRx5uXWSDu1m',
       reason: 'Witchdoctor is a curated Halftime reference point for Camo & Krooked, chosen from the EDM Atlas roadmap for how it represents this branch of electronic music history.',
     },
     {
       title: 'Atlas',
+      spotifyTrackId: '6SbM95pCKr400t9fbONsex',
       reason: 'Atlas is a curated Halftime reference point for Camo & Krooked, chosen from the EDM Atlas roadmap for how it represents this branch of electronic music history.',
     },
   ],
   'Cassius': [
     {
       title: '1999',
+      spotifyTrackId: '2R53yign0dvy3i4TLAr2Ud',
       reason: '1999 is a curated French House reference point for Cassius, chosen from the EDM Atlas roadmap for how it represents this branch of electronic music history.',
     },
     {
       title: 'Feeling for You',
+      spotifyTrackId: '0UHhtA7tNKZaEPh7hYZVGP',
       reason: 'Feeling for You is a curated French House reference point for Cassius, chosen from the EDM Atlas roadmap for how it represents this branch of electronic music history.',
     },
     {
       title: 'Toop Toop',
+      spotifyTrackId: '7cHhpJV9fC2AqgdiLvq1AO',
       reason: 'Toop Toop is a curated French House reference point for Cassius, chosen from the EDM Atlas roadmap for how it represents this branch of electronic music history.',
     },
   ],
   'Chic / Nile Rodgers': [
     {
       title: 'Le Freak',
+      spotifyTrackId: '4qL9VYPB4XwJKAOq4xn2Mh',
       reason: 'Le Freak is a curated Disco reference point for Chic / Nile Rodgers, chosen from the EDM Atlas roadmap for how it represents this branch of electronic music history.',
     },
     {
       title: 'Good Times',
+      spotifyTrackId: '0PQFPcSK1gnBGlbV4CZCG0',
       reason: 'Good Times is a curated Disco reference point for Chic / Nile Rodgers, chosen from the EDM Atlas roadmap for how it represents this branch of electronic music history.',
     },
     {
@@ -556,126 +666,153 @@ export const ARTIST_TRACKS: Record<string, ArtistTrackSuggestion[]> = {
   'Chicane': [
     {
       title: 'Offshore',
+      spotifyTrackId: '1rToUrnowFb88N2Z4Kjyau',
       reason: 'Offshore is a curated Progressive Trance reference point for Chicane, chosen from the EDM Atlas roadmap for how it represents this branch of electronic music history.',
     },
     {
       title: 'Saltwater',
+      spotifyTrackId: '05c4AAJKIulqI8vQQ41Rch',
       reason: 'Saltwater is a curated Progressive Trance reference point for Chicane, chosen from the EDM Atlas roadmap for how it represents this branch of electronic music history.',
     },
     {
       title: 'Don’t Give Up',
+      spotifyTrackId: '0gTeDTRPPVAYcdyPXhWqt2',
       reason: 'Don’t Give Up is a curated Progressive Trance reference point for Chicane, chosen from the EDM Atlas roadmap for how it represents this branch of electronic music history.',
     },
   ],
   'Chris Lake': [
     {
       title: 'Turn Off the Lights',
+      spotifyTrackId: '42CMeHqi0S8sbKvrzLyixS',
       reason: 'Turn Off the Lights is a curated Tech House reference point for Chris Lake, chosen from the EDM Atlas roadmap for how it represents this branch of electronic music history.',
     },
     {
       title: 'I Want You',
+      spotifyTrackId: '7IM73yy9leN8ftZsOVmVTO',
       reason: 'I Want You is a curated Tech House reference point for Chris Lake, chosen from the EDM Atlas roadmap for how it represents this branch of electronic music history.',
     },
     {
       title: 'Deceiver',
+      spotifyTrackId: '14i676OGxbJgIixbjrq7aD',
       reason: 'Deceiver is a curated Tech House reference point for Chris Lake, chosen from the EDM Atlas roadmap for how it represents this branch of electronic music history.',
     },
   ],
   'Chris Liebing': [
     {
       title: 'Auf und Ab',
+      spotifyTrackId: '47LBykl89Y39ZBPAa326aD',
       reason: 'Auf und Ab is a curated Hard Techno reference point for Chris Liebing, chosen from the EDM Atlas roadmap for how it represents this branch of electronic music history.',
     },
     {
       title: 'Novembergrey',
+      spotifyTrackId: '67Lkr5HnP3DbY64BMmJ5qJ',
       reason: 'Novembergrey is a curated Hard Techno reference point for Chris Liebing, chosen from the EDM Atlas roadmap for how it represents this branch of electronic music history.',
     },
     {
       title: 'Mind Bender',
+      spotifyTrackId: '1UoS0kOpJCYvqYpKuMVrLO',
       reason: 'Mind Bender is a curated Hard Techno reference point for Chris Liebing, chosen from the EDM Atlas roadmap for how it represents this branch of electronic music history.',
     },
   ],
   'Chromeo': [
     {
       title: 'Night by Night',
+      spotifyTrackId: '5bgYTzUDzerRFN7fp86MkQ',
       reason: 'Night by Night is a curated Nu-Disco reference point for Chromeo, chosen from the EDM Atlas roadmap for how it represents this branch of electronic music history.',
     },
     {
       title: 'Jealous',
+      spotifyTrackId: '3R5FA1Ay1NxgtwbElR78by',
       reason: 'Jealous is a curated Nu-Disco reference point for Chromeo, chosen from the EDM Atlas roadmap for how it represents this branch of electronic music history.',
     },
     {
       title: 'Fancy Footwork',
+      spotifyTrackId: '2kBt8AO9HZn8VvtyPhWX1o',
       reason: 'Fancy Footwork is a curated Nu-Disco reference point for Chromeo, chosen from the EDM Atlas roadmap for how it represents this branch of electronic music history.',
     },
   ],
   'Craig David': [
     {
       title: 'Re-Rewind',
+      spotifyTrackId: '5hultE7GeExA3RkTvtsear',
       reason: 'Re-Rewind is a curated UK Garage reference point for Craig David, chosen from the EDM Atlas roadmap for how it represents this branch of electronic music history.',
     },
     {
       title: 'Fill Me In',
+      spotifyTrackId: '0UzsDmdpw0Q14KU4hieQss',
       reason: 'Fill Me In is a curated UK Garage reference point for Craig David, chosen from the EDM Atlas roadmap for how it represents this branch of electronic music history.',
     },
     {
       title: '7 Days',
+      spotifyTrackId: '0gPQTLaqHDgdupKEok7J2x',
       reason: '7 Days is a curated UK Garage reference point for Craig David, chosen from the EDM Atlas roadmap for how it represents this branch of electronic music history.',
     },
   ],
   'Culoe De Song': [
     {
       title: 'Y.O.U.D.',
+      spotifyTrackId: '4mpFjY1E1xJr5qlwjiDmBc',
       reason: 'Y.O.U.D. is a curated Afro House reference point for Culoe De Song, chosen from the EDM Atlas roadmap for how it represents this branch of electronic music history.',
     },
     {
       title: 'Rambo',
+      spotifyTrackId: '0OclWK9BPAIAedHBxeytVO',
       reason: 'Rambo is a curated Afro House reference point for Culoe De Song, chosen from the EDM Atlas roadmap for how it represents this branch of electronic music history.',
     },
     {
       title: 'Webaba',
+      spotifyTrackId: '3s6zqHAMoDOhvKHFkhIGWv',
       reason: 'Webaba is a curated Afro House reference point for Culoe De Song, chosen from the EDM Atlas roadmap for how it represents this branch of electronic music history.',
     },
   ],
   'Cybotron': [
     {
       title: 'Clear',
+      spotifyTrackId: '2SAxKE5inx2L97qM3rfrr5',
       reason: 'Clear is a curated Electro reference point for Cybotron, chosen from the EDM Atlas roadmap for how it represents this branch of electronic music history.',
     },
     {
       title: 'Alleys of Your Mind',
+      spotifyTrackId: '4prvKkWksE4wtP0VrRRjtg',
       reason: 'Alleys of Your Mind is a curated Electro reference point for Cybotron, chosen from the EDM Atlas roadmap for how it represents this branch of electronic music history.',
     },
     {
       title: 'Cosmic Cars',
+      spotifyTrackId: '5nrlVx2NrC6OKJfo6U70Kn',
       reason: 'Cosmic Cars is a curated Electro reference point for Cybotron, chosen from the EDM Atlas roadmap for how it represents this branch of electronic music history.',
     },
   ],
   'DAF': [
     {
       title: 'Der Mussolini',
+      spotifyTrackId: '32NRntm0sMzx3dAcxoi5pK',
       reason: 'Der Mussolini is a curated Industrial / EBM reference point for DAF, chosen from the EDM Atlas roadmap for how it represents this branch of electronic music history.',
     },
     {
       title: 'Alle Gegen Alle',
+      spotifyTrackId: '3RkDTBL8d82LlNpCzA2uui',
       reason: 'Alle Gegen Alle is a curated Industrial / EBM reference point for DAF, chosen from the EDM Atlas roadmap for how it represents this branch of electronic music history.',
     },
     {
       title: 'Kebab-Träume',
+      spotifyTrackId: '3fKfnpNjeAj0pwARWIbt7K',
       reason: 'Kebab-Träume is a curated Industrial / EBM reference point for DAF, chosen from the EDM Atlas roadmap for how it represents this branch of electronic music history.',
     },
   ],
   'DAF (Deutsch Amerikanische Freundschaft)': [
     {
       title: 'Der Mussolini',
+      spotifyTrackId: '32NRntm0sMzx3dAcxoi5pK',
       reason: 'Der Mussolini is a curated Industrial / EBM reference point for DAF, chosen from the EDM Atlas roadmap for how it represents this branch of electronic music history.',
     },
     {
       title: 'Alle Gegen Alle',
+      spotifyTrackId: '3RkDTBL8d82LlNpCzA2uui',
       reason: 'Alle Gegen Alle is a curated Industrial / EBM reference point for DAF, chosen from the EDM Atlas roadmap for how it represents this branch of electronic music history.',
     },
     {
       title: 'Kebab-Träume',
+      spotifyTrackId: '3fKfnpNjeAj0pwARWIbt7K',
       reason: 'Kebab-Träume is a curated Industrial / EBM reference point for DAF, chosen from the EDM Atlas roadmap for how it represents this branch of electronic music history.',
     },
   ],
@@ -684,28 +821,33 @@ export const ARTIST_TRACKS: Record<string, ArtistTrackSuggestion[]> = {
       title: 'Around the World',
       appleMusicAlbumId: '696884422',
       appleMusicSongId: '696886431',
+      spotifyTrackId: '1pKYYY0dkg23sQQXi0Q5zN',
       reason: 'Around the World is a curated French House reference point for Daft Punk, chosen from the EDM Atlas roadmap for how it represents this branch of electronic music history.',
     },
     {
       title: 'One More Time',
       appleMusicAlbumId: '697194953',
       appleMusicSongId: '697195462',
+      spotifyTrackId: '0DiWol3AO6WpXZgp0goxAV',
       reason: 'One More Time is a curated French House reference point for Daft Punk, chosen from the EDM Atlas roadmap for how it represents this branch of electronic music history.',
     },
     {
       title: 'Digital Love',
       appleMusicAlbumId: '697194953',
       appleMusicSongId: '697195633',
+      spotifyTrackId: '2VEZx7NWsZ1D0eJ4uv5Fym',
       reason: 'Digital Love is a curated French House reference point for Daft Punk, chosen from the EDM Atlas roadmap for how it represents this branch of electronic music history.',
     },
   ],
   'Darren Styles': [
     {
       title: 'Save Me',
+      spotifyTrackId: '7AnjesDPOC4EUmUL6TjFkR',
       reason: 'Save Me is a curated Happy Hardcore reference point for Darren Styles, chosen from the EDM Atlas roadmap for how it represents this branch of electronic music history.',
     },
     {
       title: 'Come Running',
+      spotifyTrackId: '2izpxvSw1zToQlLNmWwnA0',
       reason: 'Come Running is a curated Happy Hardcore reference point for Darren Styles, chosen from the EDM Atlas roadmap for how it represents this branch of electronic music history.',
     },
     {
@@ -716,70 +858,85 @@ export const ARTIST_TRACKS: Record<string, ArtistTrackSuggestion[]> = {
   'Datsik': [
     {
       title: 'Nuke ’Em',
+      spotifyTrackId: '6vqnddLZgmg7EmvjnNMdnx',
       reason: 'Nuke ’Em is a curated Brostep reference point for Datsik, chosen from the EDM Atlas roadmap for how it represents this branch of electronic music history.',
     },
     {
       title: 'Firepower',
+      spotifyTrackId: '0cc9qnMlirGX1GCSzqnq69',
       reason: 'Firepower is a curated Brostep reference point for Datsik, chosen from the EDM Atlas roadmap for how it represents this branch of electronic music history.',
     },
     {
       title: 'Swagga',
+      spotifyTrackId: '44L43kQtyyOuZPD9meyUaf',
       reason: 'Swagga is a curated Brostep reference point for Datsik, chosen from the EDM Atlas roadmap for how it represents this branch of electronic music history.',
     },
   ],
   'deadmau5': [
     {
       title: 'Strobe',
+      spotifyTrackId: '5GjUhwxykUVYCYkiNo4BEM',
       reason: 'Strobe is a curated Progressive House reference point for deadmau5, chosen from the EDM Atlas roadmap for how it represents this branch of electronic music history.',
     },
     {
       title: 'Faxing Berlin',
+      spotifyTrackId: '50vhelXL6mT8d0ZJNmjsaa',
       reason: 'Faxing Berlin is a curated Progressive House reference point for deadmau5, chosen from the EDM Atlas roadmap for how it represents this branch of electronic music history.',
     },
     {
       title: 'Brazil',
+      spotifyTrackId: '1zm2KEqVdHmhdldP2CkIgv',
       reason: 'Brazil is a curated Progressive House reference point for deadmau5, chosen from the EDM Atlas roadmap for how it represents this branch of electronic music history.',
     },
   ],
   'Deadmau5': [
     {
       title: 'Strobe',
+      spotifyTrackId: '5GjUhwxykUVYCYkiNo4BEM',
       reason: 'Strobe is a curated Progressive House reference point for deadmau5, chosen from the EDM Atlas roadmap for how it represents this branch of electronic music history.',
     },
     {
       title: 'Faxing Berlin',
+      spotifyTrackId: '50vhelXL6mT8d0ZJNmjsaa',
       reason: 'Faxing Berlin is a curated Progressive House reference point for deadmau5, chosen from the EDM Atlas roadmap for how it represents this branch of electronic music history.',
     },
     {
       title: 'Brazil',
+      spotifyTrackId: '1zm2KEqVdHmhdldP2CkIgv',
       reason: 'Brazil is a curated Progressive House reference point for deadmau5, chosen from the EDM Atlas roadmap for how it represents this branch of electronic music history.',
     },
   ],
   'Deepchord': [
     {
       title: 'Vantage Isle',
+      spotifyTrackId: '6kCfoP2ZR3rybgrSbPDQPr',
       reason: 'Vantage Isle is a curated Dub Techno reference point for Deepchord, chosen from the EDM Atlas roadmap for how it represents this branch of electronic music history.',
     },
     {
       title: 'Electromagnetic Dowsing',
+      spotifyTrackId: '39F069Cs96smeQwgNkTnry',
       reason: 'Electromagnetic Dowsing is a curated Dub Techno reference point for Deepchord, chosen from the EDM Atlas roadmap for how it represents this branch of electronic music history.',
     },
     {
       title: 'Luxury',
+      spotifyTrackId: '1TThGRhWM5SPXfzjLkso05',
       reason: 'Luxury is a curated Dub Techno reference point for Deepchord, chosen from the EDM Atlas roadmap for how it represents this branch of electronic music history.',
     },
   ],
   'Derrick May': [
     {
       title: 'Strings of Life',
+      spotifyTrackId: '5S7zaCv2inktON7vNdGpHj',
       reason: 'Strings of Life is a curated Techno reference point for Derrick May, chosen from the EDM Atlas roadmap for how it represents this branch of electronic music history.',
     },
     {
       title: 'Nude Photo',
+      spotifyTrackId: '2pvnyCaDbv8M0uQCyjLT7I',
       reason: 'Nude Photo is a curated Techno reference point for Derrick May, chosen from the EDM Atlas roadmap for how it represents this branch of electronic music history.',
     },
     {
       title: 'The Dance',
+      spotifyTrackId: '427fI6o6HTR0mvyX9t3ZgU',
       reason: 'The Dance is a curated Techno reference point for Derrick May, chosen from the EDM Atlas roadmap for how it represents this branch of electronic music history.',
     },
   ],
@@ -794,34 +951,41 @@ export const ARTIST_TRACKS: Record<string, ArtistTrackSuggestion[]> = {
     },
     {
       title: 'Earth a Run Red',
+      spotifyTrackId: '0MYZaB4hSiHVdHuUf4F6nQ',
       reason: 'Earth a Run Red is a curated Dubstep reference point for Digital Mystikz, chosen from the EDM Atlas roadmap for how it represents this branch of electronic music history.',
     },
   ],
   'Digitalism': [
     {
       title: 'Zdarlight',
+      spotifyTrackId: '05JHQRBFjhTTH9DGDM8Iwy',
       reason: 'Zdarlight is a curated Nu-Electro reference point for Digitalism, chosen from the EDM Atlas roadmap for how it represents this branch of electronic music history.',
     },
     {
       title: 'Pogo',
+      spotifyTrackId: '1YPxUUih6iIQsCshtPkv2L',
       reason: 'Pogo is a curated Nu-Electro reference point for Digitalism, chosen from the EDM Atlas roadmap for how it represents this branch of electronic music history.',
     },
     {
       title: 'Idealistic',
+      spotifyTrackId: '14KzbcceJMYy3U8Zid1VWD',
       reason: 'Idealistic is a curated Nu-Electro reference point for Digitalism, chosen from the EDM Atlas roadmap for how it represents this branch of electronic music history.',
     },
   ],
   'Dillinja': [
     {
       title: 'The Angels Fell',
+      spotifyTrackId: '2KL9mHCn3aSZJzxpJM4HNb',
       reason: 'The Angels Fell is a curated Jungle reference point for Dillinja, chosen from the EDM Atlas roadmap for how it represents this branch of electronic music history.',
     },
     {
       title: 'Hard Noize',
+      spotifyTrackId: '2ABVjaUoadCpy8AvRiRKmA',
       reason: 'Hard Noize is a curated Jungle reference point for Dillinja, chosen from the EDM Atlas roadmap for how it represents this branch of electronic music history.',
     },
     {
       title: 'Silver Blade',
+      spotifyTrackId: '4sv4d6ivzBMlekB3ai2dY7',
       reason: 'Silver Blade is a curated Jungle reference point for Dillinja, chosen from the EDM Atlas roadmap for how it represents this branch of electronic music history.',
     },
   ],
@@ -832,48 +996,58 @@ export const ARTIST_TRACKS: Record<string, ArtistTrackSuggestion[]> = {
     },
     {
       title: 'Envision - Dixon Version',
+      spotifyTrackId: '6hwohNIKnAt2i9WyxccgMD',
       reason: 'Envision - Dixon Version is a curated Melodic Techno reference point for Dixon, chosen from the EDM Atlas roadmap for how it represents this branch of electronic music history.',
     },
     {
       title: 'Where We At',
+      spotifyTrackId: '56X5byrqb81eW1sIWgY6U5',
       reason: 'Where We At is a curated Melodic Techno reference point for Dixon, chosen from the EDM Atlas roadmap for how it represents this branch of electronic music history.',
     },
   ],
   'Dizzee Rascal': [
     {
       title: 'I Luv U',
+      spotifyTrackId: '4EqqHNzPaLpdVk7FgdQHXo',
       reason: 'I Luv U is a curated Grime reference point for Dizzee Rascal, chosen from the EDM Atlas roadmap for how it represents this branch of electronic music history.',
     },
     {
       title: 'Fix Up, Look Sharp',
+      spotifyTrackId: '0AOeHlRaiVoSMjjoB5fB5i',
       reason: 'Fix Up, Look Sharp is a curated Grime reference point for Dizzee Rascal, chosen from the EDM Atlas roadmap for how it represents this branch of electronic music history.',
     },
     {
       title: 'Bassline Junkie',
+      spotifyTrackId: '1o1x4gUntwc9sqeMDWR9eE',
       reason: 'Bassline Junkie is a curated Grime reference point for Dizzee Rascal, chosen from the EDM Atlas roadmap for how it represents this branch of electronic music history.',
     },
   ],
   'DJ Hixxy': [
     {
       title: 'More & More',
+      spotifyTrackId: '3QWDSgtt5zLTcXeQCOYHYR',
       reason: 'More & More is a curated Happy Hardcore reference point for DJ Hixxy, chosen from the EDM Atlas roadmap for how it represents this branch of electronic music history.',
     },
     {
       title: 'Toytown',
+      spotifyTrackId: '57lhA5anbPVBt44jbb0JPq',
       reason: 'Toytown is a curated Happy Hardcore reference point for DJ Hixxy, chosen from the EDM Atlas roadmap for how it represents this branch of electronic music history.',
     },
     {
       title: 'Wanting to Get High',
+      spotifyTrackId: '69N3vLoNjc2YkEhJlLGCd4',
       reason: 'Wanting to Get High is a curated Happy Hardcore reference point for DJ Hixxy, chosen from the EDM Atlas roadmap for how it represents this branch of electronic music history.',
     },
   ],
   'DJ Hype': [
     {
       title: 'Roll the Beats',
+      spotifyTrackId: '38oy5M1Vt0USwyQ1QJlxN6',
       reason: 'Roll the Beats is a curated Jungle reference point for DJ Hype, chosen from the EDM Atlas roadmap for how it represents this branch of electronic music history.',
     },
     {
       title: 'Peace Love & Unity',
+      spotifyTrackId: '7Cfc6dhTAZJSihMsSYMyVD',
       reason: 'Peace Love & Unity is a curated Jungle reference point for DJ Hype, chosen from the EDM Atlas roadmap for how it represents this branch of electronic music history.',
     },
     {
@@ -888,24 +1062,29 @@ export const ARTIST_TRACKS: Record<string, ArtistTrackSuggestion[]> = {
     },
     {
       title: 'Box Energy',
+      spotifyTrackId: '3R5noKZhCo09H3EK3AvJfS',
       reason: 'Box Energy is a curated House reference point for DJ Pierre, chosen from the EDM Atlas roadmap for how it represents this branch of electronic music history.',
     },
     {
       title: 'Generate Power',
+      spotifyTrackId: '22WcrlIXMFh2zvLqttKdBW',
       reason: 'Generate Power is a curated House reference point for DJ Pierre, chosen from the EDM Atlas roadmap for how it represents this branch of electronic music history.',
     },
   ],
   'DJ Rashad': [
     {
       title: 'I Don’t Give a Fuck',
+      spotifyTrackId: '2w4x96AiefAJC6qn4LzDug',
       reason: 'I Don’t Give a Fuck is a curated Footwork / Juke reference point for DJ Rashad, chosen from the EDM Atlas roadmap for how it represents this branch of electronic music history.',
     },
     {
       title: 'Feelin’',
+      spotifyTrackId: '5Ryezb2L47EsSABEu7yylR',
       reason: 'Feelin’ is a curated Footwork / Juke reference point for DJ Rashad, chosen from the EDM Atlas roadmap for how it represents this branch of electronic music history.',
     },
     {
       title: 'Double Cup',
+      spotifyTrackId: '1vXp4seiTWo7L8uXfIlmvM',
       reason: 'Double Cup is a curated Footwork / Juke reference point for DJ Rashad, chosen from the EDM Atlas roadmap for how it represents this branch of electronic music history.',
     },
   ],
