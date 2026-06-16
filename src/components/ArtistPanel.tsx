@@ -3,6 +3,7 @@ import { ExternalLink, Music, Network, X } from 'lucide-react';
 import type { ArtistNode, Genre } from '../types';
 import { getFamilyColor } from '../data/colors';
 import { useIsMobile } from '../hooks/useMediaQuery';
+import BottomSheet from './BottomSheet';
 
 interface Props {
   artist: ArtistNode | null;
@@ -52,16 +53,20 @@ export default function ArtistPanel({ artist, genre, onClose, onJumpToGenre }: P
         <p className="text-sm leading-relaxed" style={{ color: 'var(--text-2)' }}>{artist.importance}</p>
 
         <div className="flex flex-wrap gap-2">
-          <a href={artist.spotifyUrl} target="_blank" rel="noopener noreferrer"
-            className="flex items-center gap-1.5 text-xs font-medium px-3 py-2 rounded-lg transition-colors"
-            style={{ background: 'rgba(64,184,154,0.14)', color: '#5fcab0' }}>
-            <ExternalLink size={13} />Spotify
-          </a>
-          <a href={artist.appleMusicUrl} target="_blank" rel="noopener noreferrer"
-            className="flex items-center gap-1.5 text-xs font-medium px-3 py-2 rounded-lg transition-colors"
-            style={{ background: 'rgba(209,115,173,0.14)', color: '#e394c4' }}>
-            <ExternalLink size={13} />Apple Music
-          </a>
+          {artist.spotifyUrl && (
+            <a href={artist.spotifyUrl} target="_blank" rel="noopener noreferrer"
+              className="flex items-center gap-1.5 text-xs font-medium px-3 py-2 rounded-lg transition-colors"
+              style={{ background: 'rgba(64,184,154,0.14)', color: '#5fcab0' }}>
+              <ExternalLink size={13} />Spotify
+            </a>
+          )}
+          {artist.appleMusicUrl && (
+            <a href={artist.appleMusicUrl} target="_blank" rel="noopener noreferrer"
+              className="flex items-center gap-1.5 text-xs font-medium px-3 py-2 rounded-lg transition-colors"
+              style={{ background: 'rgba(209,115,173,0.14)', color: '#e394c4' }}>
+              <ExternalLink size={13} />Apple Music
+            </a>
+          )}
         </div>
 
         {artist.tracks.length > 0 && (
@@ -143,16 +148,9 @@ export default function ArtistPanel({ artist, genre, onClose, onJumpToGenre }: P
 
   if (isMobile) {
     return (
-      <div className="fixed inset-0 z-50 flex flex-col justify-end" role="dialog" aria-modal="true">
-        <div className="absolute inset-0 bg-black/50 anim-fade" onClick={onClose} />
-        <div className="relative anim-sheet rounded-t-2xl overflow-hidden flex flex-col"
-          style={{ maxHeight: '82vh', borderTop: `2px solid ${color.primary}` }}>
-          <div className="flex justify-center pt-2 pb-1 flex-shrink-0" style={{ background: 'var(--surface-1)' }}>
-            <div className="w-9 h-1 rounded-full" style={{ background: 'var(--surface-3)' }} />
-          </div>
-          <div className="flex-1 overflow-hidden">{body}</div>
-        </div>
-      </div>
+      <BottomSheet onClose={onClose} accentColor={color.primary} initialSnap={0.5}>
+        {body}
+      </BottomSheet>
     );
   }
 

@@ -3,14 +3,10 @@ import { X, MapPin, Zap, ExternalLink } from 'lucide-react';
 import type { Genre } from '../types';
 import { getFamilyColor } from '../data/colors';
 import { useIsMobile } from '../hooks/useMediaQuery';
+import { spotifyArtistUrl, appleMusicArtistUrl } from '../data/urls';
+import BottomSheet from './BottomSheet';
 
 const DECADES = ['1970s', '1980s', '1990s', '2000s', '2010s', '2020s'];
-
-function musicSearchUrl(service: 'spotify' | 'apple', name: string) {
-  const encoded = encodeURIComponent(name);
-  if (service === 'spotify') return `https://open.spotify.com/search/${encoded}`;
-  return `https://music.apple.com/us/search?term=${encoded}`;
-}
 
 interface Props {
   genre: Genre | null;
@@ -216,16 +212,20 @@ export default function DetailPanel({ genre, onClose, onJumpToGenre, allGenres }
                   <h4 className="font-semibold text-sm text-white mb-1">{a.name}</h4>
                   <p className="text-xs leading-relaxed mb-2.5" style={{ color: 'var(--text-2)' }}>{a.importance}</p>
                   <div className="flex gap-2">
-                    <a href={a.spotifyUrl} target="_blank" rel="noopener noreferrer" aria-label={`Find ${a.name} on Spotify`}
-                      className="flex items-center gap-1 text-[11px] font-medium px-2.5 py-1 rounded-lg transition-colors"
-                      style={{ background: 'rgba(64,184,154,0.14)', color: '#5fcab0' }}>
-                      <ExternalLink size={10} />Spotify
-                    </a>
-                    <a href={a.appleMusicUrl} target="_blank" rel="noopener noreferrer" aria-label={`Find ${a.name} on Apple Music`}
-                      className="flex items-center gap-1 text-[11px] font-medium px-2.5 py-1 rounded-lg transition-colors"
-                      style={{ background: 'rgba(209,115,173,0.14)', color: '#e394c4' }}>
-                      <ExternalLink size={10} />Apple Music
-                    </a>
+                    {a.spotifyArtistId && (
+                      <a href={spotifyArtistUrl(a.spotifyArtistId)} target="_blank" rel="noopener noreferrer" aria-label={`${a.name} on Spotify`}
+                        className="flex items-center gap-1 text-[11px] font-medium px-2.5 py-1 rounded-lg transition-colors"
+                        style={{ background: 'rgba(64,184,154,0.14)', color: '#5fcab0' }}>
+                        <ExternalLink size={10} />Spotify
+                      </a>
+                    )}
+                    {a.appleMusicArtistId && (
+                      <a href={appleMusicArtistUrl(a.appleMusicArtistId)} target="_blank" rel="noopener noreferrer" aria-label={`${a.name} on Apple Music`}
+                        className="flex items-center gap-1 text-[11px] font-medium px-2.5 py-1 rounded-lg transition-colors"
+                        style={{ background: 'rgba(209,115,173,0.14)', color: '#e394c4' }}>
+                        <ExternalLink size={10} />Apple Music
+                      </a>
+                    )}
                   </div>
                 </div>
               ))}
@@ -238,17 +238,9 @@ export default function DetailPanel({ genre, onClose, onJumpToGenre, allGenres }
             <p className="text-[10px] uppercase tracking-widest mb-3" style={{ color: 'var(--text-3)' }}>More artists to explore</p>
             <div className="flex flex-wrap gap-2">
               {genre.moreArtists.map((name) => (
-                <span key={name} className="inline-flex items-center gap-1.5 rounded-lg border px-2.5 py-1.5 text-xs"
+                <span key={name} className="inline-flex items-center rounded-lg border px-2.5 py-1.5 text-xs"
                   style={{ background: 'var(--surface-2)', borderColor: 'var(--border)', color: 'var(--text-1)' }}>
                   {name}
-                  <a href={musicSearchUrl('spotify', name)} target="_blank" rel="noopener noreferrer"
-                    aria-label={`Find ${name} on Spotify`} className="transition-colors" style={{ color: '#5fcab0' }}>
-                    <ExternalLink size={11} />
-                  </a>
-                  <a href={musicSearchUrl('apple', name)} target="_blank" rel="noopener noreferrer"
-                    aria-label={`Find ${name} on Apple Music`} className="transition-colors" style={{ color: '#e394c4' }}>
-                    <ExternalLink size={11} />
-                  </a>
                 </span>
               ))}
             </div>
@@ -260,16 +252,9 @@ export default function DetailPanel({ genre, onClose, onJumpToGenre, allGenres }
 
   if (isMobile) {
     return (
-      <div className="fixed inset-0 z-50 flex flex-col justify-end" role="dialog" aria-modal="true">
-        <div className="absolute inset-0 bg-black/50 anim-fade" onClick={onClose} />
-        <div className="relative anim-sheet rounded-t-2xl overflow-hidden flex flex-col"
-          style={{ maxHeight: '82vh', borderTop: `2px solid ${color.primary}` }}>
-          <div className="flex justify-center pt-2 pb-1 flex-shrink-0" style={{ background: 'var(--surface-1)' }}>
-            <div className="w-9 h-1 rounded-full" style={{ background: 'var(--surface-3)' }} />
-          </div>
-          <div className="flex-1 overflow-hidden">{body}</div>
-        </div>
-      </div>
+      <BottomSheet onClose={onClose} accentColor={color.primary} initialSnap={0.5}>
+        {body}
+      </BottomSheet>
     );
   }
 

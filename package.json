@@ -7,7 +7,9 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "verify-links": "tsx scripts/verify-links.ts",
+    "verify-links:http": "tsx scripts/verify-links.ts --check-http"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.3.1",
@@ -30,6 +32,7 @@
     "globals": "^17.6.0",
     "postcss": "^8.5.15",
     "tailwindcss": "^4.3.1",
+    "tsx": "^4.22.4",
     "typescript": "~6.0.2",
     "typescript-eslint": "^8.59.2",
     "vite": "^8.0.12"

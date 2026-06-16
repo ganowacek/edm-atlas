@@ -2,10 +2,11 @@ import { useRef, useState } from 'react';
 import GraphExplorer, { type GraphHandle } from '../components/GraphExplorer';
 import DetailPanel from '../components/DetailPanel';
 import ArtistPanel from '../components/ArtistPanel';
+import SongPanel from '../components/SongPanel';
 import SearchBar from '../components/SearchBar';
 import genres from '../data/genres';
 import { FAMILY_COLORS } from '../data/colors';
-import type { ArtistNode, Genre } from '../types';
+import type { ArtistNode, Genre, TrackNode } from '../types';
 import { SlidersHorizontal, ChevronDown } from 'lucide-react';
 import { useIsMobile } from '../hooks/useMediaQuery';
 
@@ -13,6 +14,7 @@ export default function MapPage() {
   const graphRef = useRef<GraphHandle>(null);
   const [selected, setSelected] = useState<Genre | null>(null);
   const [selectedArtist, setSelectedArtist] = useState<ArtistNode | null>(null);
+  const [selectedTrack, setSelectedTrack] = useState<TrackNode | null>(null);
   const [familyFilter, setFamilyFilter] = useState<string | null>(null);
   const [filtersOpen, setFiltersOpen] = useState(false);
   const isMobile = useIsMobile();
@@ -95,9 +97,10 @@ export default function MapPage() {
           ref={graphRef}
           key={familyFilter ?? 'all'}
           genres={visibleGenres}
-          selectedId={selectedArtist?.id ?? selected?.id ?? null}
-          onSelect={(genre) => { setSelected(genre); setSelectedArtist(null); }}
-          onSelectArtist={(artist) => { setSelectedArtist(artist); setSelected(null); }}
+          selectedId={selectedTrack?.id ?? selectedArtist?.id ?? selected?.id ?? null}
+          onSelect={(genre) => { setSelected(genre); setSelectedArtist(null); setSelectedTrack(null); }}
+          onSelectArtist={(artist) => { setSelectedArtist(artist); setSelected(null); setSelectedTrack(null); }}
+          onSelectTrack={(track) => { setSelectedTrack(track); }}
         />
 
         {/* hint (desktop) */}
@@ -125,6 +128,11 @@ export default function MapPage() {
           if (genre) setSelected(genre);
           handleJump(genreId);
         }}
+      />
+
+      <SongPanel
+        track={selectedTrack}
+        onClose={() => setSelectedTrack(null)}
       />
     </div>
   );
