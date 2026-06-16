@@ -1,4 +1,5 @@
 import type { Genre } from '../types';
+import { GENRE_ENRICHMENT } from './genreEnrichment';
 
 // Expand this file to add new genres, subgenres, and artists.
 // Each top-level genre has parentId: undefined. Subgenres reference their parent's id.
@@ -1072,4 +1073,7 @@ export const genres: Genre[] = [
   },
 ];
 
-export default genres;
+export default genres.map((genre) => ({
+  ...genre,
+  ...GENRE_ENRICHMENT[genre.id],
+}));

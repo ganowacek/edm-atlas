@@ -29,6 +29,9 @@ export default function SearchBar({ genres, onJump }: Props) {
       g.artists.forEach((a) => {
         out.push({ type: 'artist', label: a.name, sublabel: `Artist · ${g.name}`, genreId: g.id, family: g.family });
       });
+      g.moreArtists?.forEach((name) => {
+        out.push({ type: 'artist', label: name, sublabel: `Artist · ${g.name}`, genreId: g.id, family: g.family });
+      });
     });
     return out;
   }, [genres]);

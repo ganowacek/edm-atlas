@@ -6,6 +6,12 @@ import { useIsMobile } from '../hooks/useMediaQuery';
 
 const DECADES = ['1970s', '1980s', '1990s', '2000s', '2010s', '2020s'];
 
+function musicSearchUrl(service: 'spotify' | 'apple', name: string) {
+  const encoded = encodeURIComponent(name);
+  if (service === 'spotify') return `https://open.spotify.com/search/${encoded}`;
+  return `https://music.apple.com/us/search?term=${encoded}`;
+}
+
 interface Props {
   genre: Genre | null;
   onClose: () => void;
@@ -76,6 +82,17 @@ export default function DetailPanel({ genre, onClose, onJumpToGenre, allGenres }
 
         <p className="text-sm leading-relaxed" style={{ color: 'var(--text-2)' }}>{genre.description}</p>
 
+        {genre.history && genre.history.length > 0 && (
+          <div>
+            <p className="text-[10px] uppercase tracking-widest mb-2" style={{ color: 'var(--text-3)' }}>Deep history</p>
+            <div className="space-y-2">
+              {genre.history.map((item) => (
+                <p key={item} className="text-xs leading-relaxed" style={{ color: 'var(--text-2)' }}>{item}</p>
+              ))}
+            </div>
+          </div>
+        )}
+
         {/* data chips */}
         <div className="flex flex-wrap gap-2">
           <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg" style={{ background: 'var(--surface-2)' }}>
@@ -99,6 +116,43 @@ export default function DetailPanel({ genre, onClose, onJumpToGenre, allGenres }
             ))}
           </div>
         </div>
+
+        {(genre.soundProfile?.length || genre.sceneNotes?.length || genre.labels?.length) && (
+          <div className="grid grid-cols-1 gap-4">
+            {genre.soundProfile && genre.soundProfile.length > 0 && (
+              <div>
+                <p className="text-[10px] uppercase tracking-widest mb-2" style={{ color: 'var(--text-3)' }}>Sound profile</p>
+                <div className="flex flex-wrap gap-1.5">
+                  {genre.soundProfile.map((item) => (
+                    <span key={item} className="text-xs px-2 py-1 rounded" style={{ background: 'var(--surface-2)', color: 'var(--text-2)' }}>{item}</span>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {genre.sceneNotes && genre.sceneNotes.length > 0 && (
+              <div>
+                <p className="text-[10px] uppercase tracking-widest mb-2" style={{ color: 'var(--text-3)' }}>Scene context</p>
+                <div className="space-y-1.5">
+                  {genre.sceneNotes.map((item) => (
+                    <div key={item} className="text-xs leading-relaxed" style={{ color: 'var(--text-2)' }}>{item}</div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {genre.labels && genre.labels.length > 0 && (
+              <div>
+                <p className="text-[10px] uppercase tracking-widest mb-2" style={{ color: 'var(--text-3)' }}>Labels & institutions</p>
+                <div className="flex flex-wrap gap-1.5">
+                  {genre.labels.map((item) => (
+                    <span key={item} className="text-xs px-2 py-1 rounded" style={{ background: `${color.glow}40`, color: color.text }}>{item}</span>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
 
         {/* influences / influenced — clickable when in dataset */}
         {(genre.influences.length > 0 || genre.influenced.length > 0) && (
@@ -174,6 +228,28 @@ export default function DetailPanel({ genre, onClose, onJumpToGenre, allGenres }
                     </a>
                   </div>
                 </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {genre.moreArtists && genre.moreArtists.length > 0 && (
+          <div>
+            <p className="text-[10px] uppercase tracking-widest mb-3" style={{ color: 'var(--text-3)' }}>More artists to explore</p>
+            <div className="flex flex-wrap gap-2">
+              {genre.moreArtists.map((name) => (
+                <span key={name} className="inline-flex items-center gap-1.5 rounded-lg border px-2.5 py-1.5 text-xs"
+                  style={{ background: 'var(--surface-2)', borderColor: 'var(--border)', color: 'var(--text-1)' }}>
+                  {name}
+                  <a href={musicSearchUrl('spotify', name)} target="_blank" rel="noopener noreferrer"
+                    aria-label={`Find ${name} on Spotify`} className="transition-colors" style={{ color: '#5fcab0' }}>
+                    <ExternalLink size={11} />
+                  </a>
+                  <a href={musicSearchUrl('apple', name)} target="_blank" rel="noopener noreferrer"
+                    aria-label={`Find ${name} on Apple Music`} className="transition-colors" style={{ color: '#e394c4' }}>
+                    <ExternalLink size={11} />
+                  </a>
+                </span>
               ))}
             </div>
           </div>

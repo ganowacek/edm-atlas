@@ -57,7 +57,9 @@ const GraphExplorer = forwardRef<GraphHandle, Props>(function GraphExplorer(
   const svgRef = useRef<SVGSVGElement>(null);
   const [expanded, setExpanded] = useState<Set<string>>(new Set());
   const [hoveredId, setHoveredId] = useState<string | null>(null);
-  const [zoomK, setZoomK] = useState(1);
+  const hoveredIdRef = useRef<string | null>(null);
+  const selectedIdRef = useRef<string | null>(selectedId);
+  const zoomKRef = useRef(1);
   const [tooltip, setTooltip] = useState<{ text: string; sub: string; x: number; y: number } | null>(null);
 
   // Persistent D3 state across renders
@@ -73,6 +75,51 @@ const GraphExplorer = forwardRef<GraphHandle, Props>(function GraphExplorer(
     W: number;
     H: number;
   } | null>(null);
+
+  const updateLabelVisibility = useCallback(() => {
+    const e = eng.current;
+    if (!e) return;
+
+    const activeId = hoveredIdRef.current ?? selectedIdRef.current;
+    let focus: Set<string> | null = null;
+    if (activeId) {
+      const node = e.nodeById.get(activeId);
+      if (node) {
+        focus = new Set([activeId]);
+        if (node.kind === 'sub' && node.genre?.parentId) { focus.add(node.genre.parentId); focus.add(HUB_ID); }
+        if (node.kind === 'family') {
+          focus.add(HUB_ID);
+          e.nodes.forEach((n) => { if (n.genre?.parentId === node.id) focus!.add(n.id); });
+        }
+        if (node.kind === 'hub') e.nodes.forEach((n) => focus!.add(n.id));
+      }
+    }
+
+    e.gNode.selectAll<SVGGElement, GNode>('g.gnode').select<SVGTextElement>('text.lbl')
+      .interrupt()
+      .text((d) => d.kind === 'sub' ? truncate(d.name) : d.name)
+      .attr('font-size', (d) => d.kind === 'hub' ? '12px' : d.kind === 'family' ? '11px' : '9.5px')
+      .attr('font-weight', (d) => d.kind === 'sub' ? 500 : 700)
+      .attr('dy', (d) => d.kind === 'hub' ? 4 : R[d.kind] + 12)
+      .style('display', (d) => {
+        if (d.kind === 'hub' || d.kind === 'family') return null;
+        if (focus && focus.has(d.id)) return null;
+        if (zoomKRef.current >= LABEL_ZOOM) return null;
+        return 'none';
+      })
+      .style('opacity', (d) => {
+        if (d.kind === 'hub' || d.kind === 'family') return 1;
+        if (focus && focus.has(d.id)) return 1;
+        if (zoomKRef.current >= LABEL_ZOOM) return 1;
+        return 0;
+      });
+  }, []);
+
+  useEffect(() => {
+    hoveredIdRef.current = hoveredId;
+    selectedIdRef.current = selectedId;
+    updateLabelVisibility();
+  }, [hoveredId, selectedId, updateLabelVisibility]);
 
   const families = useMemo(() => genres.filter((g) => !g.parentId), [genres]);
   const subsByParent = useMemo(() => {
@@ -123,7 +170,8 @@ const GraphExplorer = forwardRef<GraphHandle, Props>(function GraphExplorer(
       .scaleExtent([0.4, 4])
       .on('zoom', (e) => {
         root.attr('transform', e.transform.toString());
-        setZoomK(e.transform.k);
+        zoomKRef.current = e.transform.k;
+        updateLabelVisibility();
       });
     svg.call(zoom);
     svg.on('dblclick.zoom', null);
@@ -316,6 +364,7 @@ const GraphExplorer = forwardRef<GraphHandle, Props>(function GraphExplorer(
             .attr('font-size', (d) => d.kind === 'hub' ? '12px' : d.kind === 'family' ? '11px' : '9.5px')
             .attr('font-weight', (d) => d.kind === 'sub' ? 500 : 700)
             .attr('dy', (d) => d.kind === 'hub' ? 4 : R[d.kind] + 12)
+            .style('display', (d) => d.kind === 'sub' ? 'none' : null)
             .style('opacity', (d) => d.kind === 'sub' ? 0 : 1);
           return g;
         },
@@ -355,8 +404,9 @@ const GraphExplorer = forwardRef<GraphHandle, Props>(function GraphExplorer(
 
     if (instant) e.sim.alpha(0.9).restart();
     else e.sim.alpha(0.7).alphaTarget(0).velocityDecay(0.38).restart();
+    updateLabelVisibility();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [desiredNodes, families, onSelect]);
+  }, [desiredNodes, families, onSelect, updateLabelVisibility]);
 
   // run structural update when expansion / data changes
   useEffect(() => {
@@ -422,19 +472,8 @@ const GraphExplorer = forwardRef<GraphHandle, Props>(function GraphExplorer(
         return focus && focus.has(s) && focus.has(t) ? 1.8 : 1;
       });
 
-    // labels (LOD)
-    e.gNode.selectAll<SVGGElement, GNode>('g.gnode').select<SVGTextElement>('text.lbl')
-      .text((d) => d.kind === 'sub' ? truncate(d.name) : d.name)
-      .attr('font-size', (d) => d.kind === 'hub' ? '12px' : d.kind === 'family' ? '11px' : '9.5px')
-      .attr('font-weight', (d) => d.kind === 'sub' ? 500 : 700)
-      .attr('dy', (d) => d.kind === 'hub' ? 4 : R[d.kind] + 12)
-      .style('opacity', (d) => {
-        if (d.kind === 'hub' || d.kind === 'family') return 1;
-        if (focus && focus.has(d.id)) return 1;
-        if (zoomK >= LABEL_ZOOM) return 1;
-        return 0;
-      });
-  }, [selectedId, hoveredId, zoomK, expanded]);
+    updateLabelVisibility();
+  }, [selectedId, hoveredId, expanded, updateLabelVisibility]);
 
   // ---------------------------------------------------------------------------
   // Imperative: search jumps here

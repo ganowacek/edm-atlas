@@ -21,6 +21,11 @@ export interface Genre {
   deepCut: boolean;
   artists: Artist[];
   essentialTracks?: string[];
+  history?: string[];
+  soundProfile?: string[];
+  sceneNotes?: string[];
+  labels?: string[];
+  moreArtists?: string[];
 }
 
 export interface FamilyColor {
