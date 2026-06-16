@@ -21,7 +21,11 @@ export const genres: Genre[] = [
     moods: ['euphoric', 'groovy', 'soulful', 'energetic'],
     beginnerFriendly: true,
     deepCut: false,
-    essentialTracks: ['Frankie Knuckles – Your Love', 'Larry Heard – Can You Feel It', 'Ten City – That\'s the Way Love Is'],
+    essentialTracks: [
+      { title: 'Your Love', artist: 'Frankie Knuckles', spotifyTrackId: '0clsHlE7wCxM68zYCpripr', appleMusicSongId: '1601915277', reason: 'The signature Chicago house anthem from "The Godfather of House" — its hypnotic bassline and Jamie Principle\'s vocal became a blueprint for house music\'s romantic, soulful strain.' },
+      { title: 'Can You Feel It', artist: 'Larry Heard', spotifyTrackId: '2T5i6wxwVffRf3QjMwEAXk', appleMusicSongId: '1272313498', reason: 'Released as Mr. Fingers, this is widely considered the foundational deep house record — its warm chords and gospel-tinged speech sample defined house\'s emotional, spiritual register.' },
+      { title: "That's the Way Love Is", artist: 'Ten City', spotifyTrackId: '3OlMwUHDVVuNQ3l98JAgZ8', reason: 'A gospel-house crossover hit that topped Billboard\'s dance chart and cracked the UK Top 10, proving house music\'s vocal, soulful side could reach the pop mainstream.' },
+    ],
     artists: [
       { name: 'Frankie Knuckles', importance: 'Godfather of House — resident DJ at the Warehouse who defined the genre' , spotifyArtistId: '63yl9nDNrHpiAYGlNJxxjc' },
       { name: 'Larry Heard', importance: 'Pioneer known as Mr. Fingers; brought emotional depth to house with "Can You Feel It"' , spotifyArtistId: '3j7teie3p6UnbA8nW51Trz' },
@@ -44,6 +48,9 @@ export const genres: Genre[] = [
     moods: ['melancholic', 'introspective', 'soulful', 'late-night'],
     beginnerFriendly: true,
     deepCut: false,
+    essentialTracks: [
+      { title: 'Mystery of Love', artist: 'Mr. Fingers', spotifyTrackId: '6AvtRMA6AzFNYZ3qEMYpch', appleMusicSongId: '1272313508', reason: 'Written by Larry Heard on the first day with his new synth and drum machine in 1984, its giddy, sparse chords set the emotional, jazz-inflected template that deep house has followed ever since.' },
+    ],
     artists: [
       { name: 'Larry Heard (Mr. Fingers)', importance: 'Defined the deep house template with sparse, emotional productions' , spotifyArtistId: '3j7teie3p6UnbA8nW51Trz' },
       { name: 'Kerri Chandler', importance: 'New Jersey producer known for soulful, raw deep house with a jazz sensibility' , spotifyArtistId: '7nqpEU6DCHkNtK1bYsyS3W' },
@@ -67,6 +74,9 @@ export const genres: Genre[] = [
     moods: ['driving', 'hypnotic', 'club', 'functional'],
     beginnerFriendly: true,
     deepCut: false,
+    essentialTracks: [
+      { title: 'Losing It', artist: 'Fisher', spotifyTrackId: '6ho0GyrWZN3mhi9zVRW7xi', appleMusicSongId: '1579442434', reason: 'A 2018 breakout that hit #1 on the Australian and US club charts and earned a Grammy nomination, proving a stripped-back, vocal-chop tech house groove could dominate festival mainstages.' },
+    ],
     artists: [
       { name: 'Fisher', importance: 'Australian DJ/producer who brought raucous, bass-forward tech house to festival main stages' , spotifyArtistId: '1VJ0briNOlXRtJUAzoUJdt' },
       { name: 'Chris Lake', importance: 'UK producer known for punchy, groove-led tech house with strong bass hooks' , spotifyArtistId: '5Igpc9iLZ3YGtKeYfSrrOE' },
@@ -89,6 +99,9 @@ export const genres: Genre[] = [
     moods: ['building', 'euphoric', 'emotional', 'epic'],
     beginnerFriendly: true,
     deepCut: false,
+    essentialTracks: [
+      { title: 'Xpander', artist: 'Sasha', spotifyTrackId: '76mh0rcSJpNhoCCqazptWm', appleMusicSongId: '1308821701', reason: 'An 11-minute, multi-part dancefloor journey from 1999 that became the genre\'s defining epic — its slow-build structure is the blueprint progressive house is named for.' },
+    ],
     artists: [
       { name: 'Sasha', importance: 'UK DJ/producer who shaped progressive house\'s epic, layered sound throughout the 90s' , spotifyArtistId: '6u4jLGLPuarS3i2XWHVxoS' },
       { name: 'John Digweed', importance: 'Long-time collaborator with Sasha; defined the progressive house aesthetic at Bedrock' , spotifyArtistId: '3xnDktxhudJR2Wv3HZDQ9W' },
@@ -111,6 +124,9 @@ export const genres: Genre[] = [
     moods: ['aggressive', 'energetic', 'club', 'festival'],
     beginnerFriendly: true,
     deepCut: false,
+    essentialTracks: [
+      { title: 'Satisfaction', artist: 'Benny Benassi', spotifyTrackId: '213yG5o4EISfGoceayLo6u', reason: 'Released in 2002 as Benny Benassi Presents The Biz, its distorted, squelching bassline became the defining sound of electro house and spawned countless remixes and imitators.' },
+    ],
     artists: [
       { name: 'Benny Benassi', importance: 'Italian producer whose distorted bass sound helped define electro house globally' , spotifyArtistId: '4Ws2otunReOa6BbwxxpCt6' },
       { name: 'Knife Party', importance: 'Duo (members of Pendulum) who pushed electro house into big festival drops' , spotifyArtistId: '2DuJi13MWHjRHrqRUwk8vH' },
@@ -133,6 +149,9 @@ export const genres: Genre[] = [
     moods: ['tribal', 'spiritual', 'deep', 'groovy'],
     beginnerFriendly: false,
     deepCut: true,
+    essentialTracks: [
+      { title: 'Superman (feat. Bucie)', artist: 'Black Coffee', spotifyTrackId: '2a8zMZ5BirCPCccgedP9EQ', appleMusicSongId: '1442361217', reason: 'A 2012 South African house anthem whose tribal percussion and Bucie\'s soaring vocal carried Afro house onto international dancefloors years before the genre\'s global festival boom.' },
+    ],
     artists: [
       { name: 'Black Coffee', importance: 'South African DJ/producer who brought Afro house to global festival audiences', spotifyArtistId: '6wMr4zKPrrR0UVz08WtUWc', appleMusicArtistId: '386491518' },
       { name: 'Themba', importance: 'South African DJ with a percussive, energetic take on Afro house' , spotifyArtistId: '64tzIMKX4Npx37YLcNZZNC' },
@@ -155,6 +174,9 @@ export const genres: Genre[] = [
     moods: ['funky', 'nostalgic', 'warm', 'groovy'],
     beginnerFriendly: true,
     deepCut: false,
+    essentialTracks: [
+      { title: 'Around the World', artist: 'Daft Punk', spotifyTrackId: '1pKYYY0dkg23sQQXi0Q5zN', appleMusicSongId: '696886431', reason: 'A 1997 single built on a single repeated bassline and vocoded phrase, it announced French house\'s filtered-disco aesthetic to the world and remains the genre\'s most recognisable record.' },
+    ],
     artists: [
       { name: 'Daft Punk', importance: 'Defined French house globally with filtered samples, vocoders, and robot personas', spotifyArtistId: '4tZwfgrHOc3mvqYlEYSvVi', appleMusicArtistId: '5468295' },
       { name: 'Cassius', importance: 'Parisian duo whose funky, soulful productions helped define the Roule/Ed Banger aesthetic' , spotifyArtistId: '4sf3QZW8a3xZ14IGsOAzoy' },
@@ -177,6 +199,9 @@ export const genres: Genre[] = [
     moods: ['melodic', 'playful', 'uplifting', 'mainstream'],
     beginnerFriendly: true,
     deepCut: false,
+    essentialTracks: [
+      { title: 'Gecko', artist: 'Oliver Heldens', spotifyTrackId: '0g4ar6033TW1DRDpdq9JsD', reason: 'Released in January 2014 when Heldens was still a teenager, its plucky bassline and FM-style lead established the future house sound months before its Becky Hill-featuring "Overdrive" remix took it global.' },
+    ],
     artists: [
       { name: 'Oliver Heldens', importance: 'Dutch DJ credited with creating and popularising future house' , spotifyArtistId: '5nki7yRhxgM509M5ADlN1p' },
       { name: 'Don Diablo', importance: 'Dutch producer who helped bring future house to mainstream festivals' , spotifyArtistId: '1l2ekx5skC4gJH8djERwh1' },
@@ -199,6 +224,9 @@ export const genres: Genre[] = [
     moods: ['emotional', 'melodic', 'streaming', 'mainstream'],
     beginnerFriendly: true,
     deepCut: false,
+    essentialTracks: [
+      { title: 'Ride It', artist: 'Regard', spotifyTrackId: '6DMwKhpM9wztCCaDW911TB', appleMusicSongId: '1472026722', reason: 'Regard\'s 2019 house flip of an 11-year-old Jay Sean R&B ballad went viral on TikTok and streamed over a billion times, becoming the genre\'s breakout, chart-topping calling card.' },
+    ],
     artists: [
       { name: 'Imanbek', importance: 'Kazakh producer who brought slap house to global #1s with his remix of "Roses"' , spotifyArtistId: '5rGrDvrLOV2VV8SCFVGWlj' },
       { name: 'Topic', importance: 'German producer known for slap house anthems with emotional hooks' , spotifyArtistId: '0u6GtibW46tFX7koQ6uNJZ' },
@@ -223,7 +251,11 @@ export const genres: Genre[] = [
     moods: ['mechanical', 'hypnotic', 'dark', 'futuristic'],
     beginnerFriendly: false,
     deepCut: false,
-    essentialTracks: ['Derrick May – Strings of Life', 'Juan Atkins – No UFOs', 'Kevin Saunderson – Big Fun'],
+    essentialTracks: [
+      { title: 'Strings of Life', artist: 'Derrick May', spotifyTrackId: '7N3FfUFMud1rjI6Vgw71mm', appleMusicSongId: '1804523655', reason: 'A piano-driven Detroit techno anthem (released as Rhythim Is Rhythim) that became a UK rave staple, proving techno could carry euphoric melody alongside machine rhythm.' },
+      { title: "No UFO's", artist: 'Juan Atkins', spotifyTrackId: '0shMp9Vkjr8X77jQCWlaEP', reason: 'Released as Model 500, one of the first true Detroit techno records — its stark drum-machine groove and Afrofuturist framing set the genre\'s founding aesthetic.' },
+      { title: 'Big Fun', artist: 'Kevin Saunderson', spotifyTrackId: '62s4BJHLdbyLKqxGWxXGax', appleMusicSongId: '724914276', reason: 'Released as Inner City with vocalist Paris Grey, it paired Detroit techno production with pop songcraft and became an international chart hit.' },
+    ],
     artists: [
       { name: 'Derrick May', importance: 'One of the Belleville Three; his "Strings of Life" is among the most influential electronic tracks ever made' , spotifyArtistId: '0v6N0xV7AfHHKVcgUOjC51' },
       { name: 'Juan Atkins', importance: 'Originator of the Detroit techno concept; his Model 500 project set the template' , spotifyArtistId: '208EQzx7RmoE2Ng9gF2edh' },
@@ -246,6 +278,9 @@ export const genres: Genre[] = [
     moods: ['hypnotic', 'sparse', 'cerebral', 'slow-burn'],
     beginnerFriendly: false,
     deepCut: true,
+    essentialTracks: [
+      { title: 'Spastik', artist: 'Plastikman', spotifyTrackId: '553HOkDZQktOEBKvxTBPS1', appleMusicSongId: '1508239038', reason: 'A 1993 Richie Hawtin production built from a single drum pattern repeated for nine hypnotic minutes — the most extreme distillation of minimal techno\'s "less is more" philosophy.' },
+    ],
     artists: [
       { name: 'Richie Hawtin', importance: 'Created Plastikman — the defining minimal techno project — and pioneered laptop DJing', spotifyArtistId: '3AhwIUus3pIaA3CvYBEtpy' },
       { name: 'Ricardo Villalobos', importance: 'Chilean-German DJ whose marathon minimal sets redefined how long music could unfold', spotifyArtistId: '0s2YIpNnjdf0FY4tNrF8Y4' },
@@ -268,6 +303,9 @@ export const genres: Genre[] = [
     moods: ['brutal', 'dark', 'confrontational', 'underground'],
     beginnerFriendly: false,
     deepCut: true,
+    essentialTracks: [
+      { title: 'My Head Is Slowly Exploding', artist: 'Perc', spotifyTrackId: '0VaedEOb0QXZluGvl9xmNr', reason: 'A 2011 release from Perc\'s "Wicker & Steel" album that fused noise textures with a punishing 4/4 kick, helping define the harsher, post-industrial techno sound that took over Berlin warehouses in the 2010s.' },
+    ],
     artists: [
       { name: 'Phase Fatale', importance: 'US-born Berlin-based DJ/producer known for dark, warehouse industrial techno', spotifyArtistId: '1jjplgZcgCwhU7JlGhBQiw' },
       { name: 'Paula Temple', importance: 'British producer whose work straddles industrial noise and techno', spotifyArtistId: '4iy2RFU8gIpXF5yaK0l8ZT' },
@@ -290,6 +328,9 @@ export const genres: Genre[] = [
     moods: ['aggressive', 'relentless', 'rave', 'intense'],
     beginnerFriendly: false,
     deepCut: false,
+    essentialTracks: [
+      { title: 'Doppler', artist: 'Charlotte de Witte', spotifyTrackId: '0TtgKq96j4bpE5UQUDXrwH', appleMusicSongId: '1678835626', reason: 'A 2021 release whose relentless, distorted kick and acid-tinged groove became a generational anthem, soundtracking the post-2020 surge of hard techno among younger club audiences.' },
+    ],
     artists: [
       { name: 'Chris Liebing', importance: 'Frankfurt DJ who helped define hard, functional techno at the CLR label', spotifyArtistId: '21444lX8gpmOX36icLmbFI' },
       { name: 'DJ Rush', importance: 'Chicago-born artist known for punishing, relentless hard techno DJ sets', spotifyArtistId: '6gBmUpKvNYtnQTSLK5vwS5' },
@@ -312,6 +353,9 @@ export const genres: Genre[] = [
     moods: ['emotional', 'melodic', 'euphoric', 'cinematic'],
     beginnerFriendly: true,
     deepCut: false,
+    essentialTracks: [
+      { title: 'Singularity', artist: 'Stephan Bodzin', spotifyTrackId: '0yuJtvXsapVOQfNDYxQ5mw', reason: 'A widely-played 2015 cut whose cinematic synth lead and driving groove exemplify the emotional, festival-scale sound that carried melodic techno out of the underground in the 2010s.' },
+    ],
     artists: [
       { name: 'Bicep', importance: 'Belfast duo whose melodic techno crossover "Glue" and debut album broke the style mainstream', spotifyArtistId: '73A3bLnfnz5BoQjb4gNCga' },
       { name: 'Solomun', importance: 'Bosnian-German DJ/producer who helped define the Ibiza-influenced melodic techno sound', spotifyArtistId: '5wJK4kQAkVGjqM9x46KQOC' },
@@ -334,6 +378,9 @@ export const genres: Genre[] = [
     moods: ['acidic', 'hypnotic', 'rave', 'underground'],
     beginnerFriendly: false,
     deepCut: true,
+    essentialTracks: [
+      { title: 'Acperience 1', artist: 'Hardfloor', spotifyTrackId: '0sz7HvLfzKGWKM4PMzbtnw', appleMusicSongId: '158241297', reason: 'A 1992 German release whose duelling TB-303 lines defined acid techno\'s squelching, hypnotic sound and remains one of the most sampled and referenced acid records ever made.' },
+    ],
     artists: [
       { name: 'Emmanuel Top', importance: 'French producer known for driving, melodic acid techno of the early-to-mid 1990s', spotifyArtistId: '5y8522WHbYqJVt1jSwNSfA' },
       { name: 'Liberator DJs', importance: 'Central figures of the London acid techno scene through Stay Up Forever records' },
@@ -356,6 +403,9 @@ export const genres: Genre[] = [
     moods: ['deep', 'spatial', 'hypnotic', 'meditative'],
     beginnerFriendly: false,
     deepCut: true,
+    essentialTracks: [
+      { title: 'Phylyps Trak', artist: 'Basic Channel', spotifyTrackId: '3kpEWFAzNVgFTGdxVX3E8w', reason: 'A 1993 Berlin release where Moritz von Oswald and Mark Ernestus stripped techno to a dub-soaked pulse of reverb and bass — the foundational record of dub techno as a style.' },
+    ],
     artists: [
       { name: 'Basic Channel', importance: 'Maurizio & Mark Ernestus — founders of the dub techno style and the Chain Reaction label', spotifyArtistId: '37um1uxI92g4ll61LzrtB5' },
       { name: 'Deepchord', importance: 'Detroit artist whose dense, textured dub techno sets span hours of immersive sound', spotifyArtistId: '45g23Apmqo2x4obM7LjmpW' },
@@ -380,7 +430,11 @@ export const genres: Genre[] = [
     moods: ['intense', 'energetic', 'cerebral', 'dark'],
     beginnerFriendly: false,
     deepCut: false,
-    essentialTracks: ['Goldie – Inner City Life', 'LTJ Bukem – Music', 'Andy C – Cool Down'],
+    essentialTracks: [
+      { title: 'Inner City Life', artist: 'Goldie', spotifyTrackId: '0O7xFEqePrcTUgOi4qe0uB', appleMusicSongId: '1420032789', reason: 'A genre-defining jungle/drum & bass single that brought Diane Charlemagne\'s soulful vocal and orchestral ambition to the genre, helping it gain mainstream recognition.' },
+      { title: 'Music', artist: 'LTJ Bukem', spotifyTrackId: '6CsR5QRDFvvvfEFbG4Ae8S', reason: 'A foundational "intelligent" jungle/drum & bass track that fused jazz-inflected atmosphere with breakbeats, helping define the smoother sound Bukem pioneered.' },
+      { title: 'Cool Down', artist: 'Andy C', spotifyTrackId: '02RwQbdZI4Dz1r7WLJJwtq', reason: 'A mid-90s Andy C release exemplifying the era\'s breakbeat science and helping establish him as one of the scene\'s defining DJ-producers.' },
+    ],
     artists: [
       { name: 'Goldie', importance: 'Pioneering artist whose "Timeless" album set the template for D&B\'s ambitions', spotifyArtistId: '2SYqJ3uDLLXZNyZdLKBy4M', appleMusicArtistId: '3518427' },
       { name: 'LTJ Bukem', importance: 'Created the atmospheric, jazz-influenced D&B known as Intelligent D&B in the early 90s', spotifyArtistId: '5Wfn5sc1w3DhMTpU7oPJZL' },
@@ -403,6 +457,9 @@ export const genres: Genre[] = [
     moods: ['soulful', 'melodic', 'emotional', 'daytime'],
     beginnerFriendly: true,
     deepCut: false,
+    essentialTracks: [
+      { title: 'Just One Second', artist: 'London Elektricity', spotifyTrackId: '0xGt4mkhb11axReg8tPvyh', reason: 'One of the Hospital Records founder\'s biggest anthems, pairing warm strings and soulful breakdowns over a rolling D&B rhythm — a defining example of liquid\'s melodic, daytime-friendly sound.' },
+    ],
     artists: [
       { name: 'Calibre', importance: 'Northern Irish producer whose melodic, soulful D&B is widely regarded as some of the genre\'s finest', spotifyArtistId: '0sklgkoO5JeS7YNhHS5EmH' },
       { name: 'London Elektricity', importance: 'Hospital Records head whose liquid productions helped define the Hospital sound', spotifyArtistId: '4CbuwI3bEF7gQOwpxBKtal' },
@@ -425,6 +482,9 @@ export const genres: Genre[] = [
     moods: ['cerebral', 'dark', 'technical', 'sci-fi'],
     beginnerFriendly: false,
     deepCut: true,
+    essentialTracks: [
+      { title: 'Wormhole', artist: 'Ed Rush & Optical', spotifyTrackId: '4y6FzZYAPrYOkI3vJNR0uT', reason: 'From the duo\'s genre-defining 1998 album of the same name, its dark, mechanical precision helped move D&B from techstep into the angular, sci-fi-inflected sound that became neurofunk.' },
+    ],
     artists: [
       { name: 'Noisia', importance: 'Dutch trio known for incredibly precise, technically complex neurofunk productions', spotifyArtistId: '4YWj8sohRDjL9deiuRvEEY' },
       { name: 'Ed Rush & Optical', importance: 'UK duo who pioneered the techstep-to-neurofunk transition with dark, mechanical precision', spotifyArtistId: '0qzMLA2bjNnjAKZtawwMLb' },
@@ -447,6 +507,9 @@ export const genres: Genre[] = [
     moods: ['heavy', 'spacious', 'hip-hop inflected', 'meditative'],
     beginnerFriendly: false,
     deepCut: true,
+    essentialTracks: [
+      { title: 'The Sirens', artist: 'Mefjus', spotifyTrackId: '2tRVrtGlpBZH2DEPxwN3XN', appleMusicSongId: '1434390098', reason: 'A 2018 release that uses halftime\'s spaced-out kick pattern to give its dense, twisted bass design room to breathe — a showcase for the genre\'s hip-hop-weight, sci-fi atmosphere.' },
+    ],
     artists: [
       { name: 'Camo & Krooked', importance: 'Austrian duo who popularised the melodic, hip-hop-influenced halftime approach', spotifyArtistId: '2N8IPNZTiNo3nj4mreOlHU' },
       { name: 'Mefjus', importance: 'Viennese producer who brought technical complexity to halftime D&B', spotifyArtistId: '54qqaSH6byJIb8eFWxe3Pj' },
@@ -469,6 +532,9 @@ export const genres: Genre[] = [
     moods: ['chaotic', 'energetic', 'urban', 'raw'],
     beginnerFriendly: false,
     deepCut: false,
+    essentialTracks: [
+      { title: 'Original Nuttah', artist: 'Shy FX & UK Apache', spotifyTrackId: '53mh7POQqTXj2Cfh7phP5b', reason: 'A groundbreaking 1994 single that became one of jungle\'s first UK Top 40 hits, fusing UK Apache\'s ragga-style toasting with rolling breakbeats to define the genre\'s multicultural, soundsystem energy.' },
+    ],
     artists: [
       { name: 'Shy FX', importance: 'Pivotal jungle and D&B producer; "Original Nuttah" is a foundational jungle record', spotifyArtistId: '5oDtp2FC8VqBjTx1aT4P5j' },
       { name: 'Grooverider', importance: 'DJ and producer at the heart of the jungle/D&B scene from its earliest days', spotifyArtistId: '65g8RO3JqCUTigI7YR3dAw' },
@@ -493,7 +559,11 @@ export const genres: Genre[] = [
     moods: ['dark', 'heavy', 'sub-heavy', 'nocturnal'],
     beginnerFriendly: false,
     deepCut: false,
-    essentialTracks: ['Digital Mystikz – Anti War Dub', 'Burial – Archangel', 'Skream – Midnight Request Line'],
+    essentialTracks: [
+      { title: 'Anti War Dub', artist: 'Digital Mystikz', spotifyTrackId: '2McvwBtG5WHCOsM2AHWXoZ', reason: 'A defining DMZ-era dubstep record known for its sparse, weighty sub-bass and political voiceover, capturing the genre\'s early South London soundsystem culture — it famously appeared in the film Children of Men.' },
+      { title: 'Archangel', artist: 'Burial', spotifyTrackId: '2agb1CPPGWXqXnrKn6cx7u', appleMusicSongId: '893175788', reason: 'From the landmark album Untrue, its pitched vocal samples and skeletal, melancholic production became one of the most influential tracks in the genre\'s evolution beyond pure dubstep.' },
+      { title: 'Midnight Request Line', artist: 'Skream', spotifyTrackId: '6saiu3uHwIpzPl8GKtRRNR', appleMusicSongId: '1419699132', reason: 'Widely considered the track that codified dubstep\'s low-end-driven, sub-bass blueprint, hugely influential on the productions that followed.' },
+    ],
     artists: [
       { name: 'Skream', importance: 'One of the definitive early dubstep producers, with a raw, bass-forward South London style', spotifyArtistId: '2jbP92oFLWqPqogflK1wlW' },
       { name: 'Benga', importance: 'South London producer whose "Diary of an Afro Warrior" is a dubstep landmark', spotifyArtistId: '6lyYDuLxgcxPLH5RjUPH5p' },
@@ -516,6 +586,9 @@ export const genres: Genre[] = [
     moods: ['aggressive', 'festival', 'loud', 'intense'],
     beginnerFriendly: true,
     deepCut: false,
+    essentialTracks: [
+      { title: 'Scary Monsters and Nice Sprites', artist: 'Skrillex', spotifyTrackId: '4rwpZEcnalkuhPyGkEdhu0', appleMusicSongId: '409001935', reason: 'The title track of Skrillex\'s 2010 breakout EP didn\'t invent dubstep, but its aggressive metallic drops and mid-range wobble bass ignited the genre\'s American mainstream explosion.' },
+    ],
     artists: [
       { name: 'Skrillex', importance: 'American producer who brought dubstep to mainstream arenas and helped create brostep', spotifyArtistId: '5he5w2lnU9x7JFhnwcekXX', appleMusicArtistId: '262954645' },
       { name: 'Excision', importance: 'Canadian DJ/producer known for immersive, physically intense brostep live shows', spotifyArtistId: '5FKchcZpQOkqFvXBj1aCvb', appleMusicArtistId: '388661810' },
@@ -538,6 +611,9 @@ export const genres: Genre[] = [
     moods: ['emotional', 'uplifting', 'lush', 'youthful'],
     beginnerFriendly: true,
     deepCut: false,
+    essentialTracks: [
+      { title: 'Never Be Like You', artist: 'Flume (feat. Kai)', spotifyTrackId: '5WI2ltQIdwgzf1SNE76JyR', appleMusicSongId: '1105939615', reason: 'A 2016 single whose pitched vocal chops, lush chords, and emotional dynamics became the textbook example of future bass\'s sound, crossing the genre into mainstream pop radio.' },
+    ],
     artists: [
       { name: 'Flume', importance: 'Australian producer whose debut album defined future bass\'s emotional, textured sound', spotifyArtistId: '6nxWCVXbOlEVRexSbLsTer' },
       { name: 'What So Not', importance: 'Australian project (later solo) known for complex, emotional future bass', spotifyArtistId: '4AA8eXtzqh5ykxtafLaPOi' },
@@ -560,6 +636,9 @@ export const genres: Genre[] = [
     moods: ['minimal', 'repetitive', 'dark', 'underground'],
     beginnerFriendly: false,
     deepCut: true,
+    essentialTracks: [
+      { title: 'Headband', artist: 'Ganja White Night & Subtronics', spotifyTrackId: '40dMUT9OmYUYgEO5OuWZCy', appleMusicSongId: '1455873134', reason: 'A 2019 collaboration between two of riddim\'s defining acts, built on a single looping bass pattern — exemplifying the stripped-back repetition that gives the riddim style its name.' },
+    ],
     artists: [
       { name: 'Antiserum', importance: 'US producer at the forefront of the modern riddim sound', spotifyArtistId: '2oZVtrCwHyCZlIWAwy3VBn' },
       { name: 'Getter', importance: 'US producer known for intense, dark riddim bass music', spotifyArtistId: '3QryVD03gGZOLQQXjy3EoA' },
@@ -582,6 +661,9 @@ export const genres: Genre[] = [
     moods: ['introspective', 'fragmented', 'emotional', 'minimal'],
     beginnerFriendly: true,
     deepCut: false,
+    essentialTracks: [
+      { title: 'Limit to Your Love', artist: 'James Blake', spotifyTrackId: '3IKc8qlbQgIGXap82ZVphu', appleMusicSongId: '1443124831', reason: 'Blake\'s skeletal cover of a Feist song — just voice, piano, and a sudden sub-bass throb — showed how dubstep\'s low-end could be repurposed as intimate songwriting, defining post-dubstep\'s introspective turn.' },
+    ],
     artists: [
       { name: 'James Blake', importance: 'UK artist who transformed dubstep\'s skeleton into minimalist vocal music' },
       { name: 'Burial', importance: 'Anonymous artist whose fragmented dubstep-influenced music became deeply influential', spotifyArtistId: '0uCCBpmg6MrPb1KY2msceF', appleMusicArtistId: '25308751' },
@@ -606,7 +688,11 @@ export const genres: Genre[] = [
     moods: ['euphoric', 'emotional', 'uplifting', 'spiritual'],
     beginnerFriendly: true,
     deepCut: false,
-    essentialTracks: ['Tiësto – Adagio for Strings', 'ATB – 9 PM (Till I Come)', 'Paul van Dyk – For An Angel'],
+    essentialTracks: [
+      { title: 'Adagio for Strings', artist: 'Tiësto', spotifyTrackId: '3Q2M6sNKDwoqZGBvwdFqZr', appleMusicSongId: '1793811654', reason: 'A trance adaptation of Samuel Barber\'s classical piece that became one of the genre\'s most iconic crossover anthems, helping bring trance to a global festival audience.' },
+      { title: '9PM (Till I Come)', artist: 'ATB', spotifyTrackId: '1CgbwsrNDlFrRuk2ebQ7zr', appleMusicSongId: '350475463', reason: 'A UK No. 1 single and one of trance\'s biggest mainstream crossover hits, its melodic, radio-friendly sound helped popularize the genre outside clubs.' },
+      { title: 'For An Angel', artist: 'Paul van Dyk', spotifyTrackId: '3PbDqZ1VMsBTjXCbs6Jv7P', appleMusicSongId: '1605918726', reason: 'An early trance classic that helped define the genre\'s uplifting, melodic sound and established van Dyk as one of trance\'s most important pioneers.' },
+    ],
     artists: [
       { name: 'Paul van Dyk', importance: 'Berlin DJ who became one of the world\'s most recognised trance artists through the late 90s and 2000s' },
       { name: 'Tiësto', importance: 'Dutch DJ/producer who became the most recognisable name in trance before crossover pop success' , spotifyArtistId: '2o5jDhtHVPhrJdv3cEQ99Z' },
@@ -1081,7 +1167,11 @@ export const genres: Genre[] = [
     moods: ['celebratory', 'sensual', 'groovy', 'liberating'],
     beginnerFriendly: true,
     deepCut: false,
-    essentialTracks: ['Donna Summer – I Feel Love', 'Gloria Gaynor – I Will Survive', 'Chic – Le Freak'],
+    essentialTracks: [
+      { title: 'I Feel Love', artist: 'Donna Summer', spotifyTrackId: '4rS63BySQrdWuTswkkZ5iS', appleMusicSongId: '1423304604', reason: 'A Giorgio Moroder/Pete Bellotte production whose all-synthesizer arrangement is widely credited as the bridge from disco to electronic dance music, directly influencing house and techno.' },
+      { title: 'I Will Survive', artist: 'Gloria Gaynor', spotifyTrackId: '7rIovIsXE6kMn629b7kDig', appleMusicSongId: '1475169107', reason: 'One of disco\'s most enduring anthems, its message of resilience made it a foundational dancefloor and queer-culture classic.' },
+      { title: 'Le Freak', artist: 'Chic', spotifyTrackId: '7z3aH1QV2zwMKXxShBNOGe', appleMusicSongId: '301649381', reason: 'One of the best-selling singles of the disco era, its Nile Rodgers guitar riff and infectious groove epitomized disco\'s commercial peak.' },
+    ],
     artists: [
       { name: 'Giorgio Moroder', importance: 'Italian producer who created the synth-driven disco template with Donna Summer' },
       { name: 'Nile Rodgers (Chic)', importance: 'Guitarist and producer whose funk-disco sound has influenced music for five decades' },
@@ -1128,7 +1218,11 @@ export const genres: Genre[] = [
     moods: ['melancholic', 'cinematic', 'smoky', 'introspective'],
     beginnerFriendly: true,
     deepCut: false,
-    essentialTracks: ['Massive Attack – Teardrop', 'Portishead – Sour Times', 'Tricky – Black Steel'],
+    essentialTracks: [
+      { title: 'Teardrop', artist: 'Massive Attack', spotifyTrackId: '67Hna13dNDkZvBpTXRIaOJ', appleMusicSongId: '725818578', reason: 'A defining trip-hop single combining Elizabeth Fraser\'s ethereal vocal with the genre\'s signature hip-hop-derived beats, often cited as the genre\'s creative peak.' },
+      { title: 'Sour Times', artist: 'Portishead', spotifyTrackId: '6vTtCOimcPs5H1Jr9d0Aep', reason: 'From the album Dummy, its noir strings and Beth Gibbons\' aching vocal helped establish trip-hop\'s melancholic, cinematic identity.' },
+      { title: 'Black Steel', artist: 'Tricky', spotifyTrackId: '2MRS933wyIBi9ZNn8GQcG4', appleMusicSongId: '1444028930', reason: 'A radical reworking of Public Enemy\'s "Black Steel in the Hour of Chaos" into a queasy, guitar-laced trip-hop track, showing the genre\'s roots in hip-hop and its willingness to subvert it.' },
+    ],
     artists: [
       { name: 'Massive Attack', importance: 'Bristol collective whose music defined what trip-hop could be emotionally and sonically' },
       { name: 'Portishead', importance: 'Bristol group whose cinematic, melancholic sound is among the most distinctive in electronic music' },

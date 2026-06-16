@@ -37,6 +37,15 @@ export interface ArtistNode {
   primary: boolean;
 }
 
+export interface EssentialTrack {
+  title: string;
+  artist: string;
+  spotifyTrackId?: string;
+  appleMusicAlbumId?: string;
+  appleMusicSongId?: string;
+  reason: string;
+}
+
 export interface Genre {
   id: string;
   name: string;
@@ -52,7 +61,7 @@ export interface Genre {
   beginnerFriendly: boolean;
   deepCut: boolean;
   artists: Artist[];
-  essentialTracks?: string[];
+  essentialTracks?: EssentialTrack[];
   history?: string[];
   soundProfile?: string[];
   sceneNotes?: string[];

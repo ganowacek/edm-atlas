@@ -5,8 +5,7 @@ import * as d3 from 'd3';
 import { GitBranch, Minus, Plus, RotateCcw } from 'lucide-react';
 import type { ArtistNode, Genre, TrackNode } from '../types';
 import { getFamilyColor } from '../data/colors';
-import { ARTIST_TRACKS } from '../data/artistTracks';
-import { spotifyArtistUrl, appleMusicArtistUrl, spotifyTrackUrl, appleMusicSongUrl } from '../data/urls';
+import { artistNodesForGenre, orphanKeyArtistsForFamily } from '../data/artistNodes';
 
 const HUB_ID = '__edm__';
 
@@ -32,6 +31,7 @@ interface GLink extends d3.SimulationLinkDatum<GNode> {
 
 export interface GraphHandle {
   focusGenre: (genreId: string) => void;
+  focusArtist: (genreId: string, artistId: string) => void;
   collapseAll: () => void;
 }
 
@@ -77,11 +77,6 @@ function truncate(s: string, n = 18) {
   return s.length > n ? s.slice(0, n - 1) + '…' : s;
 }
 
-function slugify(s: string) {
-  return s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
-}
-
-
 function layoutMetrics(width: number, height: number, nodeCount: number) {
   const minViewport = Math.min(width, height);
   const expandedSpan = Math.sqrt(Math.max(nodeCount, 1)) * 78;
@@ -110,65 +105,6 @@ function radialStrength(d: GNode) {
   if (d.kind === 'artist') return 0.08;
   if (d.kind === 'track') return 0.07;
   return 0.12;
-}
-
-function trackNodesForArtist(artistName: string, genre: Genre): TrackNode[] {
-  return (ARTIST_TRACKS[artistName] ?? []).slice(0, 3).map((track) => ({
-    ...track,
-    id: `track:${genre.id}:${slugify(artistName)}:${slugify(track.title)}`,
-    artistName,
-    appleMusicUrl: track.appleMusicAlbumId && track.appleMusicSongId
-      ? appleMusicSongUrl(track.appleMusicAlbumId, track.appleMusicSongId)
-      : undefined,
-    spotifyUrl: track.spotifyTrackId ? spotifyTrackUrl(track.spotifyTrackId) : undefined,
-    genreId: genre.id,
-    genreName: genre.name,
-    family: genre.family,
-  }));
-}
-
-function artistNodesForGenre(genre: Genre): ArtistNode[] {
-  const primary = genre.artists.map((artist) => ({
-    id: `artist:${genre.id}:${slugify(artist.name)}`,
-    name: artist.name,
-    importance: artist.importance,
-    history: [
-      artist.importance,
-      `${artist.name} appears here through the ${genre.name} branch, where the surrounding scene was shaped by ${genre.originCities.slice(0, 2).join(' and ') || 'its core club communities'}.`,
-      ...(genre.history?.slice(0, 1) ?? []),
-    ],
-    spotifyUrl: artist.spotifyArtistId ? spotifyArtistUrl(artist.spotifyArtistId) : undefined,
-    appleMusicUrl: artist.appleMusicArtistId ? appleMusicArtistUrl(artist.appleMusicArtistId) : undefined,
-    tracks: trackNodesForArtist(artist.name, genre),
-    genreId: genre.id,
-    genreName: genre.name,
-    family: genre.family,
-    primary: true,
-  }));
-
-  const more = (genre.moreArtists ?? []).map((name) => ({
-    id: `artist:${genre.id}:${slugify(name)}`,
-    name,
-    importance: `${name} is part of the broader ${genre.name} listening path in EDM Atlas.`,
-    history: [
-      `${name} is part of the broader ${genre.name} listening path in EDM Atlas.`,
-      `${genre.name} is connected to ${genre.influences.slice(0, 3).join(', ') || 'the wider electronic music lineage'} and helped shape ${genre.influenced.slice(0, 3).join(', ') || 'later club sounds'}.`,
-      ...(genre.history?.slice(0, 1) ?? []),
-    ],
-    tracks: trackNodesForArtist(name, genre),
-    genreId: genre.id,
-    genreName: genre.name,
-    family: genre.family,
-    primary: false,
-  }));
-
-  const seen = new Set<string>();
-  return [...primary, ...more].filter((artist) => {
-    const key = artist.name.toLowerCase();
-    if (seen.has(key)) return false;
-    seen.add(key);
-    return true;
-  });
 }
 
 const GraphExplorer = forwardRef<GraphHandle, Props>(function GraphExplorer(
@@ -286,7 +222,7 @@ const GraphExplorer = forwardRef<GraphHandle, Props>(function GraphExplorer(
         if (node.kind === 'sub' && node.genre?.parentId) { focus.add(node.genre.parentId); focus.add(HUB_ID); }
         if (node.kind === 'family') {
           focus.add(HUB_ID);
-          e.nodes.forEach((n) => { if (n.genre?.parentId === node.id) focus!.add(n.id); });
+          e.nodes.forEach((n) => { if (n.genre?.parentId === node.id || n.parentGenreId === node.id) focus!.add(n.id); });
         }
         if (node.kind === 'hub') e.nodes.forEach((n) => focus!.add(n.id));
       }
@@ -331,6 +267,23 @@ const GraphExplorer = forwardRef<GraphHandle, Props>(function GraphExplorer(
       out.push({ id: f.id, genre: f, artist: null, track: null, kind: 'family' });
       if (expandedFamilies.has(f.id)) {
         (subsByParent.get(f.id) ?? []).forEach((s) => out.push({ id: s.id, genre: s, artist: null, track: null, kind: 'sub' }));
+        // key artists with no matching subgenre get their own node directly under the family
+        orphanKeyArtistsForFamily(f, genres).forEach((artist) => {
+          out.push({ id: artist.id, genre: f, artist, track: null, kind: 'artist', parentGenreId: f.id });
+          if (showAll || expandedTracks.has(artist.id)) {
+            artist.tracks.forEach((track) => {
+              out.push({
+                id: track.id,
+                genre: f,
+                artist,
+                track,
+                kind: 'track',
+                parentGenreId: f.id,
+                parentArtistId: artist.id,
+              });
+            });
+          }
+        });
       }
     });
     const visibleGenreIds = new Set(out.filter((node) => node.genre).map((node) => node.id));
@@ -357,7 +310,7 @@ const GraphExplorer = forwardRef<GraphHandle, Props>(function GraphExplorer(
         });
       });
     return out;
-  }, [families, expanded, expandedArtists, expandedTracks, showAll, subsByParent]);
+  }, [families, genres, expanded, expandedArtists, expandedTracks, showAll, subsByParent]);
 
   // ---------------------------------------------------------------------------
   // SETUP (once)
@@ -753,7 +706,7 @@ const GraphExplorer = forwardRef<GraphHandle, Props>(function GraphExplorer(
         if (node.kind === 'sub' && node.genre?.parentId) { focus.add(node.genre.parentId); focus.add(HUB_ID); }
         if (node.kind === 'family') {
           focus.add(HUB_ID);
-          e.nodes.forEach((n) => { if (n.genre?.parentId === node.id) focus!.add(n.id); });
+          e.nodes.forEach((n) => { if (n.genre?.parentId === node.id || n.parentGenreId === node.id) focus!.add(n.id); });
         }
         if (node.kind === 'hub') e.nodes.forEach((n) => focus!.add(n.id));
       }
@@ -852,10 +805,47 @@ const GraphExplorer = forwardRef<GraphHandle, Props>(function GraphExplorer(
     }, genre.parentId ? 380 : 60);
   }, [genres, onSelect, subsByParent]);
 
+  // jump straight to an artist node — expanding whichever genre branch hosts it
+  // (a family's own branch when the artist has no home in a subgenre)
+  const focusArtist = useCallback((genreId: string, artistId: string) => {
+    const genre = genres.find((g) => g.id === genreId);
+    if (!genre) return;
+    setShowAll(false);
+    setExpandedTracks(new Set());
+    let delay: number;
+    if (genre.parentId) {
+      setExpanded((prev) => {
+        if (prev.has(genre.parentId!)) return prev;
+        const next = new Set(prev); next.add(genre.parentId!); return next;
+      });
+      setExpandedArtists(new Set([genre.id]));
+      delay = 380;
+    } else {
+      const children = subsByParent.get(genre.id) ?? [];
+      setExpanded((prev) => {
+        if (prev.has(genre.id)) return prev;
+        const next = new Set(prev); next.add(genre.id); return next;
+      });
+      if (children.length === 0) setExpandedArtists(new Set([genre.id]));
+      delay = 280;
+    }
+    window.setTimeout(() => {
+      const e = eng.current;
+      if (!e || !svgRef.current) return;
+      const node = e.nodeById.get(artistId);
+      if (!node || node.x == null || node.y == null) return;
+      const k = 1.6;
+      const verticalOffset = 40;
+      const t = d3.zoomIdentity.translate(e.W / 2 - node.x * k, e.H / 2 - node.y * k + verticalOffset).scale(k);
+      d3.select(svgRef.current).transition().duration(600).call(e.zoom.transform, t);
+    }, delay);
+  }, [genres, subsByParent]);
+
   useImperativeHandle(ref, () => ({
     focusGenre,
+    focusArtist,
     collapseAll: () => { setShowAll(false); setExpanded(new Set()); setExpandedArtists(new Set()); setExpandedTracks(new Set()); },
-  }), [focusGenre]);
+  }), [focusGenre, focusArtist]);
 
   const fitToGraph = useCallback((duration = 600) => {
     const e = eng.current;
