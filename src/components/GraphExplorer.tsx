@@ -6,6 +6,7 @@ import { GitBranch, Minus, Plus, RotateCcw } from 'lucide-react';
 import type { ArtistNode, Genre, TrackNode } from '../types';
 import { getFamilyColor } from '../data/colors';
 import { ARTIST_TRACKS } from '../data/artistTracks';
+import { spotifyArtistUrl, appleMusicArtistUrl, spotifyTrackUrl, appleMusicSongUrl } from '../data/urls';
 
 const HUB_ID = '__edm__';
 
@@ -39,6 +40,7 @@ interface Props {
   selectedId: string | null;
   onSelect: (genre: Genre) => void;
   onSelectArtist: (artist: ArtistNode) => void;
+  onSelectTrack: (track: TrackNode) => void;
 }
 
 const R: Record<Kind, number> = { hub: 26, family: 15, sub: 8.5, artist: 6.5, track: 4.6 };
@@ -78,11 +80,6 @@ function slugify(s: string) {
   return s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
 }
 
-function musicSearchUrl(service: 'spotify' | 'apple', name: string) {
-  const encoded = encodeURIComponent(name);
-  if (service === 'spotify') return `https://open.spotify.com/search/${encoded}`;
-  return `https://music.apple.com/us/search?term=${encoded}`;
-}
 
 function layoutMetrics(width: number, height: number, nodeCount: number) {
   const minViewport = Math.min(width, height);
@@ -115,11 +112,12 @@ function radialStrength(d: GNode) {
 }
 
 function trackNodesForArtist(artistName: string, genre: Genre): TrackNode[] {
-  return (ARTIST_TRACKS[artistName] ?? []).map((track) => ({
+  return (ARTIST_TRACKS[artistName] ?? []).slice(0, 3).map((track) => ({
     ...track,
     id: `track:${genre.id}:${slugify(artistName)}:${slugify(track.title)}`,
     artistName,
-    spotifyUrl: track.spotifyUrl ?? musicSearchUrl('spotify', `${artistName} ${track.title}`),
+    appleMusicUrl: appleMusicSongUrl(track.appleMusicAlbumId, track.appleMusicSongId),
+    spotifyUrl: track.spotifyTrackId ? spotifyTrackUrl(track.spotifyTrackId) : undefined,
     genreId: genre.id,
     genreName: genre.name,
     family: genre.family,
@@ -136,8 +134,8 @@ function artistNodesForGenre(genre: Genre): ArtistNode[] {
       `${artist.name} appears here through the ${genre.name} branch, where the surrounding scene was shaped by ${genre.originCities.slice(0, 2).join(' and ') || 'its core club communities'}.`,
       ...(genre.history?.slice(0, 1) ?? []),
     ],
-    spotifyUrl: artist.spotifyUrl,
-    appleMusicUrl: artist.appleMusicUrl,
+    spotifyUrl: artist.spotifyArtistId ? spotifyArtistUrl(artist.spotifyArtistId) : undefined,
+    appleMusicUrl: artist.appleMusicArtistId ? appleMusicArtistUrl(artist.appleMusicArtistId) : undefined,
     tracks: trackNodesForArtist(artist.name, genre),
     genreId: genre.id,
     genreName: genre.name,
@@ -154,8 +152,6 @@ function artistNodesForGenre(genre: Genre): ArtistNode[] {
       `${genre.name} is connected to ${genre.influences.slice(0, 3).join(', ') || 'the wider electronic music lineage'} and helped shape ${genre.influenced.slice(0, 3).join(', ') || 'later club sounds'}.`,
       ...(genre.history?.slice(0, 1) ?? []),
     ],
-    spotifyUrl: musicSearchUrl('spotify', name),
-    appleMusicUrl: musicSearchUrl('apple', name),
     tracks: trackNodesForArtist(name, genre),
     genreId: genre.id,
     genreName: genre.name,
@@ -173,7 +169,7 @@ function artistNodesForGenre(genre: Genre): ArtistNode[] {
 }
 
 const GraphExplorer = forwardRef<GraphHandle, Props>(function GraphExplorer(
-  { genres, selectedId, onSelect, onSelectArtist },
+  { genres, selectedId, onSelect, onSelectArtist, onSelectTrack },
   ref
 ) {
   const svgRef = useRef<SVGSVGElement>(null);
@@ -185,6 +181,8 @@ const GraphExplorer = forwardRef<GraphHandle, Props>(function GraphExplorer(
   const hoveredIdRef = useRef<string | null>(null);
   const selectedIdRef = useRef<string | null>(selectedId);
   const zoomKRef = useRef(1);
+  const isDraggingRef = useRef(false);
+  const dragTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [tooltip, setTooltip] = useState<{ text: string; sub: string; x: number; y: number } | null>(null);
 
   // Persistent D3 state across renders
@@ -236,7 +234,9 @@ const GraphExplorer = forwardRef<GraphHandle, Props>(function GraphExplorer(
       .attr('font-weight', (d) => d.kind === 'sub' || d.kind === 'artist' || d.kind === 'track' ? 500 : 700)
       .attr('dy', (d) => d.kind === 'hub' ? 4 : R[d.kind] + 12)
       .style('display', (d) => {
-        if (d.kind === 'hub' || d.kind === 'family') return null;
+        if (d.kind === 'hub') return null;
+        if (isDraggingRef.current) return d.kind === 'family' ? null : 'none';
+        if (d.kind === 'family') return null;
         if (focus && focus.has(d.id)) return null;
         if (d.kind === 'track') return zoomKRef.current >= TRACK_LABEL_ZOOM ? null : 'none';
         if (d.kind === 'artist') return zoomKRef.current >= ARTIST_LABEL_ZOOM ? null : 'none';
@@ -244,7 +244,9 @@ const GraphExplorer = forwardRef<GraphHandle, Props>(function GraphExplorer(
         return 'none';
       })
       .style('opacity', (d) => {
-        if (d.kind === 'hub' || d.kind === 'family') return 1;
+        if (d.kind === 'hub') return 1;
+        if (isDraggingRef.current) return d.kind === 'family' ? 1 : 0;
+        if (d.kind === 'family') return 1;
         if (focus && focus.has(d.id)) return 1;
         if (d.kind === 'track') return zoomKRef.current >= TRACK_LABEL_ZOOM ? 1 : 0;
         if (d.kind === 'artist') return zoomKRef.current >= ARTIST_LABEL_ZOOM ? 1 : 0;
@@ -329,9 +331,21 @@ const GraphExplorer = forwardRef<GraphHandle, Props>(function GraphExplorer(
     const zoom = d3
       .zoom<SVGSVGElement, unknown>()
       .scaleExtent([0.4, 4])
+      .on('start', () => {
+        isDraggingRef.current = true;
+        if (dragTimerRef.current) clearTimeout(dragTimerRef.current);
+        updateLabelVisibility();
+      })
       .on('zoom', (e) => {
         root.attr('transform', e.transform.toString());
         zoomKRef.current = e.transform.k;
+      })
+      .on('end', () => {
+        isDraggingRef.current = false;
+        dragTimerRef.current = setTimeout(() => {
+          isDraggingRef.current = false;
+          updateLabelVisibility();
+        }, 80);
         updateLabelVisibility();
       });
     svg.call(zoom);
@@ -595,7 +609,7 @@ const GraphExplorer = forwardRef<GraphHandle, Props>(function GraphExplorer(
       .on('click', (_evt, d) => {
         if (d.kind === 'hub') { setShowAll(false); setExpanded(new Set()); setExpandedArtists(new Set()); setExpandedTracks(new Set()); return; }
         if (d.kind === 'track' && d.track) {
-          window.open(d.track.appleMusicUrl, '_blank', 'noopener,noreferrer');
+          onSelectTrack(d.track);
           return;
         }
         if (d.kind === 'artist' && d.artist) {
@@ -729,7 +743,8 @@ const GraphExplorer = forwardRef<GraphHandle, Props>(function GraphExplorer(
       const node = e.nodeById.get(genreId);
       if (!node || node.x == null || node.y == null) return;
       const k = 1.5;
-      const t = d3.zoomIdentity.translate(e.W / 2 - node.x * k, e.H / 2 - node.y * k).scale(k);
+      const verticalOffset = 40; // offset down so label isn't clipped at top
+      const t = d3.zoomIdentity.translate(e.W / 2 - node.x * k, e.H / 2 - node.y * k + verticalOffset).scale(k);
       d3.select(svgRef.current).transition().duration(600).call(e.zoom.transform, t);
     }, genre.parentId ? 380 : 60);
   }, [genres, onSelect]);
@@ -744,12 +759,13 @@ const GraphExplorer = forwardRef<GraphHandle, Props>(function GraphExplorer(
     if (!e || !svgRef.current) return;
     const positioned = e.nodes.filter((node) => node.x != null && node.y != null);
     if (positioned.length === 0) return;
-    const pad = 140;
+    const pad = 180;
+    const extraTop = 60; // extra top clearance so labels above nodes aren't clipped
     const xs = positioned.map((node) => node.x!);
     const ys = positioned.map((node) => node.y!);
     const minX = Math.min(...xs) - pad;
     const maxX = Math.max(...xs) + pad;
-    const minY = Math.min(...ys) - pad;
+    const minY = Math.min(...ys) - pad - extraTop;
     const maxY = Math.max(...ys) + pad;
     const graphW = Math.max(1, maxX - minX);
     const graphH = Math.max(1, maxY - minY);
@@ -782,7 +798,7 @@ const GraphExplorer = forwardRef<GraphHandle, Props>(function GraphExplorer(
 
   return (
     <div className="relative w-full h-full">
-      <svg ref={svgRef} className="w-full h-full touch-none" />
+      <svg ref={svgRef} className="w-full h-full touch-none" style={{ WebkitBackfaceVisibility: 'hidden' }} />
 
       {tooltip && (
         <div
