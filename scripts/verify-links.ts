@@ -33,8 +33,6 @@ interface LinkReport {
 }
 
 const report: LinkReport[] = [];
-let searchUrlCount = 0;
-let missingIdCount = 0;
 
 async function checkUrl(url: string): Promise<number> {
   try {
@@ -81,7 +79,6 @@ async function main() {
         artistLinks.push({ type: 'spotify-artist', name: artist.name, url, status: 'ok' });
       } else {
         artistLinks.push({ type: 'spotify-artist', name: artist.name, url: '', status: 'missing-id' });
-        missingIdCount++;
       }
 
       // Apple Music artist
@@ -90,7 +87,6 @@ async function main() {
         artistLinks.push({ type: 'apple-artist', name: artist.name, url, status: 'ok' });
       } else {
         artistLinks.push({ type: 'apple-artist', name: artist.name, url: '', status: 'missing-id' });
-        missingIdCount++;
       }
     }
   }
@@ -103,7 +99,6 @@ async function main() {
       const amUrl = appleMusicSongUrl(track.appleMusicAlbumId, track.appleMusicSongId);
       if (isSearchUrl(amUrl)) {
         trackLinks.push({ type: 'apple-track', name: `${artistName} – ${track.title}`, url: amUrl, status: 'search-url' });
-        searchUrlCount++;
       } else {
         trackLinks.push({ type: 'apple-track', name: `${artistName} – ${track.title}`, url: amUrl, status: 'ok' });
       }

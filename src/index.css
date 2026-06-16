@@ -29,8 +29,27 @@ body {
 }
 
 /* graph */
+.graph-shell {
+  overscroll-behavior: contain;
+  touch-action: none;
+  contain: layout paint size;
+}
+.graph-svg {
+  display: block;
+  overscroll-behavior: contain;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
 .gnode { cursor: pointer; }
 .gnode circle { transition: r 0.18s cubic-bezier(0.34, 1.4, 0.64, 1); }
+.gnode text {
+  paint-order: stroke fill;
+  text-rendering: geometricPrecision;
+  user-select: none;
+  -webkit-user-select: none;
+}
 
 /* Prevent text trails on mobile Safari during pan/zoom.
    NOTE: do NOT set a CSS `transform` on .gnode / .nodes — D3 positions

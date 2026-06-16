@@ -48,6 +48,7 @@ const COLLIDE: Record<Kind, number> = { hub: 42, family: 48, sub: 40, artist: 34
 const LABEL_ZOOM = 1.25;
 const ARTIST_LABEL_ZOOM = 1.7;
 const TRACK_LABEL_ZOOM = 2.15;
+const LABEL_VIEWPORT_MARGIN = 96;
 
 function linkFamilyColor(link: GLink) {
   const target = link.target as GNode;
@@ -181,8 +182,9 @@ const GraphExplorer = forwardRef<GraphHandle, Props>(function GraphExplorer(
   const hoveredIdRef = useRef<string | null>(null);
   const selectedIdRef = useRef<string | null>(selectedId);
   const zoomKRef = useRef(1);
-  const isDraggingRef = useRef(false);
-  const dragTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const currentTransformRef = useRef<d3.ZoomTransform>(d3.zoomIdentity);
+  const isInteractingRef = useRef(false);
+  const interactionTimerRef = useRef<number | null>(null);
   const [tooltip, setTooltip] = useState<{ text: string; sub: string; x: number; y: number } | null>(null);
 
   // Persistent D3 state across renders
@@ -199,6 +201,62 @@ const GraphExplorer = forwardRef<GraphHandle, Props>(function GraphExplorer(
     H: number;
   } | null>(null);
 
+  const labelIsInViewport = useCallback((node: GNode) => {
+    const e = eng.current;
+    if (!e || node.x == null || node.y == null) return true;
+    const transform = currentTransformRef.current;
+    const labelY = node.y + (node.kind === 'hub' ? 4 : R[node.kind] + 12);
+    const screenX = node.x * transform.k + transform.x;
+    const screenY = labelY * transform.k + transform.y;
+    return screenX >= -LABEL_VIEWPORT_MARGIN
+      && screenX <= e.W + LABEL_VIEWPORT_MARGIN
+      && screenY >= -LABEL_VIEWPORT_MARGIN
+      && screenY <= e.H + LABEL_VIEWPORT_MARGIN;
+  }, []);
+
+  const labelShouldRender = useCallback((node: GNode, focus: Set<string> | null) => {
+    if (!labelIsInViewport(node)) return false;
+    if (isInteractingRef.current && node.kind !== 'hub' && node.kind !== 'family') return false;
+    if (node.kind === 'hub' || node.kind === 'family') return true;
+    if (focus && focus.has(node.id)) return true;
+    if (node.kind === 'track') return zoomKRef.current >= TRACK_LABEL_ZOOM;
+    if (node.kind === 'artist') return zoomKRef.current >= ARTIST_LABEL_ZOOM;
+    return zoomKRef.current >= LABEL_ZOOM;
+  }, [labelIsInViewport]);
+
+  const validateGraphIntegrity = useCallback(() => {
+    if (!import.meta.env.DEV) return;
+    const e = eng.current;
+    if (!e) return;
+    const groups = e.gNode.selectAll<SVGGElement, GNode>('g.gnode').nodes();
+    const ids = new Set<string>();
+    const duplicateIds: string[] = [];
+    const missingLabels: string[] = [];
+    let detachedLabels = 0;
+
+    groups.forEach((group) => {
+      const datum = d3.select<SVGGElement, GNode>(group).datum();
+      if (!datum?.id) return;
+      if (ids.has(datum.id)) duplicateIds.push(datum.id);
+      ids.add(datum.id);
+      if (!group.querySelector('text.lbl')) missingLabels.push(datum.id);
+    });
+
+    e.gNode.selectAll<SVGTextElement, GNode>('text.lbl').nodes().forEach((label) => {
+      if (!label.closest('g.gnode')) detachedLabels += 1;
+    });
+
+    if (groups.length !== e.nodes.length || missingLabels.length || duplicateIds.length || detachedLabels) {
+      console.warn('EDM Atlas graph label integrity warning', {
+        expectedNodes: e.nodes.length,
+        renderedNodes: groups.length,
+        missingLabels,
+        duplicateIds,
+        detachedLabels,
+      });
+    }
+  }, []);
+
   const updateLabelVisibility = useCallback(() => {
     const e = eng.current;
     if (!e) return;
@@ -207,8 +265,8 @@ const GraphExplorer = forwardRef<GraphHandle, Props>(function GraphExplorer(
     let focus: Set<string> | null = null;
     if (activeId) {
       const node = e.nodeById.get(activeId);
-        if (node) {
-          focus = new Set([activeId]);
+      if (node) {
+        focus = new Set([activeId]);
         if (node.kind === 'track' && node.parentArtistId) {
           focus.add(node.parentArtistId);
           const artistNode = e.nodeById.get(node.parentArtistId);
@@ -233,27 +291,9 @@ const GraphExplorer = forwardRef<GraphHandle, Props>(function GraphExplorer(
       .attr('font-size', (d) => d.kind === 'hub' ? '12px' : d.kind === 'family' ? '11px' : d.kind === 'artist' ? '8.5px' : d.kind === 'track' ? '7.5px' : '9.5px')
       .attr('font-weight', (d) => d.kind === 'sub' || d.kind === 'artist' || d.kind === 'track' ? 500 : 700)
       .attr('dy', (d) => d.kind === 'hub' ? 4 : R[d.kind] + 12)
-      .style('display', (d) => {
-        if (d.kind === 'hub') return null;
-        if (isDraggingRef.current) return d.kind === 'family' ? null : 'none';
-        if (d.kind === 'family') return null;
-        if (focus && focus.has(d.id)) return null;
-        if (d.kind === 'track') return zoomKRef.current >= TRACK_LABEL_ZOOM ? null : 'none';
-        if (d.kind === 'artist') return zoomKRef.current >= ARTIST_LABEL_ZOOM ? null : 'none';
-        if (zoomKRef.current >= LABEL_ZOOM) return null;
-        return 'none';
-      })
-      .style('opacity', (d) => {
-        if (d.kind === 'hub') return 1;
-        if (isDraggingRef.current) return d.kind === 'family' ? 1 : 0;
-        if (d.kind === 'family') return 1;
-        if (focus && focus.has(d.id)) return 1;
-        if (d.kind === 'track') return zoomKRef.current >= TRACK_LABEL_ZOOM ? 1 : 0;
-        if (d.kind === 'artist') return zoomKRef.current >= ARTIST_LABEL_ZOOM ? 1 : 0;
-        if (zoomKRef.current >= LABEL_ZOOM) return 1;
-        return 0;
-      });
-  }, []);
+      .style('display', (d) => (labelShouldRender(d, focus) ? null : 'none'))
+      .style('opacity', (d) => (labelShouldRender(d, focus) ? 1 : 0));
+  }, [labelShouldRender]);
 
   useEffect(() => {
     hoveredIdRef.current = hoveredId;
@@ -332,21 +372,22 @@ const GraphExplorer = forwardRef<GraphHandle, Props>(function GraphExplorer(
       .zoom<SVGSVGElement, unknown>()
       .scaleExtent([0.4, 4])
       .on('start', () => {
-        isDraggingRef.current = true;
-        if (dragTimerRef.current) clearTimeout(dragTimerRef.current);
+        isInteractingRef.current = true;
+        if (interactionTimerRef.current) window.clearTimeout(interactionTimerRef.current);
         updateLabelVisibility();
       })
       .on('zoom', (e) => {
+        currentTransformRef.current = e.transform;
         root.attr('transform', e.transform.toString());
         zoomKRef.current = e.transform.k;
+        updateLabelVisibility();
       })
       .on('end', () => {
-        isDraggingRef.current = false;
-        dragTimerRef.current = setTimeout(() => {
-          isDraggingRef.current = false;
+        if (interactionTimerRef.current) window.clearTimeout(interactionTimerRef.current);
+        interactionTimerRef.current = window.setTimeout(() => {
+          isInteractingRef.current = false;
           updateLabelVisibility();
-        }, 80);
-        updateLabelVisibility();
+        }, 110);
       });
     svg.call(zoom);
     svg.on('dblclick.zoom', null);
@@ -395,6 +436,10 @@ const GraphExplorer = forwardRef<GraphHandle, Props>(function GraphExplorer(
           return `translate(${d.x},${d.y})`;
         });
     });
+    sim.on('end', () => {
+      updateLabelVisibility();
+      validateGraphIntegrity();
+    });
 
     const hub: GNode = {
       id: HUB_ID, name: 'EDM', kind: 'hub', family: 'hub', genre: null,
@@ -426,7 +471,11 @@ const GraphExplorer = forwardRef<GraphHandle, Props>(function GraphExplorer(
     });
     ro.observe(container);
 
-    return () => { ro.disconnect(); sim.stop(); };
+    return () => {
+      if (interactionTimerRef.current) window.clearTimeout(interactionTimerRef.current);
+      ro.disconnect();
+      sim.stop();
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -553,7 +602,10 @@ const GraphExplorer = forwardRef<GraphHandle, Props>(function GraphExplorer(
       .data(e.nodes, (d) => d.id)
       .join(
         (enter) => {
-          const g = enter.append('g').attr('class', 'gnode').style('opacity', 0);
+          const g = enter.append('g')
+            .attr('class', 'gnode')
+            .attr('data-node-id', (d) => d.id)
+            .style('opacity', 0);
           g.transition().duration(300).style('opacity', 1);
           g.append('circle')
             .attr('r', (d) => R[d.kind])
@@ -580,7 +632,7 @@ const GraphExplorer = forwardRef<GraphHandle, Props>(function GraphExplorer(
             .style('opacity', (d) => d.kind === 'sub' || d.kind === 'artist' || d.kind === 'track' ? 0 : 1);
           return g;
         },
-        (update) => update,
+        (update) => update.attr('data-node-id', (d) => d.id),
         (exit) => exit.interrupt().remove()
       );
 
@@ -636,8 +688,9 @@ const GraphExplorer = forwardRef<GraphHandle, Props>(function GraphExplorer(
     if (instant) e.sim.alpha(0.9).restart();
     else e.sim.alpha(0.7).alphaTarget(0).velocityDecay(0.38).restart();
     updateLabelVisibility();
+    validateGraphIntegrity();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [desiredNodes, families, onSelect, onSelectArtist, updateLabelVisibility]);
+  }, [desiredNodes, families, onSelect, onSelectArtist, updateLabelVisibility, validateGraphIntegrity]);
 
   // run structural update when expansion / data changes
   useEffect(() => {
@@ -797,8 +850,8 @@ const GraphExplorer = forwardRef<GraphHandle, Props>(function GraphExplorer(
   };
 
   return (
-    <div className="relative w-full h-full">
-      <svg ref={svgRef} className="w-full h-full touch-none" style={{ WebkitBackfaceVisibility: 'hidden' }} />
+    <div className="graph-shell relative w-full h-full">
+      <svg ref={svgRef} className="graph-svg w-full h-full touch-none" style={{ WebkitBackfaceVisibility: 'hidden' }} />
 
       {tooltip && (
         <div
