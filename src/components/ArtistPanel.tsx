@@ -39,7 +39,7 @@ export default function ArtistPanel({ artist, genre, onClose, onJumpToGenre }: P
                 {artist.genreName}
               </button>
             </div>
-            <h2 className="text-xl font-bold text-white truncate">{artist.name}</h2>
+            <h2 className="text-xl font-bold truncate" style={{ color: 'var(--text-1)' }}>{artist.name}</h2>
           </div>
           <button onClick={onClose} aria-label="Close"
             className="p-1.5 rounded-lg hover:bg-white/8 transition-colors flex-shrink-0"

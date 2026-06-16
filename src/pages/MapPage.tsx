@@ -23,6 +23,17 @@ export default function MapPage() {
     ? genres.filter((g) => g.family === familyFilter)
     : genres;
 
+  const familyChipStyle = (fam: string, col: (typeof FAMILY_COLORS)[string]) => {
+    const active = familyFilter === fam;
+
+    return {
+      background: active ? col.primary : `color-mix(in srgb, ${col.primary} 18%, var(--surface-1))`,
+      color: active ? 'var(--chip-selected-text)' : col.primary,
+      border: `1px solid ${active ? col.primary : `color-mix(in srgb, ${col.primary} 45%, var(--border))`}`,
+      boxShadow: active ? `0 0 0 1px color-mix(in srgb, ${col.primary} 28%, transparent)` : 'none',
+    };
+  };
+
   const handleJump = (genreId: string) => {
     if (familyFilter) {
       const g = genres.find((x) => x.id === genreId);
@@ -48,11 +59,7 @@ export default function MapPage() {
             {Object.entries(FAMILY_COLORS).map(([fam, col]) => (
               <button key={fam} onClick={() => setFamilyFilter(familyFilter === fam ? null : fam)}
                 className="px-2.5 py-1 rounded-lg text-xs font-medium capitalize transition-all whitespace-nowrap"
-                style={{
-                  background: familyFilter === fam ? col.primary : 'var(--surface-2)',
-                  color: familyFilter === fam ? '#0a0a0e' : col.text,
-                  border: `1px solid ${familyFilter === fam ? col.primary : 'var(--border)'}`,
-                }}>{fam}</button>
+                style={familyChipStyle(fam, col)}>{fam}</button>
             ))}
             {familyFilter && (
               <button onClick={() => setFamilyFilter(null)}
@@ -82,11 +89,7 @@ export default function MapPage() {
           {Object.entries(FAMILY_COLORS).map(([fam, col]) => (
             <button key={fam} onClick={() => { setFamilyFilter(familyFilter === fam ? null : fam); setFiltersOpen(false); }}
               className="px-2.5 py-1 rounded-lg text-xs font-medium capitalize"
-              style={{
-                background: familyFilter === fam ? col.primary : 'var(--surface-2)',
-                color: familyFilter === fam ? '#0a0a0e' : col.text,
-                border: `1px solid ${familyFilter === fam ? col.primary : 'var(--border)'}`,
-              }}>{fam}</button>
+              style={familyChipStyle(fam, col)}>{fam}</button>
           ))}
         </div>
       )}

@@ -33,7 +33,7 @@ export default function SongPanel({ track, onClose }: Props) {
               <span className="text-[10px] font-medium uppercase tracking-wider px-2 py-0.5 rounded"
                 style={{ background: 'var(--surface-2)', color: color.text }}>{track.genreName}</span>
             </div>
-            <h2 className="text-xl font-bold text-white leading-tight">{track.title}</h2>
+            <h2 className="text-xl font-bold leading-tight" style={{ color: 'var(--text-1)' }}>{track.title}</h2>
             <p className="text-sm mt-0.5" style={{ color: color.text }}>{track.artistName}</p>
           </div>
           <button onClick={onClose} aria-label="Close"

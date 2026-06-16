@@ -613,7 +613,7 @@ const GraphExplorer = forwardRef<GraphHandle, Props>(function GraphExplorer(
           g.transition().duration(300).style('opacity', 1);
           g.append('circle')
             .attr('r', (d) => R[d.kind])
-            .attr('fill', (d) => d.kind === 'hub' ? '#1a1722' : d.kind === 'family' ? getFamilyColor(d.family).primary : d.kind === 'artist' ? '#0f0f14' : d.kind === 'track' ? getFamilyColor(d.family).primary : getFamilyColor(d.family).glow)
+            .attr('fill', (d) => d.kind === 'hub' ? 'var(--graph-hub-fill)' : d.kind === 'family' ? getFamilyColor(d.family).primary : d.kind === 'artist' ? 'var(--graph-artist-fill)' : d.kind === 'track' ? getFamilyColor(d.family).primary : getFamilyColor(d.family).glow)
             .attr('stroke', (d) => d.kind === 'hub' ? '#8b80e0' : getFamilyColor(d.family).primary)
             .attr('stroke-width', (d) => d.kind === 'family' ? 1.8 : d.kind === 'hub' ? 2.2 : d.kind === 'artist' ? 1 : d.kind === 'track' ? 0.9 : 1.2)
             .attr('opacity', (d) => (d.kind === 'track' ? 0.86 : 1));
@@ -625,9 +625,9 @@ const GraphExplorer = forwardRef<GraphHandle, Props>(function GraphExplorer(
             .attr('stroke-width', 1).attr('stroke-dasharray', '2 3').attr('opacity', 0.5);
           g.append('text').attr('class', 'lbl')
             .attr('text-anchor', 'middle')
-            .attr('fill', '#f4f4f6')
+            .attr('fill', 'var(--graph-label)')
             .attr('pointer-events', 'none')
-            .style('text-shadow', '0 1px 5px rgba(0,0,0,0.95), 0 0 3px rgba(0,0,0,0.9)')
+            .style('text-shadow', 'var(--graph-label-shadow)')
             .text((d) => d.kind === 'sub' || d.kind === 'artist' || d.kind === 'track' ? truncate(d.name) : d.name)
             .attr('font-size', (d) => d.kind === 'hub' ? '12px' : d.kind === 'family' ? '11px' : d.kind === 'artist' ? '8.5px' : d.kind === 'track' ? '7.5px' : '9.5px')
             .attr('font-weight', (d) => d.kind === 'sub' || d.kind === 'artist' || d.kind === 'track' ? 500 : 700)
@@ -675,7 +675,8 @@ const GraphExplorer = forwardRef<GraphHandle, Props>(function GraphExplorer(
         }
         if (d.kind === 'family') {
           setShowAll(false);
-          const childIds = (subsByParent.get(d.id) ?? []).map((child) => child.id);
+          const children = subsByParent.get(d.id) ?? [];
+          const childIds = children.map((child) => child.id);
           setExpanded((prev) => {
             const next = new Set(prev);
             if (next.has(d.id)) next.delete(d.id); else next.add(d.id);
@@ -683,8 +684,12 @@ const GraphExplorer = forwardRef<GraphHandle, Props>(function GraphExplorer(
           });
           setExpandedTracks(new Set());
           setExpandedArtists((prev) => {
-            const isOpen = prev.size === childIds.length && childIds.every((id) => prev.has(id));
-            return isOpen ? new Set() : new Set(childIds.length > 0 ? childIds : [d.id]);
+            if (children.length === 0) {
+              return prev.has(d.id) && prev.size === 1 ? new Set() : new Set([d.id]);
+            }
+            const next = new Set(prev);
+            childIds.forEach((id) => next.delete(id));
+            return next;
           });
           if (d.genre) onSelect(d.genre);
           return;
@@ -758,7 +763,14 @@ const GraphExplorer = forwardRef<GraphHandle, Props>(function GraphExplorer(
     // selected ring pulse
     e.gNode.selectAll<SVGGElement, GNode>('g.gnode').select('.expand-ring')
       .transition().duration(160)
-      .attr('opacity', (d) => ((d.kind === 'artist' ? expandedTracks.has(d.id) : expanded.has(d.id)) ? 0 : 0.5))
+      .attr('opacity', (d) => {
+        const isExpanded = d.kind === 'artist'
+          ? expandedTracks.has(d.id)
+          : d.kind === 'sub'
+            ? expandedArtists.has(d.id)
+            : expanded.has(d.id);
+        return isExpanded ? 0 : 0.5;
+      })
       .attr('r', (d) => R[d.kind] + 4);
 
     // links
@@ -782,7 +794,7 @@ const GraphExplorer = forwardRef<GraphHandle, Props>(function GraphExplorer(
       });
 
     updateLabelVisibility();
-  }, [selectedId, hoveredId, expanded, expandedTracks, updateLabelVisibility]);
+  }, [selectedId, hoveredId, expanded, expandedArtists, expandedTracks, updateLabelVisibility]);
 
   // ---------------------------------------------------------------------------
   // Imperative: search jumps here
@@ -808,7 +820,7 @@ const GraphExplorer = forwardRef<GraphHandle, Props>(function GraphExplorer(
           if (prev.has(genre.id)) return prev;
           const next = new Set(prev); next.add(genre.id); return next;
         });
-        setExpandedArtists(new Set(children.map((child) => child.id)));
+        setExpandedArtists(new Set());
       } else {
         setExpandedArtists(new Set([genre.id]));
       }
@@ -890,7 +902,7 @@ const GraphExplorer = forwardRef<GraphHandle, Props>(function GraphExplorer(
           style={{ left: tooltip.x, top: tooltip.y, transform: 'translate(-50%, -100%)' }}
         >
           <div className="rounded-lg px-2.5 py-1.5 shadow-xl border" style={{ background: 'var(--surface-2)', borderColor: 'var(--border-strong)' }}>
-            <div className="text-xs font-semibold text-white whitespace-nowrap">{tooltip.text}</div>
+            <div className="text-xs font-semibold whitespace-nowrap" style={{ color: 'var(--text-1)' }}>{tooltip.text}</div>
             {tooltip.sub && <div className="text-[10px] font-mono mt-0.5 whitespace-nowrap" style={{ color: 'var(--text-3)' }}>{tooltip.sub}</div>}
           </div>
         </div>
@@ -903,7 +915,7 @@ const GraphExplorer = forwardRef<GraphHandle, Props>(function GraphExplorer(
           style={{
             background: showAll ? 'var(--accent)' : 'var(--surface-1)',
             borderColor: showAll ? 'var(--accent)' : 'var(--border)',
-            color: showAll ? '#0a0a0e' : 'var(--text-2)',
+            color: showAll ? 'var(--accent-contrast)' : 'var(--text-2)',
           }} aria-label={showAll ? 'Collapse full graph' : 'Expand full graph'}>
           <GitBranch size={15} />
         </button>

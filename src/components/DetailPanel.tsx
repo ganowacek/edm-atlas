@@ -49,7 +49,7 @@ export default function DetailPanel({ genre, onClose, onJumpToGenre, allGenres }
                   style={{ background: 'rgba(212,173,74,0.18)', color: '#ecd699' }}>deep cut</span>
               )}
             </div>
-            <h2 className="text-xl font-bold text-white truncate">{genre.name}</h2>
+            <h2 className="text-xl font-bold truncate" style={{ color: 'var(--text-1)' }}>{genre.name}</h2>
           </div>
           <button onClick={onClose} aria-label="Close"
             className="p-1.5 rounded-lg hover:bg-white/8 transition-colors flex-shrink-0"
@@ -209,7 +209,7 @@ export default function DetailPanel({ genre, onClose, onJumpToGenre, allGenres }
             <div className="space-y-2">
               {genre.artists.map((a) => (
                 <div key={a.name} className="rounded-xl p-3 border" style={{ background: 'var(--surface-2)', borderColor: 'var(--border)' }}>
-                  <h4 className="font-semibold text-sm text-white mb-1">{a.name}</h4>
+                  <h4 className="font-semibold text-sm mb-1" style={{ color: 'var(--text-1)' }}>{a.name}</h4>
                   <p className="text-xs leading-relaxed mb-2.5" style={{ color: 'var(--text-2)' }}>{a.importance}</p>
                   <div className="flex gap-2">
                     {a.spotifyArtistId && (

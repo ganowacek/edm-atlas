@@ -47,7 +47,7 @@ export default function TimelinePage() {
                       borderColor: sel ? 'var(--accent)' : 'var(--border-strong)',
                       boxShadow: sel ? '0 0 18px rgba(139,128,224,0.4)' : 'none',
                     }}>
-                    <span className="text-xs font-bold font-mono" style={{ color: sel ? '#0a0a0e' : 'var(--text-2)' }}>{count}</span>
+                    <span className="text-xs font-bold font-mono" style={{ color: sel ? 'var(--accent-contrast)' : 'var(--text-2)' }}>{count}</span>
                   </div>
                   <span className="text-xs font-medium" style={{ color: sel ? 'var(--text-1)' : 'var(--text-3)' }}>{d}</span>
                 </button>
