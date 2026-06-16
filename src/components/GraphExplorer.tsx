@@ -336,7 +336,7 @@ const GraphExplorer = forwardRef<GraphHandle, Props>(function GraphExplorer(
         if (visibleChildGenres.length > 0) return;
         artistNodesForGenre(node.genre!).forEach((artist) => {
           out.push({ id: artist.id, genre: node.genre, artist, track: null, kind: 'artist', parentGenreId: node.id });
-          if (expandedTracks.has(artist.id)) {
+          if (showAll || expandedTracks.has(artist.id)) {
             artist.tracks.forEach((track) => {
               out.push({
                 id: track.id,
@@ -904,7 +904,7 @@ const GraphExplorer = forwardRef<GraphHandle, Props>(function GraphExplorer(
             background: showAll ? 'var(--accent)' : 'var(--surface-1)',
             borderColor: showAll ? 'var(--accent)' : 'var(--border)',
             color: showAll ? '#0a0a0e' : 'var(--text-2)',
-          }} aria-label={showAll ? 'Collapse all families' : 'Expand all families'}>
+          }} aria-label={showAll ? 'Collapse full graph' : 'Expand full graph'}>
           <GitBranch size={15} />
         </button>
         <button onClick={() => { const e = eng.current; if (e && svgRef.current) d3.select(svgRef.current).transition().duration(200).call(e.zoom.scaleBy, 1.3); }}
