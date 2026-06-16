@@ -1,12 +1,16 @@
 import { useEffect } from 'react';
 import { X, MapPin, Zap, ExternalLink } from 'lucide-react';
 import type { Genre } from '../types';
-import { getFamilyColor } from '../data/colors';
+import { accentText, familyTintStyle, getFamilyColor, tintStyle } from '../data/colors';
 import { useIsMobile } from '../hooks/useMediaQuery';
 import { spotifyArtistUrl, appleMusicArtistUrl } from '../data/urls';
 import BottomSheet from './BottomSheet';
 
 const DECADES = ['1970s', '1980s', '1990s', '2000s', '2010s', '2020s'];
+const BEGINNER_BADGE_STYLE = tintStyle('#40b89a', 18, 34);
+const DEEP_BADGE_STYLE = tintStyle('#d4ad4a', 18, 34);
+const SPOTIFY_LINK_STYLE = tintStyle('#1db954', 14, 34);
+const APPLE_MUSIC_LINK_STYLE = tintStyle('#d173ad', 14, 34);
 
 interface Props {
   genre: Genre | null;
@@ -26,6 +30,8 @@ export default function DetailPanel({ genre, onClose, onJumpToGenre, allGenres }
 
   if (!genre) return null;
   const color = getFamilyColor(genre.family);
+  const familyText = accentText(color.primary);
+  const familyBadgeStyle = familyTintStyle(color, 18, 42);
 
   const findByName = (name: string) =>
     allGenres.find((g) => g.name.toLowerCase() === name.toLowerCase());
@@ -39,14 +45,14 @@ export default function DetailPanel({ genre, onClose, onJumpToGenre, allGenres }
           <div className="min-w-0">
             <div className="flex items-center gap-1.5 mb-1.5 flex-wrap">
               <span className="text-[10px] font-semibold uppercase tracking-widest px-2 py-0.5 rounded"
-                style={{ background: `${color.glow}55`, color: color.text }}>{genre.family}</span>
+                style={familyBadgeStyle}>{genre.family}</span>
               {genre.beginnerFriendly && (
                 <span className="text-[10px] font-medium uppercase tracking-wider px-2 py-0.5 rounded"
-                  style={{ background: 'rgba(64,184,154,0.18)', color: '#9fe0cd' }}>beginner</span>
+                  style={BEGINNER_BADGE_STYLE}>beginner</span>
               )}
               {genre.deepCut && (
                 <span className="text-[10px] font-medium uppercase tracking-wider px-2 py-0.5 rounded"
-                  style={{ background: 'rgba(212,173,74,0.18)', color: '#ecd699' }}>deep cut</span>
+                  style={DEEP_BADGE_STYLE}>deep cut</span>
               )}
             </div>
             <h2 className="text-xl font-bold truncate" style={{ color: 'var(--text-1)' }}>{genre.name}</h2>
@@ -69,7 +75,7 @@ export default function DetailPanel({ genre, onClose, onJumpToGenre, allGenres }
               return (
                 <div key={d} className="flex-1 flex flex-col items-center gap-1">
                   <div className="h-1 w-full rounded-full" style={{ background: active ? color.primary : 'var(--surface-3)' }} />
-                  <span className="text-[9px] font-mono" style={{ color: active ? color.text : 'var(--text-3)' }}>{d.replace('s', '')}</span>
+                  <span className="text-[9px] font-mono" style={{ color: active ? familyText : 'var(--text-3)' }}>{d.replace('s', '')}</span>
                 </div>
               );
             })}
@@ -142,7 +148,7 @@ export default function DetailPanel({ genre, onClose, onJumpToGenre, allGenres }
                 <p className="text-[10px] uppercase tracking-widest mb-2" style={{ color: 'var(--text-3)' }}>Labels & institutions</p>
                 <div className="flex flex-wrap gap-1.5">
                   {genre.labels.map((item) => (
-                    <span key={item} className="text-xs px-2 py-1 rounded" style={{ background: `${color.glow}40`, color: color.text }}>{item}</span>
+                    <span key={item} className="text-xs px-2 py-1 rounded" style={familyTintStyle(color, 14, 34)}>{item}</span>
                   ))}
                 </div>
               </div>
@@ -161,7 +167,7 @@ export default function DetailPanel({ genre, onClose, onJumpToGenre, allGenres }
                     const match = findByName(inf);
                     return match && onJumpToGenre ? (
                       <button key={inf} onClick={() => onJumpToGenre(match.id)}
-                        className="block text-left text-xs hover:underline" style={{ color: color.text }}>← {inf}</button>
+                        className="block text-left text-xs hover:underline" style={{ color: familyText }}>← {inf}</button>
                     ) : (
                       <span key={inf} className="block text-xs" style={{ color: 'var(--text-2)' }}>← {inf}</span>
                     );
@@ -177,7 +183,7 @@ export default function DetailPanel({ genre, onClose, onJumpToGenre, allGenres }
                     const match = findByName(inf);
                     return match && onJumpToGenre ? (
                       <button key={inf} onClick={() => onJumpToGenre(match.id)}
-                        className="block text-left text-xs hover:underline" style={{ color: color.text }}>→ {inf}</button>
+                        className="block text-left text-xs hover:underline" style={{ color: familyText }}>→ {inf}</button>
                     ) : (
                       <span key={inf} className="block text-xs" style={{ color: 'var(--text-2)' }}>→ {inf}</span>
                     );
@@ -215,14 +221,14 @@ export default function DetailPanel({ genre, onClose, onJumpToGenre, allGenres }
                     {a.spotifyArtistId && (
                       <a href={spotifyArtistUrl(a.spotifyArtistId)} target="_blank" rel="noopener noreferrer" aria-label={`${a.name} on Spotify`}
                         className="flex items-center gap-1 text-[11px] font-medium px-2.5 py-1 rounded-lg transition-colors"
-                        style={{ background: 'rgba(64,184,154,0.14)', color: '#5fcab0' }}>
+                        style={SPOTIFY_LINK_STYLE}>
                         <ExternalLink size={10} />Spotify
                       </a>
                     )}
                     {a.appleMusicArtistId && (
                       <a href={appleMusicArtistUrl(a.appleMusicArtistId)} target="_blank" rel="noopener noreferrer" aria-label={`${a.name} on Apple Music`}
                         className="flex items-center gap-1 text-[11px] font-medium px-2.5 py-1 rounded-lg transition-colors"
-                        style={{ background: 'rgba(209,115,173,0.14)', color: '#e394c4' }}>
+                        style={APPLE_MUSIC_LINK_STYLE}>
                         <ExternalLink size={10} />Apple Music
                       </a>
                     )}

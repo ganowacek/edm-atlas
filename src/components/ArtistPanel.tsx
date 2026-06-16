@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { ExternalLink, Music, Network, X } from 'lucide-react';
 import type { ArtistNode, Genre } from '../types';
-import { getFamilyColor } from '../data/colors';
+import { accentText, familyTintStyle, getFamilyColor, tintStyle } from '../data/colors';
 import { useIsMobile } from '../hooks/useMediaQuery';
 import BottomSheet from './BottomSheet';
 
@@ -11,6 +11,9 @@ interface Props {
   onClose: () => void;
   onJumpToGenre: (genreId: string) => void;
 }
+
+const SPOTIFY_LINK_STYLE = tintStyle('#1db954', 14, 34);
+const APPLE_MUSIC_LINK_STYLE = tintStyle('#d173ad', 14, 34);
 
 export default function ArtistPanel({ artist, genre, onClose, onJumpToGenre }: Props) {
   const isMobile = useIsMobile();
@@ -23,6 +26,7 @@ export default function ArtistPanel({ artist, genre, onClose, onJumpToGenre }: P
 
   if (!artist) return null;
   const color = getFamilyColor(artist.family);
+  const familyText = accentText(color.primary);
 
   const body = (
     <div className="overflow-y-auto h-full" style={{ background: 'var(--surface-1)' }}>
@@ -32,10 +36,10 @@ export default function ArtistPanel({ artist, genre, onClose, onJumpToGenre }: P
           <div className="min-w-0">
             <div className="flex items-center gap-1.5 mb-1.5 flex-wrap">
               <span className="text-[10px] font-semibold uppercase tracking-widest px-2 py-0.5 rounded"
-                style={{ background: `${color.glow}55`, color: color.text }}>artist</span>
+                style={familyTintStyle(color, 18, 42)}>artist</span>
               <button onClick={() => onJumpToGenre(artist.genreId)}
                 className="text-[10px] font-medium uppercase tracking-wider px-2 py-0.5 rounded transition-colors"
-                style={{ background: 'var(--surface-2)', color: color.text }}>
+                style={familyTintStyle(color, 12, 30)}>
                 {artist.genreName}
               </button>
             </div>
@@ -56,14 +60,14 @@ export default function ArtistPanel({ artist, genre, onClose, onJumpToGenre }: P
           {artist.spotifyUrl && (
             <a href={artist.spotifyUrl} target="_blank" rel="noopener noreferrer"
               className="flex items-center gap-1.5 text-xs font-medium px-3 py-2 rounded-lg transition-colors"
-              style={{ background: 'rgba(64,184,154,0.14)', color: '#5fcab0' }}>
+              style={SPOTIFY_LINK_STYLE}>
               <ExternalLink size={13} />Spotify
             </a>
           )}
           {artist.appleMusicUrl && (
             <a href={artist.appleMusicUrl} target="_blank" rel="noopener noreferrer"
               className="flex items-center gap-1.5 text-xs font-medium px-3 py-2 rounded-lg transition-colors"
-              style={{ background: 'rgba(209,115,173,0.14)', color: '#e394c4' }}>
+              style={APPLE_MUSIC_LINK_STYLE}>
               <ExternalLink size={13} />Apple Music
             </a>
           )}
@@ -81,20 +85,20 @@ export default function ArtistPanel({ artist, genre, onClose, onJumpToGenre }: P
                       <p className="text-sm font-semibold truncate" style={{ color: 'var(--text-1)' }}>{track.title}</p>
                       <p className="text-xs mt-1 leading-relaxed" style={{ color: 'var(--text-2)' }}>{track.reason}</p>
                     </div>
-                    <Music size={14} className="mt-0.5 flex-shrink-0" style={{ color: color.text }} />
+                    <Music size={14} className="mt-0.5 flex-shrink-0" style={{ color: familyText }} />
                   </div>
                   <div className="flex flex-wrap gap-2 mt-3">
                     {track.appleMusicUrl && (
                       <a href={track.appleMusicUrl} target="_blank" rel="noopener noreferrer"
                         className="flex items-center gap-1.5 text-xs font-medium px-2.5 py-1.5 rounded transition-colors"
-                        style={{ background: 'rgba(209,115,173,0.14)', color: '#e394c4' }}>
+                        style={APPLE_MUSIC_LINK_STYLE}>
                         <ExternalLink size={12} />Apple Music
                       </a>
                     )}
                     {track.spotifyUrl && (
                       <a href={track.spotifyUrl} target="_blank" rel="noopener noreferrer"
                         className="flex items-center gap-1.5 text-xs font-medium px-2.5 py-1.5 rounded transition-colors"
-                        style={{ background: 'rgba(64,184,154,0.14)', color: '#5fcab0' }}>
+                        style={SPOTIFY_LINK_STYLE}>
                         <ExternalLink size={12} />Spotify
                       </a>
                     )}
@@ -125,7 +129,7 @@ export default function ArtistPanel({ artist, genre, onClose, onJumpToGenre }: P
                 className="w-full text-left rounded-lg border p-3 transition-colors hover:bg-white/5"
                 style={{ background: 'var(--surface-2)', borderColor: 'var(--border)' }}>
                 <div className="flex items-center gap-2 mb-1">
-                  <Network size={13} style={{ color: color.text }} />
+                  <Network size={13} style={{ color: familyText }} />
                   <span className="text-sm font-semibold" style={{ color: 'var(--text-1)' }}>{genre.name}</span>
                 </div>
                 <p className="text-xs line-clamp-3" style={{ color: 'var(--text-2)' }}>{genre.description}</p>

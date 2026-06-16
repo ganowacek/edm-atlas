@@ -22,3 +22,15 @@ export const FAMILY_COLORS: FamilyColorMap = {
 export const getFamilyColor = (family: string): FamilyColorMap[string] => {
   return FAMILY_COLORS[family] ?? { primary: '#8a93a8', glow: '#4a5266', text: '#c3cad8' };
 };
+
+export const accentText = (primary: string) =>
+  `color-mix(in srgb, ${primary} 52%, var(--text-1))`;
+
+export const tintStyle = (primary: string, fill = 16, border = 38) => ({
+  background: `color-mix(in srgb, ${primary} ${fill}%, var(--surface-1))`,
+  color: accentText(primary),
+  border: `1px solid color-mix(in srgb, ${primary} ${border}%, var(--border))`,
+});
+
+export const familyTintStyle = (color: FamilyColorMap[string], fill = 16, border = 38) =>
+  tintStyle(color.primary, fill, border);
