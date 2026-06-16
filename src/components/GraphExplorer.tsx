@@ -117,7 +117,9 @@ function trackNodesForArtist(artistName: string, genre: Genre): TrackNode[] {
     ...track,
     id: `track:${genre.id}:${slugify(artistName)}:${slugify(track.title)}`,
     artistName,
-    appleMusicUrl: appleMusicSongUrl(track.appleMusicAlbumId, track.appleMusicSongId),
+    appleMusicUrl: track.appleMusicAlbumId && track.appleMusicSongId
+      ? appleMusicSongUrl(track.appleMusicAlbumId, track.appleMusicSongId)
+      : undefined,
     spotifyUrl: track.spotifyTrackId ? spotifyTrackUrl(track.spotifyTrackId) : undefined,
     genreId: genre.id,
     genreName: genre.name,
@@ -828,6 +830,12 @@ const GraphExplorer = forwardRef<GraphHandle, Props>(function GraphExplorer(
     const t = d3.zoomIdentity.translate(tx, ty).scale(scale);
     d3.select(svgRef.current).transition().duration(duration).call(e.zoom.transform, t);
   }, []);
+
+  useEffect(() => {
+    if (!eng.current) return;
+    const timeout = window.setTimeout(() => fitToGraph(showAll ? 900 : 650), showAll ? 1250 : 850);
+    return () => window.clearTimeout(timeout);
+  }, [expanded, expandedArtists, expandedTracks, showAll, fitToGraph]);
 
   const resetZoom = () => fitToGraph(500);
 

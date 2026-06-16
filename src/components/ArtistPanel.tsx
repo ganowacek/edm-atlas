@@ -84,17 +84,22 @@ export default function ArtistPanel({ artist, genre, onClose, onJumpToGenre }: P
                     <Music size={14} className="mt-0.5 flex-shrink-0" style={{ color: color.text }} />
                   </div>
                   <div className="flex flex-wrap gap-2 mt-3">
-                    <a href={track.appleMusicUrl} target="_blank" rel="noopener noreferrer"
-                      className="flex items-center gap-1.5 text-xs font-medium px-2.5 py-1.5 rounded transition-colors"
-                      style={{ background: 'rgba(209,115,173,0.14)', color: '#e394c4' }}>
-                      <ExternalLink size={12} />Apple Music
-                    </a>
+                    {track.appleMusicUrl && (
+                      <a href={track.appleMusicUrl} target="_blank" rel="noopener noreferrer"
+                        className="flex items-center gap-1.5 text-xs font-medium px-2.5 py-1.5 rounded transition-colors"
+                        style={{ background: 'rgba(209,115,173,0.14)', color: '#e394c4' }}>
+                        <ExternalLink size={12} />Apple Music
+                      </a>
+                    )}
                     {track.spotifyUrl && (
                       <a href={track.spotifyUrl} target="_blank" rel="noopener noreferrer"
                         className="flex items-center gap-1.5 text-xs font-medium px-2.5 py-1.5 rounded transition-colors"
                         style={{ background: 'rgba(64,184,154,0.14)', color: '#5fcab0' }}>
                         <ExternalLink size={12} />Spotify
                       </a>
+                    )}
+                    {!track.appleMusicUrl && !track.spotifyUrl && (
+                      <span className="text-[11px]" style={{ color: 'var(--text-3)' }}>IDs queued</span>
                     )}
                   </div>
                 </div>

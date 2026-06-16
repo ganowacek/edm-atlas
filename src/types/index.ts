@@ -7,8 +7,8 @@ export interface Artist {
 
 export interface ArtistTrackSuggestion {
   title: string;
-  appleMusicAlbumId: string;
-  appleMusicSongId: string;
+  appleMusicAlbumId?: string;
+  appleMusicSongId?: string;
   spotifyTrackId?: string;
   reason: string;
 }
@@ -19,7 +19,7 @@ export interface TrackNode extends ArtistTrackSuggestion {
   genreId: string;
   genreName: string;
   family: string;
-  appleMusicUrl: string;
+  appleMusicUrl?: string;
   spotifyUrl?: string;
 }
 

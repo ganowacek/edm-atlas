@@ -54,17 +54,24 @@ export default function SongPanel({ track, onClose }: Props) {
         <div>
           <p className="text-[10px] uppercase tracking-widest mb-3" style={{ color: 'var(--text-3)' }}>Listen</p>
           <div className="flex flex-wrap gap-2">
-            <a href={track.appleMusicUrl} target="_blank" rel="noopener noreferrer"
-              className="flex items-center gap-2 text-sm font-medium px-4 py-2.5 rounded-xl transition-colors"
-              style={{ background: 'rgba(209,115,173,0.16)', color: '#e394c4', border: '1px solid rgba(209,115,173,0.25)' }}>
-              <ExternalLink size={14} />Apple Music
-            </a>
+            {track.appleMusicUrl && (
+              <a href={track.appleMusicUrl} target="_blank" rel="noopener noreferrer"
+                className="flex items-center gap-2 text-sm font-medium px-4 py-2.5 rounded-xl transition-colors"
+                style={{ background: 'rgba(209,115,173,0.16)', color: '#e394c4', border: '1px solid rgba(209,115,173,0.25)' }}>
+                <ExternalLink size={14} />Apple Music
+              </a>
+            )}
             {track.spotifyUrl && (
               <a href={track.spotifyUrl} target="_blank" rel="noopener noreferrer"
                 className="flex items-center gap-2 text-sm font-medium px-4 py-2.5 rounded-xl transition-colors"
                 style={{ background: 'rgba(64,184,154,0.16)', color: '#5fcab0', border: '1px solid rgba(64,184,154,0.25)' }}>
                 <ExternalLink size={14} />Spotify
               </a>
+            )}
+            {!track.appleMusicUrl && !track.spotifyUrl && (
+              <span className="text-xs leading-relaxed" style={{ color: 'var(--text-3)' }}>
+                Canonical streaming IDs are queued for this roadmap track.
+              </span>
             )}
           </div>
         </div>
