@@ -259,8 +259,8 @@ export default function DetailPanel({ genre, onClose, onJumpToGenre, allGenres }
   }
 
   return (
-    <div className="fixed top-0 right-0 bottom-0 z-50 w-[min(420px,90vw)] anim-panel shadow-2xl"
-      style={{ borderLeft: `1px solid var(--border-strong)`, borderTop: `2px solid ${color.primary}` }}>
+    <div className="fixed right-0 bottom-0 z-[70] w-[min(420px,90vw)] anim-panel shadow-2xl"
+      style={{ top: '56px', borderLeft: `1px solid var(--border-strong)`, borderTop: `2px solid ${color.primary}` }}>
       {body}
     </div>
   );
