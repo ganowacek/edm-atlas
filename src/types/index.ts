@@ -5,6 +5,19 @@ export interface Artist {
   appleMusicUrl: string;
 }
 
+export interface ArtistNode {
+  id: string;
+  name: string;
+  importance: string;
+  history: string[];
+  spotifyUrl: string;
+  appleMusicUrl: string;
+  genreId: string;
+  genreName: string;
+  family: string;
+  primary: boolean;
+}
+
 export interface Genre {
   id: string;
   name: string;

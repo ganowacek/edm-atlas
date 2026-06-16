@@ -1,16 +1,18 @@
 import { useRef, useState } from 'react';
 import GraphExplorer, { type GraphHandle } from '../components/GraphExplorer';
 import DetailPanel from '../components/DetailPanel';
+import ArtistPanel from '../components/ArtistPanel';
 import SearchBar from '../components/SearchBar';
 import genres from '../data/genres';
 import { FAMILY_COLORS } from '../data/colors';
-import type { Genre } from '../types';
+import type { ArtistNode, Genre } from '../types';
 import { SlidersHorizontal, ChevronDown } from 'lucide-react';
 import { useIsMobile } from '../hooks/useMediaQuery';
 
 export default function MapPage() {
   const graphRef = useRef<GraphHandle>(null);
   const [selected, setSelected] = useState<Genre | null>(null);
+  const [selectedArtist, setSelectedArtist] = useState<ArtistNode | null>(null);
   const [familyFilter, setFamilyFilter] = useState<string | null>(null);
   const [filtersOpen, setFiltersOpen] = useState(false);
   const isMobile = useIsMobile();
@@ -93,14 +95,15 @@ export default function MapPage() {
           ref={graphRef}
           key={familyFilter ?? 'all'}
           genres={visibleGenres}
-          selectedId={selected?.id ?? null}
-          onSelect={setSelected}
+          selectedId={selectedArtist?.id ?? selected?.id ?? null}
+          onSelect={(genre) => { setSelected(genre); setSelectedArtist(null); }}
+          onSelectArtist={(artist) => { setSelectedArtist(artist); setSelected(null); }}
         />
 
         {/* hint (desktop) */}
         {!isMobile && (
           <div className="absolute top-3 left-4 text-xs pointer-events-none" style={{ color: 'var(--text-3)' }}>
-            Click a family to expand its branches · hover to trace connections
+            Click a genre to reveal its artist branch · use the branch control for the full graph
           </div>
         )}
       </div>
@@ -110,6 +113,18 @@ export default function MapPage() {
         onClose={() => setSelected(null)}
         onJumpToGenre={handleJump}
         allGenres={genres}
+      />
+
+      <ArtistPanel
+        artist={selectedArtist}
+        genre={selectedArtist ? genres.find((g) => g.id === selectedArtist.genreId) ?? null : null}
+        onClose={() => setSelectedArtist(null)}
+        onJumpToGenre={(genreId) => {
+          setSelectedArtist(null);
+          const genre = genres.find((g) => g.id === genreId);
+          if (genre) setSelected(genre);
+          handleJump(genreId);
+        }}
       />
     </div>
   );
