@@ -457,6 +457,9 @@ export const genres: Genre[] = [
     moods: ['soulful', 'melodic', 'emotional', 'daytime'],
     beginnerFriendly: true,
     deepCut: false,
+    essentialTracks: [
+      { title: 'Just One Second', artist: 'London Elektricity', spotifyTrackId: '0xGt4mkhb11axReg8tPvyh', reason: 'One of the Hospital Records founder\'s biggest anthems, pairing warm strings and soulful breakdowns over a rolling D&B rhythm — a defining example of liquid\'s melodic, daytime-friendly sound.' },
+    ],
     artists: [
       { name: 'Calibre', importance: 'Northern Irish producer whose melodic, soulful D&B is widely regarded as some of the genre\'s finest', spotifyArtistId: '0sklgkoO5JeS7YNhHS5EmH' },
       { name: 'London Elektricity', importance: 'Hospital Records head whose liquid productions helped define the Hospital sound', spotifyArtistId: '4CbuwI3bEF7gQOwpxBKtal' },
@@ -479,6 +482,9 @@ export const genres: Genre[] = [
     moods: ['cerebral', 'dark', 'technical', 'sci-fi'],
     beginnerFriendly: false,
     deepCut: true,
+    essentialTracks: [
+      { title: 'Wormhole', artist: 'Ed Rush & Optical', spotifyTrackId: '4y6FzZYAPrYOkI3vJNR0uT', reason: 'From the duo\'s genre-defining 1998 album of the same name, its dark, mechanical precision helped move D&B from techstep into the angular, sci-fi-inflected sound that became neurofunk.' },
+    ],
     artists: [
       { name: 'Noisia', importance: 'Dutch trio known for incredibly precise, technically complex neurofunk productions', spotifyArtistId: '4YWj8sohRDjL9deiuRvEEY' },
       { name: 'Ed Rush & Optical', importance: 'UK duo who pioneered the techstep-to-neurofunk transition with dark, mechanical precision', spotifyArtistId: '0qzMLA2bjNnjAKZtawwMLb' },
@@ -501,6 +507,9 @@ export const genres: Genre[] = [
     moods: ['heavy', 'spacious', 'hip-hop inflected', 'meditative'],
     beginnerFriendly: false,
     deepCut: true,
+    essentialTracks: [
+      { title: 'The Sirens', artist: 'Mefjus', spotifyTrackId: '2tRVrtGlpBZH2DEPxwN3XN', appleMusicSongId: '1434390098', reason: 'A 2018 release that uses halftime\'s spaced-out kick pattern to give its dense, twisted bass design room to breathe — a showcase for the genre\'s hip-hop-weight, sci-fi atmosphere.' },
+    ],
     artists: [
       { name: 'Camo & Krooked', importance: 'Austrian duo who popularised the melodic, hip-hop-influenced halftime approach', spotifyArtistId: '2N8IPNZTiNo3nj4mreOlHU' },
       { name: 'Mefjus', importance: 'Viennese producer who brought technical complexity to halftime D&B', spotifyArtistId: '54qqaSH6byJIb8eFWxe3Pj' },
@@ -523,6 +532,9 @@ export const genres: Genre[] = [
     moods: ['chaotic', 'energetic', 'urban', 'raw'],
     beginnerFriendly: false,
     deepCut: false,
+    essentialTracks: [
+      { title: 'Original Nuttah', artist: 'Shy FX & UK Apache', spotifyTrackId: '53mh7POQqTXj2Cfh7phP5b', reason: 'A groundbreaking 1994 single that became one of jungle\'s first UK Top 40 hits, fusing UK Apache\'s ragga-style toasting with rolling breakbeats to define the genre\'s multicultural, soundsystem energy.' },
+    ],
     artists: [
       { name: 'Shy FX', importance: 'Pivotal jungle and D&B producer; "Original Nuttah" is a foundational jungle record', spotifyArtistId: '5oDtp2FC8VqBjTx1aT4P5j' },
       { name: 'Grooverider', importance: 'DJ and producer at the heart of the jungle/D&B scene from its earliest days', spotifyArtistId: '65g8RO3JqCUTigI7YR3dAw' },
@@ -574,6 +586,9 @@ export const genres: Genre[] = [
     moods: ['aggressive', 'festival', 'loud', 'intense'],
     beginnerFriendly: true,
     deepCut: false,
+    essentialTracks: [
+      { title: 'Scary Monsters and Nice Sprites', artist: 'Skrillex', spotifyTrackId: '4rwpZEcnalkuhPyGkEdhu0', appleMusicSongId: '409001935', reason: 'The title track of Skrillex\'s 2010 breakout EP didn\'t invent dubstep, but its aggressive metallic drops and mid-range wobble bass ignited the genre\'s American mainstream explosion.' },
+    ],
     artists: [
       { name: 'Skrillex', importance: 'American producer who brought dubstep to mainstream arenas and helped create brostep', spotifyArtistId: '5he5w2lnU9x7JFhnwcekXX', appleMusicArtistId: '262954645' },
       { name: 'Excision', importance: 'Canadian DJ/producer known for immersive, physically intense brostep live shows', spotifyArtistId: '5FKchcZpQOkqFvXBj1aCvb', appleMusicArtistId: '388661810' },
@@ -596,6 +611,9 @@ export const genres: Genre[] = [
     moods: ['emotional', 'uplifting', 'lush', 'youthful'],
     beginnerFriendly: true,
     deepCut: false,
+    essentialTracks: [
+      { title: 'Never Be Like You', artist: 'Flume (feat. Kai)', spotifyTrackId: '5WI2ltQIdwgzf1SNE76JyR', appleMusicSongId: '1105939615', reason: 'A 2016 single whose pitched vocal chops, lush chords, and emotional dynamics became the textbook example of future bass\'s sound, crossing the genre into mainstream pop radio.' },
+    ],
     artists: [
       { name: 'Flume', importance: 'Australian producer whose debut album defined future bass\'s emotional, textured sound', spotifyArtistId: '6nxWCVXbOlEVRexSbLsTer' },
       { name: 'What So Not', importance: 'Australian project (later solo) known for complex, emotional future bass', spotifyArtistId: '4AA8eXtzqh5ykxtafLaPOi' },
@@ -618,6 +636,9 @@ export const genres: Genre[] = [
     moods: ['minimal', 'repetitive', 'dark', 'underground'],
     beginnerFriendly: false,
     deepCut: true,
+    essentialTracks: [
+      { title: 'Headband', artist: 'Ganja White Night & Subtronics', spotifyTrackId: '40dMUT9OmYUYgEO5OuWZCy', appleMusicSongId: '1455873134', reason: 'A 2019 collaboration between two of riddim\'s defining acts, built on a single looping bass pattern — exemplifying the stripped-back repetition that gives the riddim style its name.' },
+    ],
     artists: [
       { name: 'Antiserum', importance: 'US producer at the forefront of the modern riddim sound', spotifyArtistId: '2oZVtrCwHyCZlIWAwy3VBn' },
       { name: 'Getter', importance: 'US producer known for intense, dark riddim bass music', spotifyArtistId: '3QryVD03gGZOLQQXjy3EoA' },
@@ -640,6 +661,9 @@ export const genres: Genre[] = [
     moods: ['introspective', 'fragmented', 'emotional', 'minimal'],
     beginnerFriendly: true,
     deepCut: false,
+    essentialTracks: [
+      { title: 'Limit to Your Love', artist: 'James Blake', spotifyTrackId: '3IKc8qlbQgIGXap82ZVphu', appleMusicSongId: '1443124831', reason: 'Blake\'s skeletal cover of a Feist song — just voice, piano, and a sudden sub-bass throb — showed how dubstep\'s low-end could be repurposed as intimate songwriting, defining post-dubstep\'s introspective turn.' },
+    ],
     artists: [
       { name: 'James Blake', importance: 'UK artist who transformed dubstep\'s skeleton into minimalist vocal music' },
       { name: 'Burial', importance: 'Anonymous artist whose fragmented dubstep-influenced music became deeply influential', spotifyArtistId: '0uCCBpmg6MrPb1KY2msceF', appleMusicArtistId: '25308751' },
