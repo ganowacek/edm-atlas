@@ -16,10 +16,11 @@ interface Props {
   genre: Genre | null;
   onClose: () => void;
   onJumpToGenre?: (genreId: string) => void;
+  onJumpToArtist?: (genreId: string, artistName: string) => void;
   allGenres: Genre[];
 }
 
-export default function DetailPanel({ genre, onClose, onJumpToGenre, allGenres }: Props) {
+export default function DetailPanel({ genre, onClose, onJumpToGenre, onJumpToArtist, allGenres }: Props) {
   const isMobile = useIsMobile();
 
   useEffect(() => {
@@ -215,7 +216,13 @@ export default function DetailPanel({ genre, onClose, onJumpToGenre, allGenres }
             <div className="space-y-2">
               {genre.artists.map((a) => (
                 <div key={a.name} className="rounded-xl p-3 border" style={{ background: 'var(--surface-2)', borderColor: 'var(--border)' }}>
-                  <h4 className="font-semibold text-sm mb-1" style={{ color: 'var(--text-1)' }}>{a.name}</h4>
+                  {onJumpToArtist ? (
+                    <button onClick={() => onJumpToArtist(genre.id, a.name)}
+                      className="block text-left font-semibold text-sm mb-1 hover:underline transition-colors"
+                      style={{ color: familyText }}>{a.name}</button>
+                  ) : (
+                    <h4 className="font-semibold text-sm mb-1" style={{ color: 'var(--text-1)' }}>{a.name}</h4>
+                  )}
                   <p className="text-xs leading-relaxed mb-2.5" style={{ color: 'var(--text-2)' }}>{a.importance}</p>
                   <div className="flex gap-2">
                     {a.spotifyArtistId && (

@@ -6,6 +6,7 @@ import SongPanel from '../components/SongPanel';
 import SearchBar from '../components/SearchBar';
 import genres from '../data/genres';
 import { FAMILY_COLORS, accentText, familyTintStyle } from '../data/colors';
+import { artistNodesForGenre, findArtistAnchor } from '../data/artistNodes';
 import type { ArtistNode, Genre, TrackNode } from '../types';
 import { SlidersHorizontal, ChevronDown } from 'lucide-react';
 import { useIsMobile } from '../hooks/useMediaQuery';
@@ -44,6 +45,19 @@ export default function MapPage() {
     }
     // allow filter state to flush before focusing
     requestAnimationFrame(() => graphRef.current?.focusGenre(genreId));
+  };
+
+  const handleJumpToArtist = (genreId: string, artistName: string) => {
+    const sourceGenre = genres.find((g) => g.id === genreId);
+    if (!sourceGenre) return;
+    const anchor = findArtistAnchor(sourceGenre, artistName, genres);
+    const node = artistNodesForGenre(anchor).find((a) => a.name.toLowerCase() === artistName.toLowerCase());
+    if (!node) return;
+    if (familyFilter && anchor.family !== familyFilter) setFamilyFilter(null);
+    setSelected(null);
+    setSelectedTrack(null);
+    setSelectedArtist(node);
+    requestAnimationFrame(() => graphRef.current?.focusArtist(anchor.id, node.id));
   };
 
   return (
@@ -121,6 +135,7 @@ export default function MapPage() {
         genre={selected}
         onClose={() => setSelected(null)}
         onJumpToGenre={handleJump}
+        onJumpToArtist={handleJumpToArtist}
         allGenres={genres}
       />
 
