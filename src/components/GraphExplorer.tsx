@@ -42,7 +42,7 @@ interface Props {
 }
 
 const R: Record<Kind, number> = { hub: 26, family: 15, sub: 8.5, artist: 6.5, track: 4.6 };
-const COLLIDE: Record<Kind, number> = { hub: 38, family: 36, sub: 30, artist: 22, track: 17 };
+const COLLIDE: Record<Kind, number> = { hub: 42, family: 48, sub: 40, artist: 34, track: 24 };
 const LABEL_ZOOM = 1.25;
 const ARTIST_LABEL_ZOOM = 1.7;
 const TRACK_LABEL_ZOOM = 2.15;
@@ -84,12 +84,34 @@ function musicSearchUrl(service: 'spotify' | 'apple', name: string) {
   return `https://music.apple.com/us/search?term=${encoded}`;
 }
 
-function clampPadding(d: GNode) {
-  const labelWidth = d.kind === 'hub' ? 0 : Math.min(92, d.name.length * (d.kind === 'track' ? 2.4 : d.kind === 'artist' ? 2.7 : d.kind === 'sub' ? 3.2 : 3.8));
+function layoutMetrics(width: number, height: number, nodeCount: number) {
+  const minViewport = Math.min(width, height);
+  const expandedSpan = Math.sqrt(Math.max(nodeCount, 1)) * 78;
+  const span = Math.max(minViewport, expandedSpan);
   return {
-    x: Math.max(R[d.kind] + 8, labelWidth),
-    y: d.kind === 'hub' ? R[d.kind] + 8 : R[d.kind] + 24,
+    cx: width / 2,
+    cy: height / 2,
+    ring1: span * 0.23,
+    ring2: span * 0.5,
+    artistRing: span * 0.5 + 94,
+    trackRing: span * 0.5 + 148,
   };
+}
+
+function radialDistance(d: GNode, metrics: ReturnType<typeof layoutMetrics>) {
+  if (d.kind === 'hub') return 0;
+  if (d.kind === 'family') return metrics.ring1;
+  if (d.kind === 'artist') return metrics.artistRing;
+  if (d.kind === 'track') return metrics.trackRing;
+  return metrics.ring2;
+}
+
+function radialStrength(d: GNode) {
+  if (d.kind === 'hub') return 1;
+  if (d.kind === 'family') return 0.42;
+  if (d.kind === 'artist') return 0.08;
+  if (d.kind === 'track') return 0.07;
+  return 0.12;
 }
 
 function trackNodesForArtist(artistName: string, genre: Genre): TrackNode[] {
@@ -315,8 +337,7 @@ const GraphExplorer = forwardRef<GraphHandle, Props>(function GraphExplorer(
     svg.call(zoom);
     svg.on('dblclick.zoom', null);
 
-    const ring1 = Math.min(W, H) * 0.27;
-    const ring2 = Math.min(W, H) * 0.42;
+    const metrics = layoutMetrics(W, H, families.length + 1);
 
     const sim = d3
       .forceSimulation<GNode, GLink>([])
@@ -325,21 +346,21 @@ const GraphExplorer = forwardRef<GraphHandle, Props>(function GraphExplorer(
         d3
           .forceLink<GNode, GLink>([])
           .id((d) => d.id)
-          .distance((l) => ((l.target as GNode).kind === 'track' ? 44 : (l.target as GNode).kind === 'artist' ? 72 : (l.source as GNode).kind === 'hub' ? ring1 : 84))
+          .distance((l) => ((l.target as GNode).kind === 'track' ? 54 : (l.target as GNode).kind === 'artist' ? 86 : (l.source as GNode).kind === 'hub' ? metrics.ring1 : 104))
           .strength((l) => ((l.target as GNode).kind === 'track' ? 0.5 : (l.target as GNode).kind === 'artist' ? 0.26 : (l.source as GNode).kind === 'hub' ? 0.08 : 0.42))
       )
       .force(
         'charge',
         d3.forceManyBody<GNode>().strength((d) =>
-          d.kind === 'hub' ? -120 : d.kind === 'family' ? -680 : d.kind === 'track' ? -90 : -240
-        ).distanceMax(520)
+          d.kind === 'hub' ? -160 : d.kind === 'family' ? -860 : d.kind === 'artist' ? -260 : d.kind === 'track' ? -110 : -360
+        ).distanceMax(Math.max(720, metrics.trackRing * 1.25))
       )
       .force(
         'radial',
         d3.forceRadial<GNode>(
-          (d) => (d.kind === 'hub' ? 0 : d.kind === 'family' ? ring1 : d.kind === 'artist' ? ring2 + 70 : d.kind === 'track' ? ring2 + 112 : ring2),
+          (d) => radialDistance(d, metrics),
           cx, cy
-        ).strength((d) => (d.kind === 'hub' ? 1 : d.kind === 'family' ? 0.45 : d.kind === 'artist' ? 0.1 : d.kind === 'track' ? 0.08 : 0.16))
+        ).strength(radialStrength)
       )
       .force('collide', d3.forceCollide<GNode>().radius((d) => COLLIDE[d.kind]).strength(0.95).iterations(3))
       .velocityDecay(0.42)
@@ -355,9 +376,8 @@ const GraphExplorer = forwardRef<GraphHandle, Props>(function GraphExplorer(
         .attr('y2', (d) => (d.target as GNode).y ?? 0);
       e.gNode.selectAll<SVGGElement, GNode>('g.gnode')
         .attr('transform', (d) => {
-          const pad = clampPadding(d);
-          d.x = Math.max(pad.x, Math.min(e.W - pad.x, d.x ?? cx));
-          d.y = Math.max(R[d.kind] + 8, Math.min(e.H - pad.y, d.y ?? cy));
+          d.x = d.x ?? cx;
+          d.y = d.y ?? cy;
           return `translate(${d.x},${d.y})`;
         });
     });
@@ -383,10 +403,11 @@ const GraphExplorer = forwardRef<GraphHandle, Props>(function GraphExplorer(
       svg.attr('width', e.W).attr('height', e.H);
       const hubN = e.nodeById.get(HUB_ID);
       if (hubN) { hubN.fx = e.W / 2; hubN.fy = e.H / 2; }
+      const nextMetrics = layoutMetrics(e.W, e.H, e.nodes.length);
       e.sim.force('radial', d3.forceRadial<GNode>(
-        (d) => (d.kind === 'hub' ? 0 : d.kind === 'family' ? Math.min(e.W, e.H) * 0.27 : d.kind === 'artist' ? Math.min(e.W, e.H) * 0.42 + 70 : d.kind === 'track' ? Math.min(e.W, e.H) * 0.42 + 112 : Math.min(e.W, e.H) * 0.42),
+        (d) => radialDistance(d, nextMetrics),
         e.W / 2, e.H / 2
-      ).strength((d) => (d.kind === 'hub' ? 1 : d.kind === 'family' ? 0.45 : d.kind === 'artist' ? 0.1 : d.kind === 'track' ? 0.08 : 0.14)));
+      ).strength(radialStrength));
       e.sim.alpha(0.3).restart();
     });
     ro.observe(container);
@@ -405,6 +426,7 @@ const GraphExplorer = forwardRef<GraphHandle, Props>(function GraphExplorer(
 
     const want = desiredNodes();
     const wantIds = new Set(want.map((w) => w.id));
+    const metrics = layoutMetrics(e.W, e.H, want.length);
 
     // remove gone
     e.nodes = e.nodes.filter((n) => wantIds.has(n.id));
@@ -451,8 +473,7 @@ const GraphExplorer = forwardRef<GraphHandle, Props>(function GraphExplorer(
       } else if (w.kind === 'family') {
         const i = families.findIndex((f) => f.id === w.id);
         const ang = (i / Math.max(families.length, 1)) * 2 * Math.PI - Math.PI / 2;
-        const ring = Math.min(e.W, e.H) * 0.27;
-        sx = cx + Math.cos(ang) * ring; sy = cy + Math.sin(ang) * ring;
+        sx = cx + Math.cos(ang) * metrics.ring1; sy = cy + Math.sin(ang) * metrics.ring1;
       }
       const node: GNode = {
         id: w.id, name: w.track?.title ?? w.artist?.name ?? w.genre?.name ?? 'EDM', kind: w.kind,
@@ -484,10 +505,16 @@ const GraphExplorer = forwardRef<GraphHandle, Props>(function GraphExplorer(
     });
 
     e.sim.nodes(e.nodes);
+    (e.sim.force('charge') as d3.ForceManyBody<GNode>)
+      .distanceMax(Math.max(720, metrics.trackRing * 1.25));
     (e.sim.force('link') as d3.ForceLink<GNode, GLink>).links(e.links);
     (e.sim.force('link') as d3.ForceLink<GNode, GLink>)
-      .distance((l) => ((l.target as GNode).kind === 'track' ? 44 : (l.target as GNode).kind === 'artist' ? 72 : (l.source as GNode).kind === 'hub' ? Math.min(e.W, e.H) * 0.27 : 84))
+      .distance((l) => ((l.target as GNode).kind === 'track' ? 54 : (l.target as GNode).kind === 'artist' ? 86 : (l.source as GNode).kind === 'hub' ? metrics.ring1 : 104))
       .strength((l) => ((l.target as GNode).kind === 'track' ? 0.5 : (l.target as GNode).kind === 'artist' ? 0.26 : (l.source as GNode).kind === 'hub' ? 0.08 : 0.42));
+    e.sim.force('radial', d3.forceRadial<GNode>(
+      (d) => radialDistance(d, metrics),
+      cx, cy
+    ).strength(radialStrength));
 
     // join links
     e.gLink.selectAll<SVGLineElement, GLink>('line')
@@ -712,11 +739,28 @@ const GraphExplorer = forwardRef<GraphHandle, Props>(function GraphExplorer(
     collapseAll: () => { setShowAll(false); setExpanded(new Set()); setExpandedArtists(new Set()); setExpandedTracks(new Set()); },
   }), [focusGenre]);
 
-  const resetZoom = () => {
+  const fitToGraph = useCallback((duration = 600) => {
     const e = eng.current;
     if (!e || !svgRef.current) return;
-    d3.select(svgRef.current).transition().duration(450).call(e.zoom.transform, d3.zoomIdentity);
-  };
+    const positioned = e.nodes.filter((node) => node.x != null && node.y != null);
+    if (positioned.length === 0) return;
+    const pad = 140;
+    const xs = positioned.map((node) => node.x!);
+    const ys = positioned.map((node) => node.y!);
+    const minX = Math.min(...xs) - pad;
+    const maxX = Math.max(...xs) + pad;
+    const minY = Math.min(...ys) - pad;
+    const maxY = Math.max(...ys) + pad;
+    const graphW = Math.max(1, maxX - minX);
+    const graphH = Math.max(1, maxY - minY);
+    const scale = Math.max(0.14, Math.min(2.1, Math.min(e.W / graphW, e.H / graphH)));
+    const tx = e.W / 2 - ((minX + maxX) / 2) * scale;
+    const ty = e.H / 2 - ((minY + maxY) / 2) * scale;
+    const t = d3.zoomIdentity.translate(tx, ty).scale(scale);
+    d3.select(svgRef.current).transition().duration(duration).call(e.zoom.transform, t);
+  }, []);
+
+  const resetZoom = () => fitToGraph(500);
 
   const toggleAll = () => {
     setShowAll((value) => {
@@ -725,10 +769,12 @@ const GraphExplorer = forwardRef<GraphHandle, Props>(function GraphExplorer(
         setExpanded(new Set(families.map((family) => family.id)));
         setExpandedArtists(new Set());
         setExpandedTracks(new Set());
+        window.setTimeout(() => fitToGraph(900), 1300);
       } else {
         setExpanded(new Set());
         setExpandedArtists(new Set());
         setExpandedTracks(new Set());
+        window.setTimeout(() => fitToGraph(500), 500);
       }
       return next;
     });
