@@ -14,9 +14,10 @@ interface Result {
 interface Props {
   genres: Genre[];
   onJump: (genreId: string) => void;
+  onJumpToArtist: (genreId: string, artistName: string) => void;
 }
 
-export default function SearchBar({ genres, onJump }: Props) {
+export default function SearchBar({ genres, onJump, onJumpToArtist }: Props) {
   const [query, setQuery] = useState('');
   const [open, setOpen] = useState(false);
   const [active, setActive] = useState(0);
@@ -64,7 +65,11 @@ export default function SearchBar({ genres, onJump }: Props) {
   }, []);
 
   const choose = (r: Result) => {
-    onJump(r.genreId);
+    if (r.type === 'artist') {
+      onJumpToArtist(r.genreId, r.label);
+    } else {
+      onJump(r.genreId);
+    }
     setQuery('');
     setOpen(false);
   };

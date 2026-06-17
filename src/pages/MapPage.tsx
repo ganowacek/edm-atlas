@@ -6,13 +6,18 @@ import SongPanel from '../components/SongPanel';
 import SearchBar from '../components/SearchBar';
 import Breadcrumb from '../components/Breadcrumb';
 import RecentlyExplored from '../components/RecentlyExplored';
+import ExplorationPathsPanel from '../components/ExplorationPathsPanel';
+import CompareGenresPanel from '../components/CompareGenresPanel';
+import MapMiniLegend from '../components/MapMiniLegend';
 import genres from '../data/genres';
 import { FAMILY_COLORS, accentText, familyTintStyle } from '../data/colors';
 import { artistNodesForGenre, findArtistAnchor, slugify } from '../data/artistNodes';
 import { useExplorationHistory, type HistoryEntry } from '../hooks/useExplorationHistory';
 import type { ArtistNode, Genre, TrackNode } from '../types';
-import { SlidersHorizontal, ChevronDown } from 'lucide-react';
+import { CalendarDays, ChevronDown, GitCompare, Map, Shuffle, SlidersHorizontal } from 'lucide-react';
 import { useIsMobile } from '../hooks/useMediaQuery';
+
+const DECADES = ['1970s', '1980s', '1990s', '2000s', '2010s', '2020s'];
 
 export default function MapPage() {
   const graphRef = useRef<GraphHandle>(null);
@@ -20,7 +25,12 @@ export default function MapPage() {
   const [selectedArtist, setSelectedArtist] = useState<ArtistNode | null>(null);
   const [selectedTrack, setSelectedTrack] = useState<TrackNode | null>(null);
   const [familyFilter, setFamilyFilter] = useState<string | null>(null);
+  const [eraFilter, setEraFilter] = useState<string | null>(null);
   const [filtersOpen, setFiltersOpen] = useState(false);
+  const [activeTool, setActiveTool] = useState<'paths' | 'compare' | null>(null);
+  const [legendOpen, setLegendOpen] = useState(false);
+  const [compareA, setCompareA] = useState('uk-garage');
+  const [compareB, setCompareB] = useState('dubstep');
   const isMobile = useIsMobile();
   const { history, record, clear } = useExplorationHistory();
 
@@ -28,9 +38,21 @@ export default function MapPage() {
   useEffect(() => { if (selectedArtist) record({ type: 'artist', data: selectedArtist }); }, [selectedArtist, record]);
   useEffect(() => { if (selectedTrack) record({ type: 'track', data: selectedTrack }); }, [selectedTrack, record]);
 
-  const visibleGenres = familyFilter
-    ? genres.filter((g) => g.family === familyFilter)
-    : genres;
+  const visibleGenres = (() => {
+    const familyScoped = familyFilter
+      ? genres.filter((g) => g.family === familyFilter)
+      : genres;
+    if (!eraFilter) return familyScoped;
+    const scopedIds = new Set(familyScoped.map((genre) => genre.id));
+    const parentIds = new Set<string>();
+    const matches = familyScoped.filter((genre) => genre.originDecade === eraFilter);
+    matches.forEach((genre) => {
+      if (genre.parentId && scopedIds.has(genre.parentId)) parentIds.add(genre.parentId);
+    });
+    return familyScoped.filter((genre) => genre.originDecade === eraFilter || parentIds.has(genre.id));
+  })();
+
+  const hasChildGenres = (genreId: string) => genres.some((genre) => genre.parentId === genreId);
 
   const familyChipStyle = (fam: string, col: (typeof FAMILY_COLORS)[string]) => {
     const active = familyFilter === fam;
@@ -47,10 +69,11 @@ export default function MapPage() {
   };
 
   const handleJump = (genreId: string) => {
+    const target = genres.find((x) => x.id === genreId);
     if (familyFilter) {
-      const g = genres.find((x) => x.id === genreId);
-      if (g && g.family !== familyFilter) setFamilyFilter(null);
+      if (target && target.family !== familyFilter) setFamilyFilter(null);
     }
+    if (eraFilter && target?.originDecade !== eraFilter) setEraFilter(null);
     // allow filter state to flush before focusing
     requestAnimationFrame(() => graphRef.current?.focusGenre(genreId));
   };
@@ -62,10 +85,25 @@ export default function MapPage() {
     const node = artistNodesForGenre(anchor).find((a) => a.name.toLowerCase() === artistName.toLowerCase());
     if (!node) return;
     if (familyFilter && anchor.family !== familyFilter) setFamilyFilter(null);
+    if (eraFilter && anchor.originDecade !== eraFilter) setEraFilter(null);
     setSelected(null);
     setSelectedTrack(null);
     setSelectedArtist(node);
     requestAnimationFrame(() => graphRef.current?.focusArtist(anchor.id, node.id));
+  };
+
+  const jumpToGenre = (genre: Genre) => {
+    setSelected(genre);
+    setSelectedArtist(null);
+    setSelectedTrack(null);
+    handleJump(genre.id);
+  };
+
+  const startSomewhere = () => {
+    const candidates = visibleGenres.filter((genre) => genre.parentId || !hasChildGenres(genre.id));
+    const pool = candidates.length > 0 ? candidates : visibleGenres;
+    const pick = pool[Math.floor(Math.random() * pool.length)];
+    if (pick) jumpToGenre(pick);
   };
 
   const handleHome = () => {
@@ -101,7 +139,7 @@ export default function MapPage() {
       <div className="flex-shrink-0 px-3 sm:px-4 py-2.5 flex items-center gap-2 sm:gap-3 z-30 border-b"
         style={{ borderColor: 'var(--border)', background: 'var(--surface-1)' }}>
         <div className="flex-1 min-w-0 md:flex-none md:w-[min(30vw,26rem)]">
-          <SearchBar genres={genres} onJump={handleJump} />
+          <SearchBar genres={genres} onJump={handleJump} onJumpToArtist={handleJumpToArtist} />
         </div>
 
         {/* desktop family chips */}
@@ -145,6 +183,51 @@ export default function MapPage() {
         onJumpToGenre={handleJump}
       />
 
+      <div className="flex-shrink-0 px-3 sm:px-4 py-2 flex items-center gap-2 overflow-x-auto border-b"
+        style={{ borderColor: 'var(--border)', background: 'var(--surface-1)' }}>
+        <button onClick={() => setActiveTool((value) => value === 'paths' ? null : 'paths')}
+          className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-medium whitespace-nowrap border"
+          style={{
+            background: activeTool === 'paths' ? 'var(--accent)' : 'var(--surface-2)',
+            borderColor: activeTool === 'paths' ? 'var(--accent)' : 'var(--border)',
+            color: activeTool === 'paths' ? 'var(--accent-contrast)' : 'var(--text-2)',
+          }}>
+          <Map size={14} /> Paths
+        </button>
+        <button onClick={() => setActiveTool((value) => value === 'compare' ? null : 'compare')}
+          className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-medium whitespace-nowrap border"
+          style={{
+            background: activeTool === 'compare' ? 'var(--accent)' : 'var(--surface-2)',
+            borderColor: activeTool === 'compare' ? 'var(--accent)' : 'var(--border)',
+            color: activeTool === 'compare' ? 'var(--accent-contrast)' : 'var(--text-2)',
+          }}>
+          <GitCompare size={14} /> Compare
+        </button>
+        <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border flex-shrink-0"
+          style={{ background: 'var(--surface-2)', borderColor: 'var(--border)', color: 'var(--text-2)' }}>
+          <CalendarDays size={14} />
+          <select value={eraFilter ?? 'all'} onChange={(event) => setEraFilter(event.target.value === 'all' ? null : event.target.value)}
+            aria-label="Filter map by era"
+            className="bg-transparent text-xs outline-none"
+            style={{ color: 'var(--text-2)' }}>
+            <option value="all">All eras</option>
+            {DECADES.map((decade) => <option key={decade} value={decade}>{decade}</option>)}
+          </select>
+        </div>
+        <button onClick={startSomewhere}
+          className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-medium whitespace-nowrap border"
+          style={{ background: 'var(--surface-2)', borderColor: 'var(--border)', color: 'var(--text-2)' }}>
+          <Shuffle size={14} /> Start somewhere
+        </button>
+        {(familyFilter || eraFilter) && (
+          <button onClick={() => { setFamilyFilter(null); setEraFilter(null); }}
+            className="px-3 py-2 rounded-lg text-xs whitespace-nowrap border"
+            style={{ background: 'var(--surface-1)', borderColor: 'var(--border)', color: 'var(--text-2)' }}>
+            Clear filters
+          </button>
+        )}
+      </div>
+
       {/* mobile collapsible filter chips */}
       {isMobile && filtersOpen && (
         <div className="flex-shrink-0 px-3 py-2 flex flex-wrap gap-1.5 border-b anim-fade z-20"
@@ -161,7 +244,7 @@ export default function MapPage() {
       <div className="flex-1 relative overflow-hidden">
         <GraphExplorer
           ref={graphRef}
-          key={familyFilter ?? 'all'}
+          key={`${familyFilter ?? 'all'}-${eraFilter ?? 'all'}`}
           genres={visibleGenres}
           selectedId={selectedTrack?.id ?? selectedArtist?.id ?? selected?.id ?? null}
           onSelect={(genre) => { setSelected(genre); setSelectedArtist(null); setSelectedTrack(null); }}
@@ -175,6 +258,35 @@ export default function MapPage() {
             Click a genre to reveal its artist branch · use the branch control for the full graph
           </div>
         )}
+
+        {activeTool === 'paths' && (
+          <ExplorationPathsPanel
+            genres={genres}
+            onClose={() => setActiveTool(null)}
+            onJumpToGenre={(genreId) => {
+              setActiveTool(null);
+              const genre = genres.find((item) => item.id === genreId);
+              if (genre) jumpToGenre(genre);
+            }}
+          />
+        )}
+
+        {activeTool === 'compare' && (
+          <CompareGenresPanel
+            genres={genres}
+            selectedA={compareA}
+            selectedB={compareB}
+            onSelectA={setCompareA}
+            onSelectB={setCompareB}
+            onClose={() => setActiveTool(null)}
+            onJumpToGenre={(genreId) => {
+              const genre = genres.find((item) => item.id === genreId);
+              if (genre) jumpToGenre(genre);
+            }}
+          />
+        )}
+
+        <MapMiniLegend open={legendOpen} onToggle={() => setLegendOpen((value) => !value)} />
       </div>
 
       <DetailPanel
