@@ -1,4 +1,4 @@
-import { Code, Music, Globe } from 'lucide-react';
+import { Code, Music } from 'lucide-react';
 
 export default function AboutPage() {
   return (
@@ -31,7 +31,6 @@ export default function AboutPage() {
           <div className="flex items-center gap-5 pt-2">
             <a href="https://github.com" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 transition-colors" style={{ color: 'var(--text-3)' }}><Code size={15} />GitHub</a>
             <a href="https://open.spotify.com" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 transition-colors" style={{ color: 'var(--text-3)' }}><Music size={15} />Spotify</a>
-            <a href="https://music.apple.com" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 transition-colors" style={{ color: 'var(--text-3)' }}><Globe size={15} />Apple Music</a>
           </div>
         </div>
       </div>

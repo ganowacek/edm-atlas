@@ -3,7 +3,7 @@ import { X, MapPin, Zap, ExternalLink } from 'lucide-react';
 import type { Genre } from '../types';
 import { accentText, familyTintStyle, getFamilyColor, tintStyle } from '../data/colors';
 import { useIsMobile } from '../hooks/useMediaQuery';
-import { spotifyArtistUrl, appleMusicArtistUrl, spotifyTrackUrl, appleMusicSongUrl, appleMusicTrackUrl } from '../data/urls';
+import { spotifyArtistUrl, spotifyTrackUrl } from '../data/urls';
 import { resolveEntityReference } from '../data/entityLinks';
 import LinkedText from './LinkedText';
 import BottomSheet from './BottomSheet';
@@ -12,7 +12,6 @@ const DECADES = ['1970s', '1980s', '1990s', '2000s', '2010s', '2020s'];
 const BEGINNER_BADGE_STYLE = tintStyle('#40b89a', 18, 34);
 const DEEP_BADGE_STYLE = tintStyle('#d4ad4a', 18, 34);
 const SPOTIFY_LINK_STYLE = tintStyle('#1db954', 14, 34);
-const APPLE_MUSIC_LINK_STYLE = tintStyle('#d173ad', 14, 34);
 
 interface Props {
   genre: Genre | null;
@@ -239,13 +238,6 @@ export default function DetailPanel({ genre, onClose, onJumpToGenre, onJumpToArt
                           <ExternalLink size={10} />Spotify
                         </a>
                       )}
-                      {t.appleMusicSongId && (
-                        <a href={t.appleMusicAlbumId ? appleMusicSongUrl(t.appleMusicAlbumId, t.appleMusicSongId) : appleMusicTrackUrl(t.appleMusicSongId)} target="_blank" rel="noopener noreferrer" aria-label={`${t.title} on Apple Music`}
-                          className="flex items-center gap-1 text-[11px] font-medium px-2.5 py-1 rounded-lg transition-colors"
-                          style={APPLE_MUSIC_LINK_STYLE}>
-                          <ExternalLink size={10} />Apple Music
-                        </a>
-                      )}
                     </div>
                   </div>
                 );
@@ -275,13 +267,6 @@ export default function DetailPanel({ genre, onClose, onJumpToGenre, onJumpToArt
                         className="flex items-center gap-1 text-[11px] font-medium px-2.5 py-1 rounded-lg transition-colors"
                         style={SPOTIFY_LINK_STYLE}>
                         <ExternalLink size={10} />Spotify
-                      </a>
-                    )}
-                    {a.appleMusicArtistId && (
-                      <a href={appleMusicArtistUrl(a.appleMusicArtistId)} target="_blank" rel="noopener noreferrer" aria-label={`${a.name} on Apple Music`}
-                        className="flex items-center gap-1 text-[11px] font-medium px-2.5 py-1 rounded-lg transition-colors"
-                        style={APPLE_MUSIC_LINK_STYLE}>
-                        <ExternalLink size={10} />Apple Music
                       </a>
                     )}
                   </div>

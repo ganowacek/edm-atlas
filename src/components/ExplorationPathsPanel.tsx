@@ -1,6 +1,7 @@
+import { useState } from 'react';
 import { ArrowRight, X } from 'lucide-react';
 import type { Genre } from '../types';
-import { EXPLORATION_PATHS } from '../data/explorationPaths';
+import { EXPLORATION_PATHS, type ExplorationPath } from '../data/explorationPaths';
 import { getFamilyColor, tintStyle } from '../data/colors';
 
 interface Props {
@@ -9,8 +10,18 @@ interface Props {
   onJumpToGenre: (genreId: string) => void;
 }
 
+function shufflePaths(paths: ExplorationPath[]) {
+  const shuffled = [...paths];
+  for (let i = shuffled.length - 1; i > 0; i -= 1) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+  return shuffled;
+}
+
 export default function ExplorationPathsPanel({ genres, onClose, onJumpToGenre }: Props) {
   const genreById = new Map(genres.map((genre) => [genre.id, genre]));
+  const [randomizedPaths] = useState(() => shufflePaths(EXPLORATION_PATHS));
 
   return (
     <div className="absolute left-3 top-3 z-30 w-[min(28rem,calc(100vw-1.5rem))] max-h-[calc(100%-1.5rem)] overflow-y-auto rounded-xl border shadow-2xl anim-fade"
@@ -28,7 +39,7 @@ export default function ExplorationPathsPanel({ genres, onClose, onJumpToGenre }
       </div>
 
       <div className="p-3 space-y-2.5">
-        {EXPLORATION_PATHS.map((path) => {
+        {randomizedPaths.map((path) => {
           const pathGenres = path.genreIds.map((id) => genreById.get(id)).filter(Boolean) as Genre[];
           return (
             <div key={path.id} className="rounded-xl border p-3" style={{ background: 'var(--surface-2)', borderColor: 'var(--border)' }}>

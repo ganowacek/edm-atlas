@@ -1,38 +1,21 @@
 /**
- * Verifies all Spotify and Apple Music links in EDM Atlas data.
+ * Verifies Spotify links in EDM Atlas data.
  * Run with: npm run verify-links
- *
- * Reports:
- * - Artists missing canonical IDs
- * - Tracks missing Spotify IDs
- * - HTTP status of each link (when --check-http flag is passed)
- * - Any remaining search URLs (should be zero)
  */
 
 import { genres } from '../src/data/genres';
 import { ARTIST_TRACKS } from '../src/data/artistTracks';
-import {
-  spotifyArtistUrl,
-  appleMusicArtistUrl,
-  spotifyTrackUrl,
-  appleMusicSongUrl,
-} from '../src/data/urls';
+import { spotifyArtistUrl, spotifyTrackUrl } from '../src/data/urls';
 
 const CHECK_HTTP = process.argv.includes('--check-http');
-const SEARCH_URL_PATTERNS = [
-  /open\.spotify\.com\/search/,
-  /music\.apple\.com\/us\/search/,
-];
 
 interface LinkReport {
-  type: string;
+  type: 'spotify-artist' | 'spotify-track';
   name: string;
   url: string;
-  status: 'ok' | 'missing-id' | 'search-url' | 'http-error';
+  status: 'ok' | 'missing-id' | 'http-error';
   httpStatus?: number;
 }
-
-const report: LinkReport[] = [];
 
 async function checkUrl(url: string): Promise<number> {
   try {
@@ -50,14 +33,8 @@ async function checkUrl(url: string): Promise<number> {
   }
 }
 
-function isSearchUrl(url: string): boolean {
-  return SEARCH_URL_PATTERNS.some((p) => p.test(url));
-}
-
-async function checkLink(entry: Omit<LinkReport, 'httpStatus'>): Promise<LinkReport> {
-  if (entry.status !== 'ok') return entry;
-  if (!CHECK_HTTP) return entry;
-
+async function checkLink(entry: LinkReport): Promise<LinkReport> {
+  if (entry.status !== 'ok' || !CHECK_HTTP) return entry;
   const httpStatus = await checkUrl(entry.url);
   return {
     ...entry,
@@ -67,170 +44,67 @@ async function checkLink(entry: Omit<LinkReport, 'httpStatus'>): Promise<LinkRep
 }
 
 async function main() {
-  console.log('\n── EDM Atlas Link Verifier ──\n');
+  console.log('\n-- EDM Atlas Spotify Link Verifier --\n');
 
-  // 1. Check all primary artists in genres
-  const artistLinks: Omit<LinkReport, 'httpStatus'>[] = [];
+  const artistLinks: LinkReport[] = [];
   for (const genre of genres) {
     for (const artist of genre.artists) {
-      // Spotify artist
-      if (artist.spotifyArtistId) {
-        const url = spotifyArtistUrl(artist.spotifyArtistId);
-        artistLinks.push({ type: 'spotify-artist', name: artist.name, url, status: 'ok' });
-      } else {
-        artistLinks.push({ type: 'spotify-artist', name: artist.name, url: '', status: 'missing-id' });
-      }
-
-      // Apple Music artist
-      if (artist.appleMusicArtistId) {
-        const url = appleMusicArtistUrl(artist.appleMusicArtistId);
-        artistLinks.push({ type: 'apple-artist', name: artist.name, url, status: 'ok' });
-      } else {
-        artistLinks.push({ type: 'apple-artist', name: artist.name, url: '', status: 'missing-id' });
-      }
+      artistLinks.push(artist.spotifyArtistId
+        ? { type: 'spotify-artist', name: artist.name, url: spotifyArtistUrl(artist.spotifyArtistId), status: 'ok' }
+        : { type: 'spotify-artist', name: artist.name, url: '', status: 'missing-id' });
     }
   }
 
-  // 2. Check all tracks
-  const trackLinks: Omit<LinkReport, 'httpStatus'>[] = [];
+  const trackLinks: LinkReport[] = [];
   for (const [artistName, tracks] of Object.entries(ARTIST_TRACKS)) {
     for (const track of tracks) {
-      // Apple Music song
-      if (track.appleMusicAlbumId && track.appleMusicSongId) {
-        const amUrl = appleMusicSongUrl(track.appleMusicAlbumId, track.appleMusicSongId);
-        if (isSearchUrl(amUrl)) {
-          trackLinks.push({ type: 'apple-track', name: `${artistName} – ${track.title}`, url: amUrl, status: 'search-url' });
-        } else {
-          trackLinks.push({ type: 'apple-track', name: `${artistName} – ${track.title}`, url: amUrl, status: 'ok' });
-        }
-      } else {
-        trackLinks.push({ type: 'apple-track', name: `${artistName} – ${track.title}`, url: '', status: 'missing-id' });
-      }
-
-      // Spotify track (optional)
-      if (track.spotifyTrackId) {
-        const spUrl = spotifyTrackUrl(track.spotifyTrackId);
-        trackLinks.push({ type: 'spotify-track', name: `${artistName} – ${track.title}`, url: spUrl, status: 'ok' });
-      } else {
-        trackLinks.push({ type: 'spotify-track', name: `${artistName} – ${track.title}`, url: '', status: 'missing-id' });
-      }
+      trackLinks.push(track.spotifyTrackId
+        ? { type: 'spotify-track', name: `${artistName} - ${track.title}`, url: spotifyTrackUrl(track.spotifyTrackId), status: 'ok' }
+        : { type: 'spotify-track', name: `${artistName} - ${track.title}`, url: '', status: 'missing-id' });
     }
   }
 
-  // Verify HTTP if requested
-  const allLinks = CHECK_HTTP
+  const report = CHECK_HTTP
     ? await Promise.all([...artistLinks, ...trackLinks].map(checkLink))
-    : ([...artistLinks, ...trackLinks] as LinkReport[]);
+    : [...artistLinks, ...trackLinks];
 
-  report.push(...allLinks);
-
-  // Summarise
-  const byStatus = {
-    ok: report.filter((r) => r.status === 'ok').length,
-    missingId: report.filter((r) => r.status === 'missing-id').length,
-    searchUrl: report.filter((r) => r.status === 'search-url').length,
-    httpError: report.filter((r) => r.status === 'http-error').length,
-  };
+  const ok = report.filter((r) => r.status === 'ok').length;
+  const missing = report.filter((r) => r.status === 'missing-id').length;
+  const httpError = report.filter((r) => r.status === 'http-error').length;
+  const totalTracks = Object.values(ARTIST_TRACKS).flat().length;
+  const tracksWithSpotify = Object.values(ARTIST_TRACKS).flat().filter((t) => t.spotifyTrackId).length;
 
   console.log('SUMMARY');
   console.log('-------');
   console.log(`  Total links checked : ${report.length}`);
-  console.log(`  ✓ Valid             : ${byStatus.ok}`);
-  console.log(`  ⚠ Missing IDs       : ${byStatus.missingId}`);
-  console.log(`  ✗ Search URLs       : ${byStatus.searchUrl}`);
-  if (CHECK_HTTP) {
-    console.log(`  ✗ HTTP errors       : ${byStatus.httpError}`);
+  console.log(`  Valid               : ${ok}`);
+  console.log(`  Missing IDs         : ${missing}`);
+  if (CHECK_HTTP) console.log(`  HTTP errors         : ${httpError}`);
+
+  console.log('\nTRACK IDs');
+  console.log('---------');
+  console.log(`  Total tracks        : ${totalTracks}`);
+  console.log(`  With Spotify ID     : ${tracksWithSpotify}`);
+  console.log(`  Without Spotify ID  : ${totalTracks - tracksWithSpotify}`);
+
+  const missingTracks = trackLinks.filter((r) => r.status === 'missing-id');
+  if (missingTracks.length) {
+    console.log('\nTracks still needing Spotify IDs:');
+    missingTracks.forEach((track) => console.log(`  - ${track.name}`));
   }
 
-  // Artists with IDs
-  const withIds = genres.flatMap((g) => g.artists).filter((a) => a.spotifyArtistId || a.appleMusicArtistId);
-  const withoutIds = genres.flatMap((g) => g.artists).filter((a) => !a.spotifyArtistId && !a.appleMusicArtistId);
-
-  console.log(`\nARTIST IDs`);
-  console.log('----------');
-  console.log(`  Artists with IDs   : ${withIds.length}`);
-  console.log(`  Artists without IDs: ${withoutIds.length}`);
-
-  if (withIds.length > 0) {
-    console.log('\n  Artists with canonical IDs:');
-    const seen = new Set<string>();
-    for (const a of withIds) {
-      if (seen.has(a.name)) continue;
-      seen.add(a.name);
-      const sp = a.spotifyArtistId ? `Spotify:${a.spotifyArtistId}` : 'Spotify:—';
-      const am = a.appleMusicArtistId ? `AM:${a.appleMusicArtistId}` : 'AM:—';
-      console.log(`    ${a.name.padEnd(30)} ${sp}  ${am}`);
-    }
-  }
-
-  if (withoutIds.length > 0) {
-    console.log('\n  Artists needing IDs (first 20):');
-    const seen = new Set<string>();
-    for (const a of withoutIds.slice(0, 20)) {
-      if (seen.has(a.name)) continue;
-      seen.add(a.name);
-      console.log(`    - ${a.name}`);
-    }
-    if (withoutIds.length > 20) {
-      console.log(`    ... and ${withoutIds.length - 20} more`);
-    }
-  }
-
-  // Tracks
-  console.log(`\nTRACK IDs (from ARTIST_TRACKS)`);
-  console.log('------------------------------');
-  const totalTracks = Object.values(ARTIST_TRACKS).flat().length;
-  const tracksWithApple = Object.values(ARTIST_TRACKS).flat().filter((t) => t.appleMusicAlbumId && t.appleMusicSongId).length;
-  const tracksWithSpotify = Object.values(ARTIST_TRACKS).flat().filter((t) => t.spotifyTrackId).length;
-  console.log(`  Total tracks       : ${totalTracks}`);
-  console.log(`  With Apple ID      : ${tracksWithApple}`);
-  console.log(`  Without Apple ID   : ${totalTracks - tracksWithApple}`);
-  console.log(`  With Spotify ID    : ${tracksWithSpotify}`);
-  console.log(`  Without Spotify ID : ${totalTracks - tracksWithSpotify}`);
-
-  const primaryArtists = genres.flatMap((g) => g.artists.map((artist) => ({
-    name: artist.name,
-    genreName: g.name,
-    trackCount: ARTIST_TRACKS[artist.name]?.length ?? 0,
-  })));
-  const primaryArtistsWithTracks = primaryArtists.filter((artist) => artist.trackCount >= 3);
-  const primaryArtistsWithoutTracks = primaryArtists.filter((artist) => artist.trackCount < 3);
-
-  console.log(`\nROADMAP COVERAGE`);
-  console.log('----------------');
-  console.log(`  Primary graph artists with 3+ tracks : ${primaryArtistsWithTracks.length}`);
-  console.log(`  Primary graph artists needing tracks : ${primaryArtistsWithoutTracks.length}`);
-  if (primaryArtistsWithoutTracks.length > 0) {
-    console.log('\n  Primary artists needing roadmap tracks:');
-    primaryArtistsWithoutTracks.slice(0, 40).forEach((artist) => {
-      console.log(`    - ${artist.name} (${artist.genreName})`);
-    });
-    if (primaryArtistsWithoutTracks.length > 40) {
-      console.log(`    ... and ${primaryArtistsWithoutTracks.length - 40} more`);
-    }
-  }
-
-  if (byStatus.searchUrl > 0) {
-    console.log('\n✗ SEARCH URLS FOUND (must be fixed):');
-    report.filter((r) => r.status === 'search-url').forEach((r) => {
-      console.log(`  [${r.type}] ${r.name}: ${r.url}`);
-    });
-  } else {
-    console.log('\n✓ No search URLs found — all links use canonical IDs or direct URLs.');
-  }
-
-  if (CHECK_HTTP && byStatus.httpError > 0) {
-    console.log('\n✗ HTTP ERRORS:');
+  if (CHECK_HTTP && httpError > 0) {
+    console.log('\nHTTP errors:');
     report.filter((r) => r.status === 'http-error').forEach((r) => {
-      console.log(`  [${r.httpStatus}] ${r.type} – ${r.name}: ${r.url}`);
+      console.log(`  [${r.httpStatus}] ${r.type} - ${r.name}: ${r.url}`);
     });
   }
 
   console.log('\nDone.\n');
-  process.exit(byStatus.searchUrl > 0 ? 1 : 0);
+  process.exit(httpError > 0 ? 1 : 0);
 }
 
-main().catch((e) => {
-  console.error(e);
+main().catch((error) => {
+  console.error(error);
   process.exit(1);
 });

@@ -15,7 +15,6 @@ interface Props {
 }
 
 const SPOTIFY_LINK_STYLE = tintStyle('#1db954', 14, 34);
-const APPLE_MUSIC_LINK_STYLE = tintStyle('#d173ad', 14, 34);
 
 export default function ArtistPanel({ artist, genre, onClose, onJumpToGenre, onJumpToArtist }: Props) {
   const isMobile = useIsMobile();
@@ -68,13 +67,6 @@ export default function ArtistPanel({ artist, genre, onClose, onJumpToGenre, onJ
               <ExternalLink size={13} />Spotify
             </a>
           )}
-          {artist.appleMusicUrl && (
-            <a href={artist.appleMusicUrl} target="_blank" rel="noopener noreferrer"
-              className="flex items-center gap-1.5 text-xs font-medium px-3 py-2 rounded-lg transition-colors"
-              style={APPLE_MUSIC_LINK_STYLE}>
-              <ExternalLink size={13} />Apple Music
-            </a>
-          )}
         </div>
 
         {artist.tracks.length > 0 && (
@@ -92,13 +84,6 @@ export default function ArtistPanel({ artist, genre, onClose, onJumpToGenre, onJ
                     <Music size={14} className="mt-0.5 flex-shrink-0" style={{ color: familyText }} />
                   </div>
                   <div className="flex flex-wrap gap-2 mt-3">
-                    {track.appleMusicUrl && (
-                      <a href={track.appleMusicUrl} target="_blank" rel="noopener noreferrer"
-                        className="flex items-center gap-1.5 text-xs font-medium px-2.5 py-1.5 rounded transition-colors"
-                        style={APPLE_MUSIC_LINK_STYLE}>
-                        <ExternalLink size={12} />Apple Music
-                      </a>
-                    )}
                     {track.spotifyUrl && (
                       <a href={track.spotifyUrl} target="_blank" rel="noopener noreferrer"
                         className="flex items-center gap-1.5 text-xs font-medium px-2.5 py-1.5 rounded transition-colors"
@@ -106,7 +91,7 @@ export default function ArtistPanel({ artist, genre, onClose, onJumpToGenre, onJ
                         <ExternalLink size={12} />Spotify
                       </a>
                     )}
-                    {!track.appleMusicUrl && !track.spotifyUrl && (
+                    {!track.spotifyUrl && (
                       <span className="text-[11px]" style={{ color: 'var(--text-3)' }}>IDs queued</span>
                     )}
                   </div>

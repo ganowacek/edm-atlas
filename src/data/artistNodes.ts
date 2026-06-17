@@ -1,6 +1,6 @@
 import type { ArtistNode, Genre, TrackNode } from '../types';
 import { ARTIST_TRACKS } from './artistTracks';
-import { spotifyArtistUrl, appleMusicArtistUrl, spotifyTrackUrl, appleMusicSongUrl, appleMusicTrackUrl } from './urls';
+import { spotifyArtistUrl, spotifyTrackEmbedUrl, spotifyTrackUrl } from './urls';
 
 export function slugify(s: string) {
   return s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
@@ -11,12 +11,8 @@ export function trackNodesForArtist(artistName: string, genre: Genre): TrackNode
     ...track,
     id: `track:${genre.id}:${slugify(artistName)}:${slugify(track.title)}`,
     artistName,
-    appleMusicUrl: track.appleMusicAlbumId && track.appleMusicSongId
-      ? appleMusicSongUrl(track.appleMusicAlbumId, track.appleMusicSongId)
-      : track.appleMusicSongId
-        ? appleMusicTrackUrl(track.appleMusicSongId)
-        : undefined,
     spotifyUrl: track.spotifyTrackId ? spotifyTrackUrl(track.spotifyTrackId) : undefined,
+    spotifyEmbedUrl: track.spotifyTrackId ? spotifyTrackEmbedUrl(track.spotifyTrackId) : undefined,
     genreId: genre.id,
     genreName: genre.name,
     family: genre.family,
@@ -34,7 +30,6 @@ export function keyArtistNodesForGenre(genre: Genre): ArtistNode[] {
       ...(genre.history?.slice(0, 1) ?? []),
     ],
     spotifyUrl: artist.spotifyArtistId ? spotifyArtistUrl(artist.spotifyArtistId) : undefined,
-    appleMusicUrl: artist.appleMusicArtistId ? appleMusicArtistUrl(artist.appleMusicArtistId) : undefined,
     tracks: trackNodesForArtist(artist.name, genre),
     genreId: genre.id,
     genreName: genre.name,

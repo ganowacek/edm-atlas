@@ -9,7 +9,7 @@ EDM Atlas is a static web app that lets you explore four decades of electronic m
 
 - **Genre Map** — interactive D3 force graph, drag/zoom/click for details
 - **Timeline** — browse genres decade by decade, 1970s to present
-- **Genre Panels** — description, origins, BPM, mood tags, essential tracks, 5+ artists per genre with Spotify & Apple Music links
+- **Genre Panels** — description, origins, BPM, mood tags, essential tracks, 5+ artists per genre with Spotify links
 - **Search & Filter** — search by genre, city, mood; filter by family
 
 ## Tech stack
@@ -77,7 +77,6 @@ All data is in `src/data/genres.ts`. Append a new object to the array:
       name: 'Artist Name',
       importance: 'Why they matter.',
       spotifyUrl: 'https://open.spotify.com/search/Artist%20Name',
-      appleMusicUrl: 'https://music.apple.com/us/search?term=Artist+Name',
     },
     // add at least 5 artists
   ],

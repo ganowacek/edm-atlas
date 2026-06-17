@@ -10,7 +10,6 @@ interface Props {
 }
 
 const SPOTIFY_LINK_STYLE = tintStyle('#1db954', 16, 34);
-const APPLE_MUSIC_LINK_STYLE = tintStyle('#d173ad', 16, 34);
 
 export default function SongPanel({ track, onClose }: Props) {
   const isMobile = useIsMobile();
@@ -58,13 +57,6 @@ export default function SongPanel({ track, onClose }: Props) {
         <div>
           <p className="text-[10px] uppercase tracking-widest mb-3" style={{ color: 'var(--text-3)' }}>Listen</p>
           <div className="flex flex-wrap gap-2">
-            {track.appleMusicUrl && (
-              <a href={track.appleMusicUrl} target="_blank" rel="noopener noreferrer"
-                className="flex items-center gap-2 text-sm font-medium px-4 py-2.5 rounded-xl transition-colors"
-                style={APPLE_MUSIC_LINK_STYLE}>
-                <ExternalLink size={14} />Apple Music
-              </a>
-            )}
             {track.spotifyUrl && (
               <a href={track.spotifyUrl} target="_blank" rel="noopener noreferrer"
                 className="flex items-center gap-2 text-sm font-medium px-4 py-2.5 rounded-xl transition-colors"
@@ -72,7 +64,7 @@ export default function SongPanel({ track, onClose }: Props) {
                 <ExternalLink size={14} />Spotify
               </a>
             )}
-            {!track.appleMusicUrl && !track.spotifyUrl && (
+            {!track.spotifyUrl && (
               <span className="text-xs leading-relaxed" style={{ color: 'var(--text-3)' }}>
                 Canonical streaming IDs are queued for this roadmap track.
               </span>
