@@ -31,8 +31,9 @@ export default function HomePage({ onNavigate, theme, onToggleTheme }: HomePageP
           EDM <span style={{ color: 'var(--accent)' }}>Atlas</span>
         </h1>
         <p className="text-base md:text-lg leading-relaxed mb-10 max-w-xl mx-auto" style={{ color: 'var(--text-2)' }}>
-          Explore four decades of electronic dance music — from Detroit Techno to Neurofunk,
-          from Goa Trance to Grime. Navigate the connections, discover the pioneers.
+          Explore eight decades of electronic music — from musique concrète and Krautrock
+          to Detroit Techno, Goa Trance, Grime, Gqom and Amapiano. Navigate the connections,
+          discover the pioneers.
         </p>
 
         <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center">
@@ -49,7 +50,7 @@ export default function HomePage({ onNavigate, theme, onToggleTheme }: HomePageP
         </div>
 
         <div className="mt-16 grid grid-cols-3 gap-6">
-          {[{ v: '12', l: 'Genre families' }, { v: '80+', l: 'Genres & subgenres' }, { v: '300+', l: 'Artist profiles' }].map((s) => (
+          {[{ v: '12', l: 'Genre families' }, { v: '180+', l: 'Genres & subgenres' }, { v: '900+', l: 'Artist profiles' }].map((s) => (
             <div key={s.l}>
               <p className="text-3xl font-bold mb-1 font-mono" style={{ color: 'var(--text-1)' }}>{s.v}</p>
               <p className="text-sm" style={{ color: 'var(--text-3)' }}>{s.l}</p>
