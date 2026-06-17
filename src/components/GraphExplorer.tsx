@@ -8,6 +8,7 @@ import { getFamilyColor } from '../data/colors';
 import { artistNodesForGenre, orphanKeyArtistsForFamily } from '../data/artistNodes';
 
 const HUB_ID = '__edm__';
+export type GraphDepthMode = 'subgenres' | 'families' | 'artists' | 'songs';
 
 type Kind = 'hub' | 'family' | 'sub' | 'artist' | 'track';
 
@@ -38,6 +39,10 @@ export interface GraphHandle {
 interface Props {
   genres: Genre[];
   selectedId: string | null;
+  highlightedPathIds?: string[];
+  depthMode: GraphDepthMode;
+  onDepthModeChange: (mode: GraphDepthMode) => void;
+  compareGenreIds?: string[];
   onSelect: (genre: Genre) => void;
   onSelectArtist: (artist: ArtistNode) => void;
   onSelectTrack: (track: TrackNode) => void;
@@ -49,6 +54,12 @@ const LABEL_ZOOM = 1.25;
 const ARTIST_LABEL_ZOOM = 1.7;
 const TRACK_LABEL_ZOOM = 2.15;
 const LABEL_VIEWPORT_MARGIN = 96;
+const DEPTH_OPTIONS: Array<{ mode: GraphDepthMode; label: string; short: string }> = [
+  { mode: 'subgenres', label: 'Original genre families', short: 'Families' },
+  { mode: 'families', label: 'Add subgenres', short: '+ Genres' },
+  { mode: 'artists', label: 'Add artists', short: '+ Artists' },
+  { mode: 'songs', label: 'Add songs', short: '+ Songs' },
+];
 
 function linkFamilyColor(link: GLink) {
   const target = link.target as GNode;
@@ -79,15 +90,16 @@ function truncate(s: string, n = 18) {
 
 function layoutMetrics(width: number, height: number, nodeCount: number) {
   const minViewport = Math.min(width, height);
-  const expandedSpan = Math.sqrt(Math.max(nodeCount, 1)) * 78;
+  const dense = nodeCount > 180;
+  const expandedSpan = Math.sqrt(Math.max(nodeCount, 1)) * (dense ? 42 : 78);
   const span = Math.max(minViewport, expandedSpan);
   return {
     cx: width / 2,
     cy: height / 2,
-    ring1: span * 0.23,
-    ring2: span * 0.5,
-    artistRing: span * 0.5 + 94,
-    trackRing: span * 0.5 + 148,
+    ring1: dense ? span * 0.12 : span * 0.33,
+    ring2: dense ? span * 0.31 : span * 0.5,
+    artistRing: dense ? span * 0.35 + 48 : span * 0.5 + 94,
+    trackRing: dense ? span * 0.39 + 70 : span * 0.5 + 148,
   };
 }
 
@@ -108,7 +120,7 @@ function radialStrength(d: GNode) {
 }
 
 const GraphExplorer = forwardRef<GraphHandle, Props>(function GraphExplorer(
-  { genres, selectedId, onSelect, onSelectArtist, onSelectTrack },
+  { genres, selectedId, highlightedPathIds = [], depthMode, onDepthModeChange, compareGenreIds, onSelect, onSelectArtist, onSelectTrack },
   ref
 ) {
   const svgRef = useRef<SVGSVGElement>(null);
@@ -245,6 +257,11 @@ const GraphExplorer = forwardRef<GraphHandle, Props>(function GraphExplorer(
   }, [hoveredId, selectedId, updateLabelVisibility]);
 
   const families = useMemo(() => genres.filter((g) => !g.parentId), [genres]);
+  const compareGenres = useMemo(() => {
+    const ids = compareGenreIds ?? [];
+    return ids.map((id) => genres.find((genre) => genre.id === id)).filter(Boolean) as Genre[];
+  }, [compareGenreIds, genres]);
+  const compareMode = compareGenres.length >= 2;
   const subsByParent = useMemo(() => {
     const map = new Map<string, Genre[]>();
     genres.forEach((g) => {
@@ -258,20 +275,36 @@ const GraphExplorer = forwardRef<GraphHandle, Props>(function GraphExplorer(
 
   // ---- Derive which node ids should currently exist ----
   const desiredNodes = useCallback((): { id: string; genre: Genre | null; artist: ArtistNode | null; track: TrackNode | null; kind: Kind; parentGenreId?: string; parentArtistId?: string }[] => {
+    if (compareMode) {
+      return compareGenres.map((genre) => ({
+        id: genre.id,
+        genre,
+        artist: null,
+        track: null,
+        kind: genre.parentId ? 'sub' : 'family',
+      }));
+    }
+
     const out: { id: string; genre: Genre | null; artist: ArtistNode | null; track: TrackNode | null; kind: Kind; parentGenreId?: string; parentArtistId?: string }[] = [
       { id: HUB_ID, genre: null, artist: null, track: null, kind: 'hub' },
     ];
-    const expandedFamilies = showAll ? new Set(families.map((f) => f.id)) : expanded;
+    const controlled = depthMode !== 'subgenres';
+    const expandedFamilies = controlled || showAll ? new Set(families.map((f) => f.id)) : expanded;
+    const showArtists = depthMode === 'artists' || depthMode === 'songs';
+    const showTracks = depthMode === 'songs';
 
     families.forEach((f) => {
       out.push({ id: f.id, genre: f, artist: null, track: null, kind: 'family' });
+      if (depthMode === 'subgenres') return;
       if (expandedFamilies.has(f.id)) {
-        (subsByParent.get(f.id) ?? []).forEach((s) => out.push({ id: s.id, genre: s, artist: null, track: null, kind: 'sub' }));
-        if (!showAll) {
+        const children = subsByParent.get(f.id) ?? [];
+        children.forEach((s) => out.push({ id: s.id, genre: s, artist: null, track: null, kind: 'sub' }));
+        if (!showAll || showArtists) {
           // Key artists with no matching subgenre get their own node directly under the family.
+          if (!showArtists) return;
           orphanKeyArtistsForFamily(f, genres).forEach((artist) => {
             out.push({ id: artist.id, genre: f, artist, track: null, kind: 'artist', parentGenreId: f.id });
-            if (expandedTracks.has(artist.id)) {
+            if (showTracks || expandedTracks.has(artist.id)) {
               artist.tracks.forEach((track) => {
                 out.push({
                   id: track.id,
@@ -289,14 +322,14 @@ const GraphExplorer = forwardRef<GraphHandle, Props>(function GraphExplorer(
       }
     });
     const visibleGenreIds = new Set(out.filter((node) => node.genre).map((node) => node.id));
-    const expandedArtistBranches = expandedArtists;
+    const expandedArtistBranches = showArtists ? visibleGenreIds : expandedArtists;
     out.filter((node) => node.genre && expandedArtistBranches.has(node.id) && visibleGenreIds.has(node.id))
       .forEach((node) => {
         const visibleChildGenres = (subsByParent.get(node.id) ?? []).filter((child) => visibleGenreIds.has(child.id));
         if (visibleChildGenres.length > 0) return;
         artistNodesForGenre(node.genre!).forEach((artist) => {
           out.push({ id: artist.id, genre: node.genre, artist, track: null, kind: 'artist', parentGenreId: node.id });
-          if (expandedTracks.has(artist.id)) {
+          if (showTracks || expandedTracks.has(artist.id)) {
             artist.tracks.forEach((track) => {
               out.push({
                 id: track.id,
@@ -310,9 +343,9 @@ const GraphExplorer = forwardRef<GraphHandle, Props>(function GraphExplorer(
             });
           }
         });
-      });
+    });
     return out;
-  }, [families, genres, expanded, expandedArtists, expandedTracks, showAll, subsByParent]);
+  }, [compareGenres, compareMode, depthMode, families, genres, expanded, expandedArtists, expandedTracks, showAll, subsByParent]);
 
   // ---------------------------------------------------------------------------
   // SETUP (once)
@@ -462,6 +495,31 @@ const GraphExplorer = forwardRef<GraphHandle, Props>(function GraphExplorer(
     const want = desiredNodes();
     const wantIds = new Set(want.map((w) => w.id));
     const metrics = layoutMetrics(e.W, e.H, want.length);
+    const wantById = new Map(want.map((node) => [node.id, node]));
+    const normalizedPathIds: string[] = [];
+    const routeSourceIds = highlightedPathIds.length > 0
+      ? selectedId && !highlightedPathIds.includes(selectedId) ? [...highlightedPathIds, selectedId] : highlightedPathIds
+      : selectedId ? [HUB_ID, selectedId] : [];
+    routeSourceIds.forEach((id) => {
+      const node = wantById.get(id);
+      const parentId = node?.kind === 'sub'
+        ? node.genre?.parentId
+        : node?.kind === 'artist'
+          ? node.parentGenreId
+          : node?.kind === 'track'
+            ? node.parentArtistId
+            : undefined;
+      if (parentId && normalizedPathIds[normalizedPathIds.length - 1] !== parentId) {
+        normalizedPathIds.push(parentId);
+      }
+      normalizedPathIds.push(id);
+    });
+    const pathFocus = new Set(normalizedPathIds.filter((id) => wantIds.has(id)));
+    const pathLinks = new Set<string>();
+    normalizedPathIds.forEach((id, index) => {
+      const previous = normalizedPathIds[index - 1];
+      if (previous) pathLinks.add(`${previous}->${id}`);
+    });
 
     // remove gone
     e.nodes = e.nodes.filter((n) => wantIds.has(n.id));
@@ -487,11 +545,14 @@ const GraphExplorer = forwardRef<GraphHandle, Props>(function GraphExplorer(
       }
     });
 
-    want.forEach((w) => {
+    want.forEach((w, wantIndex) => {
       if (e.nodeById.has(w.id)) return;
       let sx = cx, sy = cy;
       const parentId = w.kind === 'track' ? w.parentArtistId : w.kind === 'artist' ? w.parentGenreId : w.genre?.parentId;
-      if ((w.kind === 'sub' || w.kind === 'artist' || w.kind === 'track') && parentId) {
+      if (compareMode) {
+        sx = cx + (wantIndex - (want.length - 1) / 2) * Math.min(220, Math.max(132, e.W / Math.max(want.length, 2)));
+        sy = cy + (wantIndex % 2 === 0 ? -36 : 36);
+      } else if ((w.kind === 'sub' || w.kind === 'artist' || w.kind === 'track') && parentId) {
         const p = e.nodeById.get(parentId);
         if (p) {
           const px = p.x ?? cx, py = p.y ?? cy;
@@ -526,18 +587,24 @@ const GraphExplorer = forwardRef<GraphHandle, Props>(function GraphExplorer(
 
     // links
     e.links = [];
-    e.nodes.forEach((n) => {
-      if (n.kind === 'family') e.links.push({ source: HUB_ID, target: n.id });
-      if (n.kind === 'sub' && n.genre?.parentId && e.nodeById.has(n.genre.parentId)) {
-        e.links.push({ source: n.genre.parentId, target: n.id });
+    if (compareMode) {
+      for (let i = 0; i < e.nodes.length - 1; i += 1) {
+        e.links.push({ source: e.nodes[i].id, target: e.nodes[i + 1].id });
       }
-      if (n.kind === 'artist' && n.parentGenreId && e.nodeById.has(n.parentGenreId)) {
-        e.links.push({ source: n.parentGenreId, target: n.id });
-      }
-      if (n.kind === 'track' && n.parentArtistId && e.nodeById.has(n.parentArtistId)) {
-        e.links.push({ source: n.parentArtistId, target: n.id });
-      }
-    });
+    } else {
+      e.nodes.forEach((n) => {
+        if (n.kind === 'family') e.links.push({ source: HUB_ID, target: n.id });
+        if (n.kind === 'sub' && n.genre?.parentId) {
+          e.links.push({ source: e.nodeById.has(n.genre.parentId) ? n.genre.parentId : HUB_ID, target: n.id });
+        }
+        if (n.kind === 'artist' && n.parentGenreId && e.nodeById.has(n.parentGenreId)) {
+          e.links.push({ source: n.parentGenreId, target: n.id });
+        }
+        if (n.kind === 'track' && n.parentArtistId && e.nodeById.has(n.parentArtistId)) {
+          e.links.push({ source: n.parentArtistId, target: n.id });
+        }
+      });
+    }
 
     e.sim.nodes(e.nodes);
     (e.sim.force('charge') as d3.ForceManyBody<GNode>)
@@ -607,6 +674,25 @@ const GraphExplorer = forwardRef<GraphHandle, Props>(function GraphExplorer(
         (update) => update.attr('data-node-id', (d) => d.id),
         (exit) => exit.interrupt().remove()
       );
+
+    if (pathFocus.size > 0) {
+      e.gNode.selectAll<SVGGElement, GNode>('g.gnode')
+        .style('opacity', (d) => (pathFocus.has(d.id) ? 1 : 0.14))
+        .select('circle')
+        .attr('r', (d) => (pathFocus.has(d.id) ? R[d.kind] * 1.28 : R[d.kind]))
+        .attr('stroke-width', (d) => (pathFocus.has(d.id) ? 3.4 : d.kind === 'family' ? 1.8 : d.kind === 'hub' ? 2.2 : d.kind === 'artist' ? 1 : 1.2));
+
+      e.gLink.selectAll<SVGLineElement, GLink>('line')
+        .attr('stroke-width', (l) => {
+          const s = (l.source as GNode).id, t = (l.target as GNode).id;
+          return pathLinks.has(`${s}->${t}`) ? linkWidth(l) + 2.3 : linkWidth(l);
+        })
+        .attr('opacity', (l) => {
+          const s = (l.source as GNode).id, t = (l.target as GNode).id;
+          if (pathLinks.has(`${s}->${t}`)) return 1;
+          return Math.max(0.18, linkOpacity(l) * 0.45);
+        });
+    }
 
     // wire events (rebind every update so new nodes get handlers)
     nodeJoin
@@ -681,7 +767,7 @@ const GraphExplorer = forwardRef<GraphHandle, Props>(function GraphExplorer(
   useEffect(() => {
     if (eng.current) updateGraph();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [expanded, expandedArtists, expandedTracks, showAll, genres]);
+  }, [expanded, expandedArtists, expandedTracks, showAll, genres, depthMode, compareGenreIds, highlightedPathIds, selectedId]);
 
   // ---------------------------------------------------------------------------
   // VISUAL UPDATE (focus mode, hover, label LOD) — cheap, no reheat
@@ -691,6 +777,30 @@ const GraphExplorer = forwardRef<GraphHandle, Props>(function GraphExplorer(
     if (!e) return;
 
     const activeId = hoveredId ?? selectedId;
+    const normalizedPathIds: string[] = [];
+    const routeSourceIds = highlightedPathIds.length > 0
+      ? selectedId && !highlightedPathIds.includes(selectedId) ? [...highlightedPathIds, selectedId] : highlightedPathIds
+      : selectedId ? [HUB_ID, selectedId] : [];
+    routeSourceIds.forEach((id) => {
+      const node = e.nodeById.get(id);
+      const parentId = node?.kind === 'sub'
+        ? node.genre?.parentId
+        : node?.kind === 'artist'
+          ? node.parentGenreId
+          : node?.kind === 'track'
+            ? node.parentArtistId
+            : undefined;
+      if (parentId && normalizedPathIds[normalizedPathIds.length - 1] !== parentId) {
+        normalizedPathIds.push(parentId);
+      }
+      normalizedPathIds.push(id);
+    });
+    const pathFocus = new Set(normalizedPathIds.filter((id) => e.nodeById.has(id)));
+    const pathLinks = new Set<string>();
+    normalizedPathIds.forEach((id, index) => {
+      const previous = normalizedPathIds[index - 1];
+      if (previous) pathLinks.add(`${previous}->${id}`);
+    });
     let focus: Set<string> | null = null;
     if (activeId) {
       const node = e.nodeById.get(activeId);
@@ -713,6 +823,9 @@ const GraphExplorer = forwardRef<GraphHandle, Props>(function GraphExplorer(
         if (node.kind === 'hub') e.nodes.forEach((n) => focus!.add(n.id));
       }
     }
+    if (pathFocus.size > 0) {
+      focus = new Set([...(focus ?? []), ...pathFocus]);
+    }
 
     e.gNode.selectAll<SVGGElement, GNode>('g.gnode')
       .transition().duration(160)
@@ -723,10 +836,11 @@ const GraphExplorer = forwardRef<GraphHandle, Props>(function GraphExplorer(
       .attr('r', (d) => {
         const base = R[d.kind];
         if (d.id === selectedId) return base * 1.45;
+        if (pathFocus.has(d.id)) return base * 1.28;
         if (d.id === hoveredId) return base * 1.2;
         return base;
       })
-      .attr('stroke-width', (d) => (d.id === selectedId ? 3 : d.kind === 'family' ? 1.8 : d.kind === 'hub' ? 2.2 : d.kind === 'artist' ? 1 : 1.2));
+      .attr('stroke-width', (d) => (d.id === selectedId ? 3 : pathFocus.has(d.id) ? 3.4 : d.kind === 'family' ? 1.8 : d.kind === 'hub' ? 2.2 : d.kind === 'artist' ? 1 : 1.2));
 
     // selected ring pulse
     e.gNode.selectAll<SVGGElement, GNode>('g.gnode').select('.expand-ring')
@@ -751,18 +865,20 @@ const GraphExplorer = forwardRef<GraphHandle, Props>(function GraphExplorer(
       })
       .attr('stroke-width', (l) => {
         const s = (l.source as GNode).id, t = (l.target as GNode).id;
+        if (pathLinks.has(`${s}->${t}`)) return linkWidth(l) + 2.3;
         if (focus && focus.has(s) && focus.has(t)) return linkWidth(l) + 0.55;
         return linkWidth(l);
       })
       .attr('opacity', (l) => {
         const s = (l.source as GNode).id, t = (l.target as GNode).id;
+        if (pathLinks.has(`${s}->${t}`)) return 1;
         if (focus && focus.has(s) && focus.has(t)) return 0.9;
         if (focus) return Math.max(0.18, linkOpacity(l) * 0.45);
         return linkOpacity(l);
       });
 
     updateLabelVisibility();
-  }, [selectedId, hoveredId, expanded, expandedArtists, expandedTracks, updateLabelVisibility]);
+  }, [selectedId, hoveredId, highlightedPathIds, expanded, expandedArtists, expandedTracks, updateLabelVisibility]);
 
   // ---------------------------------------------------------------------------
   // Imperative: search jumps here
@@ -854,8 +970,9 @@ const GraphExplorer = forwardRef<GraphHandle, Props>(function GraphExplorer(
     if (!e || !svgRef.current) return;
     const positioned = e.nodes.filter((node) => node.x != null && node.y != null);
     if (positioned.length === 0) return;
-    const pad = 180;
-    const extraTop = 60; // extra top clearance so labels above nodes aren't clipped
+    const dense = positioned.length > 180;
+    const pad = dense ? 120 : 180;
+    const extraTop = dense ? 40 : 60; // extra top clearance so labels above nodes aren't clipped
     const xs = positioned.map((node) => node.x!);
     const ys = positioned.map((node) => node.y!);
     const minX = Math.min(...xs) - pad;
@@ -880,21 +997,21 @@ const GraphExplorer = forwardRef<GraphHandle, Props>(function GraphExplorer(
   const resetZoom = () => fitToGraph(500);
 
   const toggleAll = () => {
-    setShowAll((value) => {
-      const next = !value;
-      if (next) {
-        setExpanded(new Set(families.map((family) => family.id)));
-        setExpandedArtists(new Set());
-        setExpandedTracks(new Set());
-        window.setTimeout(() => fitToGraph(900), 1300);
-      } else {
-        setExpanded(new Set());
-        setExpandedArtists(new Set());
-        setExpandedTracks(new Set());
-        window.setTimeout(() => fitToGraph(500), 500);
-      }
-      return next;
-    });
+    const next = !showAll;
+    setShowAll(next);
+    if (next) {
+      onDepthModeChange('songs');
+      setExpanded(new Set(families.map((family) => family.id)));
+      setExpandedArtists(new Set());
+      setExpandedTracks(new Set());
+      window.setTimeout(() => fitToGraph(900), 1300);
+    } else {
+      onDepthModeChange('subgenres');
+      setExpanded(new Set());
+      setExpandedArtists(new Set());
+      setExpandedTracks(new Set());
+      window.setTimeout(() => fitToGraph(500), 500);
+    }
   };
 
   return (
@@ -912,6 +1029,30 @@ const GraphExplorer = forwardRef<GraphHandle, Props>(function GraphExplorer(
           </div>
         </div>
       )}
+
+      <div className="absolute left-3 top-16 sm:left-4 sm:top-14 z-20 flex flex-col gap-1.5">
+        {DEPTH_OPTIONS.map((option) => {
+          const active = depthMode === option.mode;
+          return (
+            <button key={option.mode} onClick={() => {
+              onDepthModeChange(option.mode);
+              setShowAll(false);
+              setExpandedTracks(new Set());
+              window.setTimeout(() => fitToGraph(700), 900);
+            }}
+              className="px-2.5 py-2 rounded-lg border text-left text-[11px] font-medium transition-colors"
+              aria-label={option.label}
+              style={{
+                background: active ? 'var(--accent)' : 'var(--surface-1)',
+                borderColor: active ? 'var(--accent)' : 'var(--border)',
+                color: active ? 'var(--accent-contrast)' : 'var(--text-2)',
+                boxShadow: active ? '0 0 18px color-mix(in srgb, var(--accent) 22%, transparent)' : 'none',
+              }}>
+              {option.short}
+            </button>
+          );
+        })}
+      </div>
 
       {/* zoom + reset controls */}
       <div className="absolute right-3 bottom-20 sm:right-4 sm:bottom-4 flex flex-col gap-2 sm:gap-1.5">

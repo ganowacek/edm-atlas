@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { ExternalLink, Music, X } from 'lucide-react';
 import type { TrackNode } from '../types';
 import { accentText, familyTintStyle, getFamilyColor, tintStyle } from '../data/colors';
+import { trackContextTags } from '../data/rabbitHoles';
 import { useIsMobile } from '../hooks/useMediaQuery';
 
 interface Props {
@@ -23,6 +24,7 @@ export default function SongPanel({ track, onClose }: Props) {
   if (!track) return null;
   const color = getFamilyColor(track.family);
   const familyText = accentText(color.primary);
+  const contextTags = trackContextTags(track);
 
   const body = (
     <div className="overflow-y-auto h-full" style={{ background: 'var(--surface-1)' }}>
@@ -53,6 +55,17 @@ export default function SongPanel({ track, onClose }: Props) {
           <Music size={16} className="flex-shrink-0 mt-0.5" style={{ color: familyText }} />
           <p className="text-sm leading-relaxed" style={{ color: 'var(--text-2)' }}>{track.reason}</p>
         </div>
+
+        {contextTags.length > 0 && (
+          <div>
+            <p className="text-[10px] uppercase tracking-widest mb-2" style={{ color: 'var(--text-3)' }}>Audio context</p>
+            <div className="flex flex-wrap gap-1.5">
+              {contextTags.map((tag) => (
+                <span key={tag} className="text-xs px-2 py-1 rounded-lg" style={familyTintStyle(color, 14, 34)}>{tag}</span>
+              ))}
+            </div>
+          </div>
+        )}
 
         <div>
           <p className="text-[10px] uppercase tracking-widest mb-3" style={{ color: 'var(--text-3)' }}>Listen</p>

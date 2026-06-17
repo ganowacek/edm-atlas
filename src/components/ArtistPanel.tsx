@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { ExternalLink, Music, Network, X } from 'lucide-react';
 import type { ArtistNode, Genre } from '../types';
 import { accentText, familyTintStyle, getFamilyColor, tintStyle } from '../data/colors';
+import { relatedArtists } from '../data/rabbitHoles';
 import { useIsMobile } from '../hooks/useMediaQuery';
 import LinkedText from './LinkedText';
 import BottomSheet from './BottomSheet';
@@ -28,6 +29,7 @@ export default function ArtistPanel({ artist, genre, onClose, onJumpToGenre, onJ
   if (!artist) return null;
   const color = getFamilyColor(artist.family);
   const familyText = accentText(color.primary);
+  const artistRabbitHoles = genre ? relatedArtists(artist.name, genre) : [];
 
   const body = (
     <div className="overflow-y-auto h-full" style={{ background: 'var(--surface-1)' }}>
@@ -96,6 +98,21 @@ export default function ArtistPanel({ artist, genre, onClose, onJumpToGenre, onJ
                     )}
                   </div>
                 </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {artistRabbitHoles.length > 0 && onJumpToArtist && (
+          <div>
+            <p className="text-[10px] uppercase tracking-widest mb-2" style={{ color: 'var(--text-3)' }}>Next artist rabbit holes</p>
+            <div className="flex flex-wrap gap-2">
+              {artistRabbitHoles.map((nextArtist) => (
+                <button key={nextArtist.name} onClick={() => onJumpToArtist(artist.genreId, nextArtist.name)}
+                  className="text-xs font-medium px-2.5 py-1.5 rounded-lg border hover:underline transition-colors"
+                  style={{ background: 'var(--surface-2)', borderColor: 'var(--border)', color: familyText }}>
+                  {nextArtist.name}
+                </button>
               ))}
             </div>
           </div>

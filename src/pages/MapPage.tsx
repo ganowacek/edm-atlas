@@ -1,5 +1,5 @@
-import { useEffect, useRef, useState } from 'react';
-import GraphExplorer, { type GraphHandle } from '../components/GraphExplorer';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import GraphExplorer, { type GraphDepthMode, type GraphHandle } from '../components/GraphExplorer';
 import DetailPanel from '../components/DetailPanel';
 import ArtistPanel from '../components/ArtistPanel';
 import SongPanel from '../components/SongPanel';
@@ -8,16 +8,19 @@ import Breadcrumb from '../components/Breadcrumb';
 import RecentlyExplored from '../components/RecentlyExplored';
 import ExplorationPathsPanel from '../components/ExplorationPathsPanel';
 import CompareGenresPanel from '../components/CompareGenresPanel';
+import DailyJourneyPanel from '../components/DailyJourneyPanel';
 import MapMiniLegend from '../components/MapMiniLegend';
 import genres from '../data/genres';
 import { FAMILY_COLORS, accentText, familyTintStyle } from '../data/colors';
 import { artistNodesForGenre, findArtistAnchor, slugify } from '../data/artistNodes';
+import { closestGenreCousins } from '../data/rabbitHoles';
 import { useExplorationHistory, type HistoryEntry } from '../hooks/useExplorationHistory';
 import type { ArtistNode, Genre, TrackNode } from '../types';
-import { CalendarDays, ChevronDown, GitCompare, Map, Shuffle, SlidersHorizontal } from 'lucide-react';
+import { CalendarDays, ChevronDown, GitCompare, Map, Route, Shuffle, SlidersHorizontal } from 'lucide-react';
 import { useIsMobile } from '../hooks/useMediaQuery';
 
 const DECADES = ['1970s', '1980s', '1990s', '2000s', '2010s', '2020s'];
+const GRAPH_HUB_ID = '__edm__';
 
 export default function MapPage() {
   const graphRef = useRef<GraphHandle>(null);
@@ -27,10 +30,13 @@ export default function MapPage() {
   const [familyFilter, setFamilyFilter] = useState<string | null>(null);
   const [eraFilter, setEraFilter] = useState<string | null>(null);
   const [filtersOpen, setFiltersOpen] = useState(false);
-  const [activeTool, setActiveTool] = useState<'paths' | 'compare' | null>(null);
+  const [activeTool, setActiveTool] = useState<'paths' | 'compare' | 'journey' | null>(null);
   const [legendOpen, setLegendOpen] = useState(false);
   const [compareA, setCompareA] = useState('uk-garage');
   const [compareB, setCompareB] = useState('dubstep');
+  const [surpriseMode, setSurpriseMode] = useState<'any' | 'beginner' | 'deep' | 'family'>('any');
+  const [graphDepthMode, setGraphDepthMode] = useState<GraphDepthMode>('subgenres');
+  const [surprisePathIds, setSurprisePathIds] = useState<string[]>([]);
   const isMobile = useIsMobile();
   const { history, record, clear } = useExplorationHistory();
 
@@ -51,8 +57,25 @@ export default function MapPage() {
     });
     return familyScoped.filter((genre) => genre.originDecade === eraFilter || parentIds.has(genre.id));
   })();
+  const graphGenres = activeTool === 'compare' ? genres : visibleGenres;
+  const compareGraphIds = useMemo(() => {
+    if (activeTool !== 'compare') return undefined;
+    const genreA = genres.find((genre) => genre.id === compareA);
+    const genreB = genres.find((genre) => genre.id === compareB);
+    if (!genreA || !genreB) return undefined;
+    const bridge = closestGenreCousins(genreA, genres, 8)
+      .filter((genre) => genre.id !== genreB.id)
+      .slice(0, 3)
+      .map((genre) => genre.id);
+    return [...new Set([genreA.id, ...bridge, genreB.id])];
+  }, [activeTool, compareA, compareB]);
 
   const hasChildGenres = (genreId: string) => genres.some((genre) => genre.parentId === genreId);
+
+  const genrePathIds = (genre: Genre) => {
+    const parent = genre.parentId ? genres.find((candidate) => candidate.id === genre.parentId) : null;
+    return [GRAPH_HUB_ID, parent?.id, genre.id].filter(Boolean) as string[];
+  };
 
   const familyChipStyle = (fam: string, col: (typeof FAMILY_COLORS)[string]) => {
     const active = familyFilter === fam;
@@ -101,15 +124,28 @@ export default function MapPage() {
 
   const startSomewhere = () => {
     const candidates = visibleGenres.filter((genre) => genre.parentId || !hasChildGenres(genre.id));
-    const pool = candidates.length > 0 ? candidates : visibleGenres;
+    const basePool = candidates.length > 0 ? candidates : visibleGenres;
+    const scopedPool = basePool.filter((genre) => {
+      if (surpriseMode === 'beginner') return genre.beginnerFriendly;
+      if (surpriseMode === 'deep') return genre.deepCut;
+      if (surpriseMode === 'family') return familyFilter ? genre.family === familyFilter : true;
+      return true;
+    });
+    const pool = scopedPool.length > 0 ? scopedPool : basePool;
     const pick = pool[Math.floor(Math.random() * pool.length)];
-    if (pick) jumpToGenre(pick);
+    if (pick) {
+      setActiveTool(null);
+      setGraphDepthMode(pick.parentId ? 'families' : 'subgenres');
+      setSurprisePathIds(genrePathIds(pick));
+      jumpToGenre(pick);
+    }
   };
 
   const handleHome = () => {
     setSelected(null);
     setSelectedArtist(null);
     setSelectedTrack(null);
+    setSurprisePathIds([]);
     graphRef.current?.collapseAll();
   };
 
@@ -203,6 +239,15 @@ export default function MapPage() {
           }}>
           <GitCompare size={14} /> Compare
         </button>
+        <button onClick={() => setActiveTool((value) => value === 'journey' ? null : 'journey')}
+          className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-medium whitespace-nowrap border"
+          style={{
+            background: activeTool === 'journey' ? 'var(--accent)' : 'var(--surface-2)',
+            borderColor: activeTool === 'journey' ? 'var(--accent)' : 'var(--border)',
+            color: activeTool === 'journey' ? 'var(--accent-contrast)' : 'var(--text-2)',
+          }}>
+          <Route size={14} /> Journey
+        </button>
         <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border flex-shrink-0"
           style={{ background: 'var(--surface-2)', borderColor: 'var(--border)', color: 'var(--text-2)' }}>
           <CalendarDays size={14} />
@@ -219,6 +264,18 @@ export default function MapPage() {
           style={{ background: 'var(--surface-2)', borderColor: 'var(--border)', color: 'var(--text-2)' }}>
           <Shuffle size={14} /> Start somewhere
         </button>
+        <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border flex-shrink-0"
+          style={{ background: 'var(--surface-2)', borderColor: 'var(--border)', color: 'var(--text-2)' }}>
+          <select value={surpriseMode} onChange={(event) => setSurpriseMode(event.target.value as typeof surpriseMode)}
+            aria-label="Choose start somewhere mode"
+            className="bg-transparent text-xs outline-none"
+            style={{ color: 'var(--text-2)' }}>
+            <option value="any">Surprise: any</option>
+            <option value="beginner">Surprise: beginner</option>
+            <option value="deep">Surprise: deep cut</option>
+            <option value="family">Surprise: this family</option>
+          </select>
+        </div>
         {(familyFilter || eraFilter) && (
           <button onClick={() => { setFamilyFilter(null); setEraFilter(null); }}
             className="px-3 py-2 rounded-lg text-xs whitespace-nowrap border"
@@ -245,11 +302,15 @@ export default function MapPage() {
         <GraphExplorer
           ref={graphRef}
           key={`${familyFilter ?? 'all'}-${eraFilter ?? 'all'}`}
-          genres={visibleGenres}
+          genres={graphGenres}
           selectedId={selectedTrack?.id ?? selectedArtist?.id ?? selected?.id ?? null}
-          onSelect={(genre) => { setSelected(genre); setSelectedArtist(null); setSelectedTrack(null); }}
-          onSelectArtist={(artist) => { setSelectedArtist(artist); setSelected(null); setSelectedTrack(null); }}
-          onSelectTrack={(track) => { setSelectedTrack(track); }}
+          highlightedPathIds={surprisePathIds}
+          depthMode={graphDepthMode}
+          onDepthModeChange={setGraphDepthMode}
+          compareGenreIds={compareGraphIds}
+          onSelect={(genre) => { setSurprisePathIds([]); setSelected(genre); setSelectedArtist(null); setSelectedTrack(null); }}
+          onSelectArtist={(artist) => { setSurprisePathIds([]); setSelectedArtist(artist); setSelected(null); setSelectedTrack(null); }}
+          onSelectTrack={(track) => { setSurprisePathIds([]); setSelectedTrack(track); }}
         />
 
         {/* hint (desktop) */}
@@ -286,13 +347,30 @@ export default function MapPage() {
           />
         )}
 
+        {activeTool === 'journey' && (
+          <DailyJourneyPanel
+            genres={genres}
+            history={history}
+            onClose={() => setActiveTool(null)}
+            onJumpToGenre={(genreId) => {
+              setActiveTool(null);
+              const genre = genres.find((item) => item.id === genreId);
+              if (genre) jumpToGenre(genre);
+            }}
+          />
+        )}
+
         <MapMiniLegend open={legendOpen} onToggle={() => setLegendOpen((value) => !value)} />
       </div>
 
       <DetailPanel
         genre={selected}
+        genres={genres}
         onClose={() => setSelected(null)}
-        onJumpToGenre={handleJump}
+        onJumpToGenre={(genreId) => {
+          const genre = genres.find((item) => item.id === genreId);
+          if (genre) jumpToGenre(genre);
+        }}
         onJumpToArtist={handleJumpToArtist}
       />
 

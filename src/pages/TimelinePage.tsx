@@ -101,7 +101,15 @@ export default function TimelinePage() {
         </div>
       </div>
 
-      <DetailPanel genre={selected} onClose={() => setSelected(null)} />
+      <DetailPanel
+        genre={selected}
+        genres={genres}
+        onClose={() => setSelected(null)}
+        onJumpToGenre={(genreId) => {
+          const genre = genres.find((item) => item.id === genreId);
+          if (genre) setSelected(genre);
+        }}
+      />
     </div>
   );
 }

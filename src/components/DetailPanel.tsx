@@ -5,6 +5,7 @@ import { accentText, familyTintStyle, getFamilyColor, tintStyle } from '../data/
 import { useIsMobile } from '../hooks/useMediaQuery';
 import { spotifyArtistUrl, spotifyTrackUrl } from '../data/urls';
 import { resolveEntityReference } from '../data/entityLinks';
+import { closestGenreCousins, genreDna } from '../data/rabbitHoles';
 import LinkedText from './LinkedText';
 import BottomSheet from './BottomSheet';
 
@@ -15,12 +16,13 @@ const SPOTIFY_LINK_STYLE = tintStyle('#1db954', 14, 34);
 
 interface Props {
   genre: Genre | null;
+  genres: Genre[];
   onClose: () => void;
   onJumpToGenre?: (genreId: string) => void;
   onJumpToArtist?: (genreId: string, artistName: string) => void;
 }
 
-export default function DetailPanel({ genre, onClose, onJumpToGenre, onJumpToArtist }: Props) {
+export default function DetailPanel({ genre, genres, onClose, onJumpToGenre, onJumpToArtist }: Props) {
   const isMobile = useIsMobile();
 
   useEffect(() => {
@@ -33,6 +35,8 @@ export default function DetailPanel({ genre, onClose, onJumpToGenre, onJumpToArt
   const color = getFamilyColor(genre.family);
   const familyText = accentText(color.primary);
   const familyBadgeStyle = familyTintStyle(color, 18, 42);
+  const cousins = closestGenreCousins(genre, genres);
+  const dna = genreDna(genre);
 
   const body = (
     <div className="overflow-y-auto h-full" style={{ background: 'var(--surface-1)' }}>
@@ -83,6 +87,18 @@ export default function DetailPanel({ genre, onClose, onJumpToGenre, onJumpToArt
         <p className="text-sm leading-relaxed" style={{ color: 'var(--text-2)' }}>
           <LinkedText text={genre.description} genreId={genre.id} onJumpToGenre={onJumpToGenre} onJumpToArtist={onJumpToArtist} />
         </p>
+
+        <div>
+          <p className="text-[10px] uppercase tracking-widest mb-2" style={{ color: 'var(--text-3)' }}>Genre DNA</p>
+          <div className="grid grid-cols-2 gap-2">
+            {dna.map((item) => (
+              <div key={item.label} className="rounded-lg border p-2.5" style={{ background: 'var(--surface-2)', borderColor: 'var(--border)' }}>
+                <p className="text-[10px] uppercase tracking-widest mb-1" style={{ color: 'var(--text-3)' }}>{item.label}</p>
+                <p className="text-xs font-medium" style={{ color: familyText }}>{item.value}</p>
+              </div>
+            ))}
+          </div>
+        </div>
 
         {genre.history && genre.history.length > 0 && (
           <div>
@@ -210,6 +226,25 @@ export default function DetailPanel({ genre, onClose, onJumpToGenre, onJumpToArt
                 </div>
               </div>
             )}
+          </div>
+        )}
+
+        {cousins.length > 0 && onJumpToGenre && (
+          <div>
+            <p className="text-[10px] uppercase tracking-widest mb-2" style={{ color: 'var(--text-3)' }}>Closest cousins</p>
+            <div className="grid grid-cols-2 gap-2">
+              {cousins.map((cousin) => {
+                const cousinColor = getFamilyColor(cousin.family);
+                return (
+                  <button key={cousin.id} onClick={() => onJumpToGenre(cousin.id)}
+                    className="text-left rounded-lg border p-2.5 transition-transform hover:scale-[1.01]"
+                    style={{ background: 'var(--surface-2)', borderColor: 'var(--border)' }}>
+                    <span className="block text-xs font-semibold" style={{ color: accentText(cousinColor.primary) }}>{cousin.name}</span>
+                    <span className="block text-[11px] mt-0.5 capitalize" style={{ color: 'var(--text-3)' }}>{cousin.family} · {cousin.originDecade}</span>
+                  </button>
+                );
+              })}
+            </div>
           </div>
         )}
 

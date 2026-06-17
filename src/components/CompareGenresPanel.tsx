@@ -1,6 +1,7 @@
 import { X } from 'lucide-react';
 import type { Genre } from '../types';
 import { accentText, familyTintStyle, getFamilyColor, tintStyle } from '../data/colors';
+import { closestGenreCousins } from '../data/rabbitHoles';
 
 interface Props {
   genres: Genre[];
@@ -90,6 +91,9 @@ export default function CompareGenresPanel({
   const sharedCities = overlap(genreA.originCities, genreB.originCities);
   const sharedSound = overlap(genreA.soundProfile ?? [], genreB.soundProfile ?? []);
   const sharedLabels = overlap(genreA.labels ?? [], genreB.labels ?? []);
+  const bridgeGenres = closestGenreCousins(genreA, genres, 8)
+    .filter((genre) => genre.id !== genreB.id)
+    .slice(0, 3);
 
   return (
     <div className="absolute left-3 top-3 z-30 w-[min(42rem,calc(100vw-1.5rem))] max-h-[calc(100%-1.5rem)] overflow-y-auto rounded-xl border shadow-2xl anim-fade"
@@ -132,6 +136,19 @@ export default function CompareGenresPanel({
           <ChipGroup title="Shared cities" items={sharedCities} />
           <ChipGroup title="Shared sound profile" items={sharedSound} />
           <ChipGroup title="Shared labels" items={sharedLabels} />
+        </div>
+
+        <div>
+          <p className="text-[10px] uppercase tracking-widest mb-2" style={{ color: 'var(--text-3)' }}>Bridge route</p>
+          <div className="flex flex-wrap gap-1.5">
+            {[genreA, ...bridgeGenres, genreB].map((genre) => (
+              <button key={genre.id} onClick={() => onJumpToGenre(genre.id)}
+                className="text-[11px] px-2 py-1 rounded-lg font-medium"
+                style={tintStyle(getFamilyColor(genre.family).primary, 15, 36)}>
+                {genre.name}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
     </div>

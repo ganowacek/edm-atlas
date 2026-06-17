@@ -3,6 +3,7 @@ import { ArrowRight, X } from 'lucide-react';
 import type { Genre } from '../types';
 import { EXPLORATION_PATHS, type ExplorationPath } from '../data/explorationPaths';
 import { getFamilyColor, tintStyle } from '../data/colors';
+import { moodExplorationPaths } from '../data/rabbitHoles';
 
 interface Props {
   genres: Genre[];
@@ -21,7 +22,7 @@ function shufflePaths(paths: ExplorationPath[]) {
 
 export default function ExplorationPathsPanel({ genres, onClose, onJumpToGenre }: Props) {
   const genreById = new Map(genres.map((genre) => [genre.id, genre]));
-  const [randomizedPaths] = useState(() => shufflePaths(EXPLORATION_PATHS));
+  const [randomizedPaths] = useState(() => shufflePaths([...EXPLORATION_PATHS, ...moodExplorationPaths(genres)]));
 
   return (
     <div className="absolute left-3 top-3 z-30 w-[min(28rem,calc(100vw-1.5rem))] max-h-[calc(100%-1.5rem)] overflow-y-auto rounded-xl border shadow-2xl anim-fade"
