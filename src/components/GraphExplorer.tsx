@@ -272,6 +272,23 @@ const GraphExplorer = forwardRef<GraphHandle, Props>(function GraphExplorer(
     });
     return map;
   }, [genres]);
+  const genreById = useMemo(() => {
+    const map = new Map<string, Genre>();
+    genres.forEach((g) => map.set(g.id, g));
+    return map;
+  }, [genres]);
+  // Ancestor chain (family root → ... → id, inclusive) for accordion expansion.
+  const pathToRoot = useCallback((id: string): string[] => {
+    const path: string[] = [];
+    let cur: Genre | undefined = genreById.get(id);
+    const guard = new Set<string>();
+    while (cur && !guard.has(cur.id)) {
+      guard.add(cur.id);
+      path.unshift(cur.id);
+      cur = cur.parentId ? genreById.get(cur.parentId) : undefined;
+    }
+    return path;
+  }, [genreById]);
 
   // ---- Derive which node ids should currently exist ----
   const desiredNodes = useCallback((): { id: string; genre: Genre | null; artist: ArtistNode | null; track: TrackNode | null; kind: Kind; parentGenreId?: string; parentArtistId?: string }[] => {
@@ -293,32 +310,43 @@ const GraphExplorer = forwardRef<GraphHandle, Props>(function GraphExplorer(
     const showArtists = depthMode === 'artists' || depthMode === 'songs';
     const showTracks = depthMode === 'songs';
 
+    // Recursively reveal a genre's descendants. In controlled depth modes (and
+    // "show all") the whole tree is shown; in interactive "subgenres" mode only
+    // branches whose id is in `expanded` open, so deeper levels appear one tap
+    // at a time.
+    const pushGenreChildren = (parentId: string) => {
+      const children = subsByParent.get(parentId) ?? [];
+      children.forEach((s) => {
+        out.push({ id: s.id, genre: s, artist: null, track: null, kind: 'sub' });
+        const grandchildren = subsByParent.get(s.id) ?? [];
+        if (grandchildren.length > 0 && (controlled || showAll || expanded.has(s.id))) {
+          pushGenreChildren(s.id);
+        }
+      });
+    };
+
     families.forEach((f) => {
       out.push({ id: f.id, genre: f, artist: null, track: null, kind: 'family' });
-      if (depthMode === 'subgenres') return;
-      if (expandedFamilies.has(f.id)) {
-        const children = subsByParent.get(f.id) ?? [];
-        children.forEach((s) => out.push({ id: s.id, genre: s, artist: null, track: null, kind: 'sub' }));
-        if (!showAll || showArtists) {
-          // Key artists with no matching subgenre get their own node directly under the family.
-          if (!showArtists) return;
-          orphanKeyArtistsForFamily(f, genres).forEach((artist) => {
-            out.push({ id: artist.id, genre: f, artist, track: null, kind: 'artist', parentGenreId: f.id });
-            if (showTracks || expandedTracks.has(artist.id)) {
-              artist.tracks.forEach((track) => {
-                out.push({
-                  id: track.id,
-                  genre: f,
-                  artist,
-                  track,
-                  kind: 'track',
-                  parentGenreId: f.id,
-                  parentArtistId: artist.id,
-                });
+      if (!expandedFamilies.has(f.id)) return;
+      pushGenreChildren(f.id);
+      // Key artists with no matching subgenre get their own node directly under the family.
+      if (showArtists) {
+        orphanKeyArtistsForFamily(f, genres).forEach((artist) => {
+          out.push({ id: artist.id, genre: f, artist, track: null, kind: 'artist', parentGenreId: f.id });
+          if (showTracks || expandedTracks.has(artist.id)) {
+            artist.tracks.forEach((track) => {
+              out.push({
+                id: track.id,
+                genre: f,
+                artist,
+                track,
+                kind: 'track',
+                parentGenreId: f.id,
+                parentArtistId: artist.id,
               });
-            }
-          });
-        }
+            });
+          }
+        });
       }
     });
     const visibleGenreIds = new Set(out.filter((node) => node.genre).map((node) => node.id));
@@ -578,7 +606,15 @@ const GraphExplorer = forwardRef<GraphHandle, Props>(function GraphExplorer(
         track: w.track,
         parentGenreId: w.parentGenreId,
         parentArtistId: w.parentArtistId,
-        childCount: w.kind === 'family' ? (subsByParent.get(w.id) ?? []).length : w.kind === 'artist' ? (w.artist?.tracks.length ?? 0) : w.genre ? artistNodesForGenre(w.genre).length : 0,
+        // Expandable count: drives the dashed "can expand" ring. A genre node
+        // can expand if it has child subgenres OR artists to fan out, so count
+        // both — otherwise top-level genres with no subgenres show no ring
+        // despite still expanding into their artists on tap.
+        childCount: w.kind === 'artist'
+          ? (w.artist?.tracks.length ?? 0)
+          : (w.kind === 'family' || w.kind === 'sub') && w.genre
+            ? ((subsByParent.get(w.id) ?? []).length + artistNodesForGenre(w.genre).length)
+            : 0,
         x: sx, y: sy,
       };
       e.nodes.push(node);
@@ -727,32 +763,25 @@ const GraphExplorer = forwardRef<GraphHandle, Props>(function GraphExplorer(
           onSelectArtist(d.artist);
           return;
         }
-        if (d.kind === 'family') {
+        if (d.kind === 'family' || d.kind === 'sub') {
           setShowAll(false);
-          const children = subsByParent.get(d.id) ?? [];
-          const childIds = children.map((child) => child.id);
-          setExpanded((prev) => {
-            const next = new Set(prev);
-            if (next.has(d.id)) next.delete(d.id); else next.add(d.id);
-            return next;
-          });
           setExpandedTracks(new Set());
-          setExpandedArtists((prev) => {
-            if (children.length === 0) {
-              return prev.has(d.id) && prev.size === 1 ? new Set() : new Set([d.id]);
-            }
-            const next = new Set(prev);
-            childIds.forEach((id) => next.delete(id));
-            return next;
-          });
+          const hasChildren = (subsByParent.get(d.id) ?? []).length > 0;
+          const path = pathToRoot(d.id);
+          if (hasChildren) {
+            // Accordion: opening a node keeps only its own journey (ancestors →
+            // this node) expanded, collapsing any other branches that were open.
+            // Tapping an already-open node collapses it back to its parent.
+            setExpanded((prev) => (prev.has(d.id) ? new Set(path.slice(0, -1)) : new Set(path)));
+            setExpandedArtists(new Set());
+          } else {
+            // Leaf genre: keep its journey visible, collapse other branches, and
+            // toggle its artist fan-out.
+            setExpanded(new Set(path));
+            setExpandedArtists((prev) => (prev.has(d.id) && prev.size === 1 ? new Set() : new Set([d.id])));
+          }
           if (d.genre) onSelect(d.genre);
           return;
-        }
-        if (d.genre) {
-          setShowAll(false);
-          setExpandedTracks(new Set());
-          setExpandedArtists((prev) => (prev.has(d.id) && prev.size === 1 ? new Set() : new Set([d.id])));
-          onSelect(d.genre);
         }
       });
 
@@ -849,7 +878,7 @@ const GraphExplorer = forwardRef<GraphHandle, Props>(function GraphExplorer(
         const isExpanded = d.kind === 'artist'
           ? expandedTracks.has(d.id)
           : d.kind === 'sub'
-            ? expandedArtists.has(d.id)
+            ? expanded.has(d.id) || expandedArtists.has(d.id)
             : expanded.has(d.id);
         return isExpanded ? 0 : 0.5;
       })

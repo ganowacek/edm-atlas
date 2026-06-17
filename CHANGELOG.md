@@ -32,7 +32,7 @@ decades.
 - **Timeline page** generalized to bucket genres by decade parsed from
   descriptive origin strings (e.g. "Late 1990s"), extended back to the 1940s,
   with a new family filter.
-- **Home page** updated with accurate scope (180+ genres, 900+ artists, 12
+- **Home page** updated with accurate scope (180+ genres, 900+ artists, 20
   families) and a broadened tagline covering the full timeline.
 - **About page** updated with the expanded scope and Wikipedia data-source
   credits.

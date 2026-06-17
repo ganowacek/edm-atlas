@@ -5,7 +5,7 @@ Found at https://ganowacek.github.io/edm-atlas/
 
 ## What it is
 
-EDM Atlas is a static web app that lets you explore nearly a century of electronic music history — from 1940s musique concrète and electroacoustic experiments through disco, the birth of house and techno, the rave explosion, and on to today's hyperpop, melodic techno, and Afro house. It currently covers **188 genres and subgenres** across 12 families.
+EDM Atlas is a static web app that lets you explore nearly a century of electronic music history — from 1940s musique concrète and electroacoustic experiments through disco, the birth of house and techno, the rave explosion, and on to today's hyperpop, melodic techno, and Afro house. It currently covers **188 genres and subgenres** across 20 top-level families.
 
 - **Genre Map** — interactive D3 force graph, drag/zoom/click for details
 - **Timeline** — browse genres decade by decade, 1940s to present, with family filtering

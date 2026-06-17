@@ -50,7 +50,7 @@ export default function HomePage({ onNavigate, theme, onToggleTheme }: HomePageP
         </div>
 
         <div className="mt-16 grid grid-cols-3 gap-6">
-          {[{ v: '12', l: 'Genre families' }, { v: '180+', l: 'Genres & subgenres' }, { v: '900+', l: 'Artist profiles' }].map((s) => (
+          {[{ v: '20', l: 'Genre families' }, { v: '180+', l: 'Genres & subgenres' }, { v: '900+', l: 'Artist profiles' }].map((s) => (
             <div key={s.l}>
               <p className="text-3xl font-bold mb-1 font-mono" style={{ color: 'var(--text-1)' }}>{s.v}</p>
               <p className="text-sm" style={{ color: 'var(--text-3)' }}>{s.l}</p>
