@@ -1,15 +1,25 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import genres from '../data/genres';
-import { getFamilyColor, tintStyle } from '../data/colors';
+import { FAMILY_COLORS, accentText, familyTintStyle, getFamilyColor, tintStyle } from '../data/colors';
 import type { Genre } from '../types';
 import DetailPanel from '../components/DetailPanel';
 
-const DECADES = ['1970s', '1980s', '1990s', '2000s', '2010s', '2020s'];
+const DECADE_PATTERN = /\d{4}s/;
+const extractDecade = (originDecade: string): string => {
+  const match = originDecade.match(DECADE_PATTERN);
+  return match ? match[0] : originDecade;
+};
+
+const FALLBACK_DECADES = ['1970s', '1980s', '1990s', '2000s', '2010s', '2020s'];
 const LABELS: Record<string, string> = {
+  '1940s': 'The Precursors', '1950s': 'The Precursors', '1960s': 'The Precursors',
   '1970s': 'The Roots', '1980s': 'The Birth', '1990s': 'The Golden Age',
   '2000s': 'The Expansion', '2010s': 'The Mainstream Era', '2020s': 'The Present',
 };
 const DESC: Record<string, string> = {
+  '1940s': 'Musique concrète and early tape experiments lay the groundwork for electronic composition.',
+  '1950s': 'Electroacoustic and acousmatic music mature in European studios, pioneering sound-as-material.',
+  '1960s': 'Synthesizers enter the studio; krautrock and early electronic rock push pop toward the machine.',
   '1970s': 'Disco, early electronic experimentation, Kraftwerk — the foundations of everything that followed.',
   '1980s': 'House and techno are born in Chicago and Detroit. Electro, EBM, and synth-pop emerge globally.',
   '1990s': 'Explosion — UK rave, jungle, D&B, trance, gabber, trip-hop, ambient house, and more.',
@@ -20,13 +30,40 @@ const DESC: Record<string, string> = {
 const BEGINNER_BADGE_STYLE = tintStyle('#40b89a', 18, 34);
 const DEEP_BADGE_STYLE = tintStyle('#d4ad4a', 18, 34);
 
+const decadeSortKey = (d: string) => {
+  const n = parseInt(d, 10);
+  return Number.isNaN(n) ? 0 : n;
+};
+
 export default function TimelinePage() {
+  const allDecades = useMemo(() => {
+    const set = new Set<string>();
+    genres.forEach((g) => set.add(extractDecade(g.originDecade)));
+    FALLBACK_DECADES.forEach((d) => set.add(d));
+    return Array.from(set).sort((a, b) => decadeSortKey(a) - decadeSortKey(b));
+  }, []);
+
   const [decade, setDecade] = useState('1990s');
+  const [familyFilter, setFamilyFilter] = useState<string | null>(null);
   const [selected, setSelected] = useState<Genre | null>(null);
 
-  const inDecade = genres.filter((g) => g.originDecade === decade);
+  const inDecade = genres.filter((g) => extractDecade(g.originDecade) === decade);
+  const familyScoped = familyFilter ? inDecade.filter((g) => g.family === familyFilter) : inDecade;
   const byFamily: Record<string, Genre[]> = {};
-  inDecade.forEach((g) => { (byFamily[g.family] ??= []).push(g); });
+  familyScoped.forEach((g) => { (byFamily[g.family] ??= []).push(g); });
+
+  const familyChipStyle = (fam: string, col: (typeof FAMILY_COLORS)[string]) => {
+    const active = familyFilter === fam;
+    return {
+      ...(active ? {
+        background: col.primary,
+        color: 'var(--chip-selected-text)',
+        border: `1px solid ${col.primary}`,
+      } : familyTintStyle(col, 18, 45)),
+      color: active ? 'var(--chip-selected-text)' : accentText(col.primary),
+      boxShadow: active ? `0 0 0 1px color-mix(in srgb, ${col.primary} 28%, transparent)` : 'none',
+    };
+  };
 
   return (
     <div className="min-h-screen pt-14" style={{ background: 'var(--bg)' }}>
@@ -35,11 +72,11 @@ export default function TimelinePage() {
         <p className="text-sm mb-8" style={{ color: 'var(--text-3)' }}>Electronic dance music, decade by decade.</p>
 
         {/* decade rail */}
-        <div className="relative mb-10">
+        <div className="relative mb-10 overflow-x-auto">
           <div className="absolute top-5 left-0 right-0 h-px" style={{ background: 'var(--border)' }} />
-          <div className="flex justify-between relative">
-            {DECADES.map((d) => {
-              const count = genres.filter((g) => g.originDecade === d).length;
+          <div className="flex justify-between relative min-w-max gap-4 sm:gap-0">
+            {allDecades.map((d) => {
+              const count = genres.filter((g) => extractDecade(g.originDecade) === d).length;
               const sel = decade === d;
               return (
                 <button key={d} onClick={() => setDecade(d)} className="flex flex-col items-center gap-2 group">
@@ -61,9 +98,23 @@ export default function TimelinePage() {
         <div className="mb-6">
           <div className="flex items-baseline gap-3 mb-1">
             <h2 className="text-xl font-bold" style={{ color: 'var(--text-1)' }}>{decade}</h2>
-            <span className="font-semibold text-sm" style={{ color: 'var(--accent)' }}>{LABELS[decade]}</span>
+            <span className="font-semibold text-sm" style={{ color: 'var(--accent)' }}>{LABELS[decade] ?? ''}</span>
           </div>
-          <p className="text-sm max-w-2xl" style={{ color: 'var(--text-2)' }}>{DESC[decade]}</p>
+          <p className="text-sm max-w-2xl mb-4" style={{ color: 'var(--text-2)' }}>{DESC[decade] ?? ''}</p>
+
+          {/* family filter chips */}
+          <div className="flex items-center gap-1.5 flex-wrap">
+            {Object.entries(FAMILY_COLORS).map(([fam, col]) => (
+              <button key={fam} onClick={() => setFamilyFilter(familyFilter === fam ? null : fam)}
+                className="px-2.5 py-1 rounded-lg text-xs font-medium capitalize transition-all whitespace-nowrap"
+                style={familyChipStyle(fam, col)}>{fam}</button>
+            ))}
+            {familyFilter && (
+              <button onClick={() => setFamilyFilter(null)}
+                className="px-2.5 py-1 rounded-lg text-xs transition-colors hover:bg-white/5"
+                style={{ color: 'var(--text-2)', border: '1px solid var(--border)' }}>Clear</button>
+            )}
+          </div>
         </div>
 
         <div className="space-y-7">
