@@ -267,34 +267,36 @@ const GraphExplorer = forwardRef<GraphHandle, Props>(function GraphExplorer(
       out.push({ id: f.id, genre: f, artist: null, track: null, kind: 'family' });
       if (expandedFamilies.has(f.id)) {
         (subsByParent.get(f.id) ?? []).forEach((s) => out.push({ id: s.id, genre: s, artist: null, track: null, kind: 'sub' }));
-        // key artists with no matching subgenre get their own node directly under the family
-        orphanKeyArtistsForFamily(f, genres).forEach((artist) => {
-          out.push({ id: artist.id, genre: f, artist, track: null, kind: 'artist', parentGenreId: f.id });
-          if (showAll || expandedTracks.has(artist.id)) {
-            artist.tracks.forEach((track) => {
-              out.push({
-                id: track.id,
-                genre: f,
-                artist,
-                track,
-                kind: 'track',
-                parentGenreId: f.id,
-                parentArtistId: artist.id,
+        if (!showAll) {
+          // Key artists with no matching subgenre get their own node directly under the family.
+          orphanKeyArtistsForFamily(f, genres).forEach((artist) => {
+            out.push({ id: artist.id, genre: f, artist, track: null, kind: 'artist', parentGenreId: f.id });
+            if (expandedTracks.has(artist.id)) {
+              artist.tracks.forEach((track) => {
+                out.push({
+                  id: track.id,
+                  genre: f,
+                  artist,
+                  track,
+                  kind: 'track',
+                  parentGenreId: f.id,
+                  parentArtistId: artist.id,
+                });
               });
-            });
-          }
-        });
+            }
+          });
+        }
       }
     });
     const visibleGenreIds = new Set(out.filter((node) => node.genre).map((node) => node.id));
-    const expandedArtistBranches = showAll ? visibleGenreIds : expandedArtists;
+    const expandedArtistBranches = expandedArtists;
     out.filter((node) => node.genre && expandedArtistBranches.has(node.id) && visibleGenreIds.has(node.id))
       .forEach((node) => {
         const visibleChildGenres = (subsByParent.get(node.id) ?? []).filter((child) => visibleGenreIds.has(child.id));
         if (visibleChildGenres.length > 0) return;
         artistNodesForGenre(node.genre!).forEach((artist) => {
           out.push({ id: artist.id, genre: node.genre, artist, track: null, kind: 'artist', parentGenreId: node.id });
-          if (showAll || expandedTracks.has(artist.id)) {
+          if (expandedTracks.has(artist.id)) {
             artist.tracks.forEach((track) => {
               out.push({
                 id: track.id,
@@ -912,9 +914,9 @@ const GraphExplorer = forwardRef<GraphHandle, Props>(function GraphExplorer(
       )}
 
       {/* zoom + reset controls */}
-      <div className="absolute bottom-4 right-4 flex flex-col gap-1.5">
+      <div className="absolute right-3 bottom-20 sm:right-4 sm:bottom-4 flex flex-col gap-2 sm:gap-1.5">
         <button onClick={toggleAll}
-          className="w-9 h-9 rounded-lg flex items-center justify-center border transition-colors hover:bg-white/5"
+          className="w-10 h-10 sm:w-9 sm:h-9 rounded-lg flex items-center justify-center border transition-colors hover:bg-white/5"
           style={{
             background: showAll ? 'var(--accent)' : 'var(--surface-1)',
             borderColor: showAll ? 'var(--accent)' : 'var(--border)',
@@ -923,17 +925,17 @@ const GraphExplorer = forwardRef<GraphHandle, Props>(function GraphExplorer(
           <GitBranch size={15} />
         </button>
         <button onClick={() => { const e = eng.current; if (e && svgRef.current) d3.select(svgRef.current).transition().duration(200).call(e.zoom.scaleBy, 1.3); }}
-          className="w-9 h-9 rounded-lg flex items-center justify-center border transition-colors hover:bg-white/5"
+          className="w-10 h-10 sm:w-9 sm:h-9 rounded-lg flex items-center justify-center border transition-colors hover:bg-white/5"
           style={{ background: 'var(--surface-1)', borderColor: 'var(--border)', color: 'var(--text-2)' }} aria-label="Zoom in">
           <Plus size={16} />
         </button>
         <button onClick={() => { const e = eng.current; if (e && svgRef.current) d3.select(svgRef.current).transition().duration(200).call(e.zoom.scaleBy, 1 / 1.3); }}
-          className="w-9 h-9 rounded-lg flex items-center justify-center border transition-colors hover:bg-white/5"
+          className="w-10 h-10 sm:w-9 sm:h-9 rounded-lg flex items-center justify-center border transition-colors hover:bg-white/5"
           style={{ background: 'var(--surface-1)', borderColor: 'var(--border)', color: 'var(--text-2)' }} aria-label="Zoom out">
           <Minus size={16} />
         </button>
         <button onClick={resetZoom}
-          className="w-9 h-9 rounded-lg flex items-center justify-center border transition-colors hover:bg-white/5"
+          className="w-10 h-10 sm:w-9 sm:h-9 rounded-lg flex items-center justify-center border transition-colors hover:bg-white/5"
           style={{ background: 'var(--surface-1)', borderColor: 'var(--border)', color: 'var(--text-2)' }} aria-label="Reset view">
           <RotateCcw size={14} />
         </button>
