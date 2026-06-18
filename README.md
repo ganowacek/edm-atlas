@@ -20,7 +20,7 @@ EDM Atlas is a static web app that lets you explore nearly a century of electron
 ## Getting started
 
 ```bash
-git clone https://github.com/your-username/edm-atlas.git
+git clone https://github.com/ganowacek/edm-atlas.git
 cd edm-atlas
 npm install
 npm run dev

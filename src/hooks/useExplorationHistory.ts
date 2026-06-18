@@ -16,8 +16,15 @@ function historyKey(entry: Pick<HistoryEntry, 'type' | 'data'>): string {
 function readStored(): HistoryEntry[] {
   try {
     const raw = window.localStorage.getItem(STORAGE_KEY);
-    const parsed = raw ? JSON.parse(raw) : [];
-    return Array.isArray(parsed) ? parsed : [];
+    const parsed: unknown = raw ? JSON.parse(raw) : [];
+    if (!Array.isArray(parsed)) return [];
+    return parsed.filter((entry): entry is HistoryEntry => {
+      if (!entry || typeof entry !== 'object') return false;
+      const candidate = entry as { type?: unknown; data?: { id?: unknown }; ts?: unknown };
+      return (candidate.type === 'genre' || candidate.type === 'artist' || candidate.type === 'track')
+        && typeof candidate.data?.id === 'string'
+        && typeof candidate.ts === 'number';
+    }).slice(0, MAX_ITEMS);
   } catch {
     return [];
   }
@@ -27,7 +34,11 @@ export function useExplorationHistory() {
   const [history, setHistory] = useState<HistoryEntry[]>(readStored);
 
   useEffect(() => {
-    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(history));
+    try {
+      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(history));
+    } catch {
+      // Keep in-memory history when storage is unavailable or full.
+    }
   }, [history]);
 
   const record = useCallback((entry: Pick<HistoryEntry, 'type' | 'data'>) => {

@@ -17,8 +17,8 @@ const QUEST_STORAGE_KEY = 'edm-atlas-listening-quest';
 
 function readChecked() {
   try {
-    const parsed = JSON.parse(window.localStorage.getItem(QUEST_STORAGE_KEY) ?? '[]');
-    return Array.isArray(parsed) ? parsed as string[] : [];
+    const parsed: unknown = JSON.parse(window.localStorage.getItem(QUEST_STORAGE_KEY) ?? '[]');
+    return Array.isArray(parsed) ? parsed.filter((item): item is string => typeof item === 'string') : [];
   } catch {
     return [];
   }
@@ -42,7 +42,11 @@ export default function DailyJourneyPanel({ genres, history, onClose, onJumpToGe
     .slice(0, 7) as Genre[];
 
   useEffect(() => {
-    window.localStorage.setItem(QUEST_STORAGE_KEY, JSON.stringify(checked));
+    try {
+      window.localStorage.setItem(QUEST_STORAGE_KEY, JSON.stringify(checked));
+    } catch {
+      // Quest state remains usable for the current session.
+    }
   }, [checked]);
 
   const toggleTrack = (id: string) => {
